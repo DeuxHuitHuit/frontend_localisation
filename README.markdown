@@ -11,7 +11,6 @@ Offers a frontend localisation mechanism using XML files.
 * Requirements:
 	- Symphony 2.2 or above
 	- At least one frontend language driver. See **Adding a Language Driver** in **4.1 Frontend Language** section.
-	- Extension [Language Redirect](https://github.com/klaftertief/language_redirect) by Jonas Coch, at least version 1.0.2.
 
 Thank you all other Symphony & Extensions developers for your inspirational work.
 
@@ -62,6 +61,7 @@ For PHP developers:
 #### 4.1.1 @ PHP developers ####
 
 This extension provides a [FrontendLanguage class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FrontendLanguage.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.
+For default Language Driver, you must install extension [Language Redirect](https://github.com/klaftertief/language_redirect) by Jonas Coch, at least version 1.0.2.
 
 ##### Adding a Language Driver #####
 
