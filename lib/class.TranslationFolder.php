@@ -153,6 +153,9 @@
 							$this->t_files[$ref_filename]->setContent();
 						}
 					}
+					else{
+						$this->t_files[$ref_filename]->ensureStructure();
+					}
 				}
 			}
 		}
