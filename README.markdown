@@ -195,7 +195,7 @@ If I attach these Translations to a page, XML output will look like this:
 
 ##### Getting a value is trivial. #####
 
-    <xsl:value-of select="/data/frontend-localisation/item[ @handle='just-a-handle' ]" />
+    <xsl:value-of select="/data/frontend-localisation/fancy-stuff/item[ @handle='just-a-handle' ]" />
 
 will output
 
