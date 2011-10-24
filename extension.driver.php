@@ -61,7 +61,7 @@
 		
 		public function __construct($args) {
 			if( Symphony::ExtensionManager()->fetchStatus(FRONTEND_LOCALISATION_GROUP) == EXTENSION_ENABLED
-			    && FrontendLanguage::instance() == null ){
+			    && FrontendLanguage::instance() != null ){
 			    
 				$this->language_codes = (array) FrontendLanguage::instance()->languageCodes();
 				$this->reference_language = (string) FrontendLanguage::instance()->referenceLanguage();
@@ -443,15 +443,16 @@
 			$new_translation_path = $context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path'];
 			
 			if ( $old_translation_path != $new_translation_path ) {
-				Symphony::Configuration()->set('translation_path', $new_translation_path, FRONTEND_LOCALISATION_GROUP);
-				
-				/* @todo
-				 * change folders here from $old_translation_path to $new_translation_path
-				 * on changing to a new folder, existing <<lang_code>> folders will be DELETED
-				 * 
-				 * This will do nothing atm. Perhaps Symphony will provide a general method to copy one folder to another.
-				 */
-				// $this->translation_manager->changeTranslationLocation($old_translation_path, $new_translation_path);
+				try {
+					if( rename(DOCROOT . $old_translation_path, DOCROOT . $new_translation_path) ){
+						Symphony::Configuration()->set('translation_path', $new_translation_path, FRONTEND_LOCALISATION_GROUP);
+					}
+					else{
+						unset($context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path']);
+					}
+				} catch (Exception $e) {
+					unset($context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path']);
+				}
 			}
 			
 			
@@ -568,6 +569,7 @@
 				'/workspace/pages',
 				'/workspace/utilities'
 			);
+			
 			$directories = General::listDirStructure(WORKSPACE, null, true, DOCROOT, $ignore);
 
 			$label = Widget::Label(__('Translation path'));
@@ -580,8 +582,8 @@
 					if(!in_array($d, $ignore)) $options[] = array($d, (Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP) == $d), $d);
 				}
 			}
-
-			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][translation_path]', $options) );
+			
+			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][translation_path]', $options, $attributes) );
 			
 			return $label;
 		}
