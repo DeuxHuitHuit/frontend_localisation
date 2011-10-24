@@ -42,7 +42,7 @@
 		public function about(){
 			return array(
 				'name' => FRONTEND_LOCALISATION_NAME,
-				'version' => '0.1',
+				'version' => '0.2beta',
 				'release-date' => '2011-10-24',
 				'author' => array(
 					array(

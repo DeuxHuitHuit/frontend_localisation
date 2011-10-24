@@ -3,7 +3,7 @@ Frontend Localisation
 
 Offers a frontend localisation mechanism using XML files.
 
-* Version: 0.1 beta
+* Version: 0.2 beta
 * Build Date: 2011-10-24
 * Authors:
 	- [Xander Group](http://www.xandergroup.ro)
@@ -268,5 +268,4 @@ Language Redirect | Frontend Localisation
 
 ## 6 Changelog ##
 
-- 0.1beta, 24 October 2011
-    - initial beta release.
+- to be released.
