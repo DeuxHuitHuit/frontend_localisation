@@ -61,13 +61,13 @@ For PHP developers:
 #### 4.1.1 @ PHP developers ####
 
 This extension provides a [FrontendLanguage class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FrontendLanguage.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.
-For default Language Driver, you must install extension [Language Redirect](https://github.com/klaftertief/language_redirect) by Jonas Coch, at least version 1.0.2.
 
 ##### Adding a Language Driver #####
 
 1. In [$supported_language_drivers](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FrontendLanguage.php#L20) array add a name for this language driver with `value` set to extension folder of the driver.
 2. Create a new class named `LanguageDriver<driver_name>` that extends `LangaugeDriver` abstract class. Save it in file `/frontend_localisation/lib/class.LanguageDriver<driver_name>.php`. You must implement all abstract methods from [LangaugeDriver class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.LanguageDriver.php)
-3. Done. You can now select this driver on Preferences page.
+3. For default Language Driver, you must install extension [Language Redirect](https://github.com/klaftertief/language_redirect) by Jonas Coch, at least version 1.0.2.
+4. Done. You can now select this driver on Preferences page.
 
 
 #### 4.1.2 @ Site builders ####
