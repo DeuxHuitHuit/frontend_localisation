@@ -41,18 +41,18 @@
 			
 			if( empty($this->available_language_drivers) ){
 				$message = '<code>%s</code>: At least one language driver must be installed. Supported language drivers are:';
-				$message_params = array(FRONTEND_LOCALISATION_NAME, $driver_name);
+				$message_params = array(FRONTEND_LOCALISATION_NAME);
 				
-				foreach( $this->supported_language_drivers as $name ){
+				foreach( $this->supported_language_drivers as $name => $handle ){
 					$message .= ' <code>%s</code>,';
 					$message_params[] = $name;
 				}
 				$message = trim($message, ',').'.'.
 				
-				Administration::instance()->Page->Alert = new Alert(__($message, $message_params), Alert::ERROR);
+				Administration::instance()->Page->pageAlert(__($message, $message_params), Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);
 				
-				return false;
+				return null;
 			}
 			else{
 				$this->_newLanguageDriver( Symphony::Configuration()->get('language_driver','frontend_localisation') );
@@ -244,7 +244,7 @@
 				if (!class_exists($driver_class)) {
 					$message = __('code>%s</code>: Driver class <code>%s</code> doesn\'t exist in file <code>%s</code>.', array(FRONTEND_LOCALISATION_NAME, $driver_class, $driver_file));
 				
-					Administration::instance()->Page->Alert = new Alert($message, Alert::ERROR);
+					Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 					Symphony::$Log->pushToLog($message, E_NOTICE, true);
 					
 					return false;
@@ -253,7 +253,7 @@
 			else {
 				$message = __('code>%s</code>: File <code>%s</code> doesn\'t exist.', array(FRONTEND_LOCALISATION_NAME, $driver_file));
 				
-				Administration::instance()->Page->Alert = new Alert($message, Alert::ERROR);
+				Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);
 				
 				return false;

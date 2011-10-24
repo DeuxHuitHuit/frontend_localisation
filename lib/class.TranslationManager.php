@@ -183,24 +183,27 @@
 		public function updateFolders(array $language_codes = null) {
 			
 			// if no languages desired, update all folders
-			if (empty($language_codes)) {
+			if( empty($language_codes) ){
 				$language_codes = FrontendLanguage::instance()->languageCodes();
 			}
 			
-			// update folder for reference language
-			$reference_language = FrontendLanguage::instance()->referenceLanguage();
-			if (empty($this->t_folders[$reference_language])) {
-				$this->addFolder($reference_language);
-			}
-			$this->t_folders[$reference_language]->updateFilesForPages();
+			if( !empty($language_codes) ){
 			
-			
-			// update remaining folders
-			foreach ($language_codes as $language_code) {
-				if( $language_code === $reference_language ) continue;
+				// update folder for reference language
+				$reference_language = FrontendLanguage::instance()->referenceLanguage();
+				if (empty($this->t_folders[$reference_language])) {
+					$this->addFolder($reference_language);
+				}
+				$this->t_folders[$reference_language]->updateFilesForPages();
 				
-				$this->addFolder($language_code);
-				$this->t_folders[$language_code]->updateFiles( $this->t_folders[$reference_language]->getFiles() );
+				
+				// update remaining folders
+				foreach ($language_codes as $language_code) {
+					if( $language_code === $reference_language ) continue;
+					
+					$this->addFolder($language_code);
+					$this->t_folders[$language_code]->updateFiles( $this->t_folders[$reference_language]->getFiles() );
+				}
 			}
 		}
 		
@@ -220,7 +223,7 @@
 					unset($this->t_folders[$language_code]);
 				}
 				else{
-					Administration::instance()->Page->Alert = new Alert(
+					Administration::instance()->Page->pageAlert(
 						__(
 							'<code>%s</code>: Failed to remove <code>%s</code> folder.', 
 							array(FRONTEND_LOCALISATION_NAME, $language_code)

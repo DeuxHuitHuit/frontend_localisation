@@ -60,20 +60,23 @@
 		}
 		
 		public function __construct($args) {
-			$this->language_codes = (array) FrontendLanguage::instance()->languageCodes();
-			$this->reference_language = (string) FrontendLanguage::instance()->referenceLanguage();
+			if( Symphony::ExtensionManager()->fetchStatus(FRONTEND_LOCALISATION_GROUP) == EXTENSION_ENABLED
+			    && FrontendLanguage::instance() == null ){
+			    
+				$this->language_codes = (array) FrontendLanguage::instance()->languageCodes();
+				$this->reference_language = (string) FrontendLanguage::instance()->referenceLanguage();
+				$this->translation_path = (string) Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
 			
-			$this->translation_path = (string) Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
-			if (empty($this->translation_path)) {
-				$this->translation_path = '/workspace/translations';
-			}
-			
-			if( Symphony::ExtensionManager()->fetchStatus(FRONTEND_LOCALISATION_GROUP) == EXTENSION_ENABLED ){
 				$this->translation_manager = new TranslationManager(DOCROOT . $this->translation_path);
 			}
 		}
 		
 		public function install() {
+			// depends on FrontendLanguage
+			if( FrontendLanguage::instance() == null ){
+				return false;
+			}
+			
 			/* Database */
 			try {
 				Symphony::Database()->query("ALTER TABLE `tbl_pages` ADD `translations` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER `events`");
@@ -87,7 +90,7 @@
 					$message = __("<code>%s</code>: MySQL error %d occured when adding column `translation` to `tbl_pages`. Installation aborted.", array(FRONTEND_LOCALISATION_NAME, $dbe['_error']['num']));
 				}
 				
-				Administration::instance()->Page->Alert = new Alert($message, Alert::ERROR);
+				Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);
 				
 				return false;
@@ -95,8 +98,8 @@
 			
 			/* Configuration */
 			Symphony::Configuration()->set('language_driver', FrontendLanguage::instance()->getDefaultLanguageDriverName(), FRONTEND_LOCALISATION_GROUP);
-			Symphony::Configuration()->set('reference_language', $this->reference_language, FRONTEND_LOCALISATION_GROUP);
-			Symphony::Configuration()->set('translation_path', $this->translation_path, FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('reference_language', FrontendLanguage::instance()->referenceLanguage(), FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('translation_path', '/workspace/translations', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('page_name_prefix', 'pagina_', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('consolidate_translations', self::CHECKBOX_YES, FRONTEND_LOCALISATION_GROUP);
 			
@@ -105,7 +108,7 @@
 			/* Translations */
 			General::realiseDirectory(DOCROOT . Symphony::Configuration()->get('translation_path', FRONTEND_LOCALISATION_GROUP));
 			
-			$this->translation_manager = new TranslationManager(DOCROOT . $this->translation_path);
+			$this->translation_manager = new TranslationManager(DOCROOT . '/workspace/translations');
 			$this->translation_manager->updateFolders();
 			
 			return true;
@@ -117,7 +120,8 @@
 				/* @todo To be replaced with */
 				// General::deleteDirectory(DOCROOT . $this->translation_path);
 				/*  in Symphony 2.3 */
-				if (is_dir(DOCROOT . $this->translation_path)) {
+				
+				if( !empty($this->translation_path) && is_dir(DOCROOT . $this->translation_path) ){
 					TranslationManager::deleteFolder(DOCROOT . $this->translation_path);
 				}
 			}
@@ -128,7 +132,7 @@
 			} catch (Exception $e){
 				$message = __('<code>%s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.', array(FRONTEND_LOCALISATION_NAME));
 				
-				Administration::instance()->Page->Alert = new Alert($message, Alert::ERROR);
+				Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);
 			}
 			
@@ -462,7 +466,7 @@
 				}
 				else{
 					$message = __('<code>%s</code>: couldn\'t change prefix for pages\' Translation Files.', array(FRONTEND_LOCALISATION_NAME));
-					Administration::instance()->Page->Alert = new Alert($message, Alert::ERROR);
+					Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 					$context['errors'][] = $message;
 				}
 			}
@@ -487,6 +491,8 @@
 			if( !in_array($reference_language, $new_languages) ){
 				$reference_language = FrontendLanguage::instance()->referenceLanguage();
 			}
+			
+			if( empty($reference_language) ) return true;
 			
 			Symphony::Configuration()->set('reference_language', $reference_language, FRONTEND_LOCALISATION_GROUP);
 			
