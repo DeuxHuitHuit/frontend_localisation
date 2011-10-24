@@ -43,7 +43,7 @@
 			return array(
 				'name' => FRONTEND_LOCALISATION_NAME,
 				'version' => '0.1',
-				'release-date' => '2011-10-04',
+				'release-date' => '2011-10-24',
 				'author' => array(
 					array(
 						'name' => 'Xander Group',
@@ -141,15 +141,15 @@
 		
 		
 		
-		public function fetchNavigation() {
-			return array(
-				array(
-					'location'	=> __('Blueprints'),
-					'name'		=> __('Frontend Translations'),
-					'link'		=> '/frontendtranslations/'
-				),
-			);
-		}
+//		public function fetchNavigation() {
+//			return array(
+//				array(
+//					'location'	=> __('Blueprints'),
+//					'name'		=> __('Frontend Translations'),
+//					'link'		=> '/frontendtranslations/'
+//				),
+//			);
+//		}
 		
 		public function getSubscribedDelegates(){
 			return array(

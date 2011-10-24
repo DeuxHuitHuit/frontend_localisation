@@ -6,7 +6,7 @@ Offers a frontend localisation mechanism using XML files.
 * Version: 0.1 beta
 * Build Date: 2011-10-22
 * Authors:
-	- [Xander Group](www.xandergroup.ro)
+	- [Xander Group](http://www.xandergroup.ro)
 	- Vlad Ghita
 * Requirements:
 	- Symphony 2.2 or above
@@ -23,7 +23,7 @@ Frontend localisation in Symphony (and other systems) implies coverage of two pr
 1. Frontend language detection and (optional) redirect mechanism.<br />
 2. Translation mechanism of static text, whether it's a few words long or a few paragraphs.<br />
 
-For problem 1, there are a few extensions that provide this functionality, but there is a lack of a unified approach. This extension is decoupled from any of these drivers and provides a mechanism to associate it with them. More details in **Frontend Language** section.<br />
+For problem 1, there are a few extensions that provide this functionality, but there is a lack of unified approach. This extension is decoupled from any of these drivers and provides a mechanism to associate it with them. More details in **Frontend Language** section.<br />
 For problem 2, this extension offers a translation mechanism using XML files. More details in **Translation Manager** section.
 
 
@@ -37,8 +37,8 @@ For site builders:
 * changeble `Reference Language`
 * @todo changeble `Translation Path`
 * changeable `Page name prefix` to distinguish Pages' Translation Files from other Translation Files.
-* translations consolidation on unsinstall
-* one button update of all language translations referencing `Reference Language`
+* Translations consolidation on unsinstall
+* one button update of all language Translations referencing `Reference Language`
 * offers a Datasource with strings from all Translation Files attached to current page. 
 
 For PHP developers:
@@ -59,7 +59,184 @@ For PHP developers:
 
 ### Frontend Language ###
 
+#### @ PHP developers ####
+
+This extension provides a [FrontendLanguage class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FrontendLanguage.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.
+
+##### Adding a Language Driver #####
+
+1. In [$supported_language_drivers](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FrontendLanguage.php#L20) array add a name for this language driver with `value` set to extension folder of the driver.
+2. Create a new class named `LanguageDriver<driver_name>` that extends `LangaugeDriver` abstract class. Save it in file `/frontend_localisation/lib/class.LanguageDriver<driver_name>.php`. You must implement all abstract methods from [LangaugeDriver class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.LanguageDriver.php)
+3. Done. You can now select this driver on Preferences page.
+
+
+#### @site builders ####
+
+On Preferences page you can select:
+
+- `Language Driver` you want to use from supported and integrated ones. The Language Driver provides Frontend language information for the system.
+- `Reference Language` is the language code which Translations will be used as reference when updating other languages Translations.
+
+
 ### Translation Manager ###
+
+On Preferences page you can select:
+
+- `Translation Path` is the path in your `/workspace` directory where translation files will be stored.
+- `Page Prefix` will be added at begin of translation filename to differentiate Symphony Page translation files from other translation files.
+- `Consolidate Translations` is set default to `checked`. When this is checked, on uninstall, translation folders will **not** be deleted.
+- pushing `Update Translation Files` button will update all languages Translations with reference to `Reference Language`. ***If a translation file is not marked as translated (`/data/meta/translated` is anything but `yes`), its contents will be changed to its reference file contents***.
+
+Translation File's XML structure:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <data>
+        <meta>
+            <translated>yes / no</translated>
+            <language code="__language-code__" handle="__language-handle__">__language-name__</language>
+        </meta>
+        <!--Business logic nodes here-->
+        <item handle="" />
+    </data>
+
+`/data/meta/translated` - marks this file as translated in this `/data/meta/language`. If this is set to `yes`, on updating from Preferences Page, this file will be skipped.
+
+`data` and `meta` node are mandatory. At some extent, the extension [ensures this structure](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.TranslationFile.php#L152-187) to keep the file usable. **As a rule of thumb, keep these nodes as they are, change only `/data/meta/translated`**.
+
+Business information must be added as XML child elements of `data` node. See next section for example.
+
+#### Adding Translation to pages ####
+
+1. Create / Edit a page.
+2. Add Translations the same way you add Events and Datasources.
+3. Add Datasource `Frontend Localisation` to your page.
+4. Inspect XML output in debug -> `/data/frontend-localisation`.
+
+example:
+
+If Frontend language is english and in `/translations/en` I have:
+
+general.xml:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <data>
+        <meta>
+            <translated>yes</translated>
+            <language code="en" handle="english">English</language>
+        </meta>
+        <!--Business logic nodes here-->
+        <item handle="page-not-found">Page not found</item>
+        <item handle="you-are-here">You are here.</item>
+        <item handle="image">Image</item>
+        <fancy-stuff>
+            <item handle="irrelevat">Please not that your request is ireelevat.</item>
+            <item handle="just-a-handle">Yet another Frontend Localisation Extension.</item>
+        </fancy-stuff>
+    </data>
+
+pagina_contact.xml:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <data>
+        <meta>
+            <translated>yes</translated>
+            <language code="en" handle="english">English</language>
+        </meta>
+        <!--Business logic nodes here-->
+        <item handle="name">Name :</item>
+        <item handle="address">Contact address</item>
+        <item handle="funky-handle">Telephone</item>
+        <item handle="mandatory-name">
+            <p>
+                Name is a mandatory field.
+            </p>
+        </item>
+        <item handle="message-success">
+            <p>
+                Message sent successfully. Return <a href="link_home">Home</a> to continue. Well, you <span style="color:red">get the point</span>.
+            </p>
+        </item>
+    </data>
+
+If I attach these Translations to a page, XML output will look like this:
+
+    <data>
+        ...
+        <frontend-localisation>
+            <item handle="page-not-found">Page not found</item>
+            <item handle="you-are-here">You are here.</item>
+            <item handle="image">Image</item>
+            <fancy-stuff>
+                <item handle="irrelevat">Please not that your request is ireelevat.</item>
+                <item handle="just-a-handle">Yet another Frontend Localisation Extension.</item>
+            </fancy-stuff>
+            <item handle="name">Name :</item>
+            <item handle="address">Contact address</item>
+            <item handle="funky-handle">Telephone</item>
+            <item handle="mandatory-name">
+                <p>
+                    Name is a mandatory field.
+                    </p>
+            </item>
+            <item handle="message-success">
+                <p>
+                    Message sent successfully. Return <a href="link_home">Home</a> to continue. Well, you <span style="color:red">get the point</span>.
+                </p>
+            </item>
+        </frontend-localisation>
+        ...
+    </data>
+
+Getting a value is trivial. This
+
+    <xsl:value-of select="/data/frontend-localisation/item[ @handle='just-a-handle' ]" />
+
+will output
+
+    Yet another Frontend Localisation Extension.
+
+For easy access, in `master.xml` I like to add this:
+
+    <xsl:variable name="__">
+        <xsl:copy-of select="/data/frontend-localisation" />
+    </xsl:variable>
+
+or all `item` nodes if their handle is unique (so no conflicts appear):
+
+    <xsl:variable name="__">
+        <xsl:copy-of select="/data/frontend-localisation//item" />
+    </xsl:variable>
+
+Now use `$__/item[ @handle='xxxxxx' ]` to output what you need.
+
+You have a link in your `item`? [Ninja technique](http://symphony-cms.com/learn/articles/view/html-ninja-technique/) suites you perfect:
+
+    <xsl:apply-templates select="$__/item[ @handle='message-success' ]" mode="links" />
+
+    <xsl:template match="*">
+        <xsl:element name="{name()}">
+            <xsl:apply-templates select="* | @* | text()" mode="links" />
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="@*">
+        <xsl:attribute name="{name(.)}">
+            <xsl:value-of select="."/>
+        </xsl:attribute>
+    </xsl:template>
+
+    <xsl:template match="a">
+        <xsl:attribute name="a">
+            <xsl:choose>
+                <xsl:when test=". = 'link_home'">
+                    __generate link to home here__
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:attribute>
+    </xsl:template>
 
 
 
@@ -79,5 +256,5 @@ Language Redirect | Frontend Localisation
 
 ## Changelog ##
 
-* 0.1beta, 22 October 2011
-	* initial beta release.
+- 0.1beta, 22 October 2011
+    - initial beta release.

@@ -17,7 +17,7 @@
 					'website' => 'www.xandergroup.ro'
 				),
 				'version' => '1.0',
-				'release-date' => '2011-10-22',
+				'release-date' => '2011-10-24',
 				'description' => 'From Frontend Localisation extension. It supplies translation strings for current Page, as selected in Page settings.');
 		}
 
@@ -40,12 +40,16 @@
 		    	$translations = preg_split('/,/i', $pages[$page_id]['translations'], -1, PREG_SPLIT_NO_EMPTY);
 		    	
 		    	if( !empty($translations) ){
+		    		$result_value = '';
+		    		
 			    	foreach( $translation_manager->getFolder( FrontendLanguage::instance()->getLangaugeCode() )->getFiles() as $t_file ){
 			    		
 			    		if( in_array($t_file->getFilename(), $translations) ){
-			    			$result->appendChild( $this->_addFile($t_file) );
+			    			$result_value .= $this->_addFile($t_file);
 			    		}
 			    	}
+					
+			    	$result->setValue( $this->_formatXmlString($result_value) );
 		    	}
 	    	}
 			
@@ -55,7 +59,7 @@
 	    
 	    
 	    private function _addFile(TranslationFile $t_file){
-	    	$result = new XMLElement(substr($t_file->getFilename(), 0, -4));
+	    	$result = '';
 	    	$force_empty_result = false;
 	    	
 	    	$stylesheet = new XMLElement('xsl:stylesheet');
@@ -82,14 +86,17 @@
 
 	    	// Handle where there is `$xml` and the XML is valid
 	    	if(strlen($xml) > 0 && !General::validateXML($xml, $errors, false, new XsltProcess)){
-	    		$result->setAttribute('valid', 'false');
-	    		$result->appendChild(new XMLElement('error', __('XML returned is invalid.')));
-	    		$element = new XMLElement('errors');
+	    		$result .= '<error> XML returned is invalid.';
+	    		$result .= '<elemet>';
 	    		foreach($errors as $e) {
 	    			if(strlen(trim($e['message'])) == 0) continue;
-	    			$element->appendChild(new XMLElement('item', General::sanitize($e['message'])));
+	    			 
+	    			$result .= '<item>';
+	    			$result .= General::sanitize($e['message']);
+	    			$result .= '</item>';
 	    		}
-	    		$result->appendChild($element);
+	    		$result .= '</elemet>';
+	    		$result .= '</error>';
 	    	}
 	    	// If `$xml` is empty, set the `force_empty_result` to true.
 	    	elseif(strlen($xml) == 0){
@@ -98,21 +105,23 @@
 
 	    	// If `force_empty_result` is false and `$result` is not an instance of
 	    	// XMLElement, build the `$result`.
-	    	if(!$force_empty_result && is_object($result)) {
+	    	if(!$force_empty_result) {
 
 	    		$proc = new XsltProcess;
 	    		$ret = $proc->process($xml, $xsl);
 
 	    		if($proc->isErrors()){
-	    			$result->setAttribute('valid', 'false');
-	    			$error = new XMLElement('error', __('XML returned is invalid.'));
-	    			$result->appendChild($error);
-	    			$element = new XMLElement('errors');
+	    			$result .= '<error> XML returned is invalid.';
+	    			$result .= '<elemet>';
 	    			foreach($proc->getError() as $e) {
 	    				if(strlen(trim($e['message'])) == 0) continue;
-	    				$element->appendChild(new XMLElement('item', General::sanitize($e['message'])));
+	    				
+	    				$result .= '<item>';
+	    				$result .= General::sanitize($e['message']);
+	    				$result .= '</item>';
 	    			}
-	    			$result->appendChild($element);
+	    			$result .= '</elemet>';
+	    			$result .= '</error>';
 	    		}
 
 	    		else if(strlen(trim($ret)) == 0){
@@ -120,12 +129,55 @@
 	    		}
 
 	    		else{
-	    			$result->setValue(self::CRLF . preg_replace('/([\r\n]+)/', '$1	', $ret));
+	    			$result .= self::CRLF . preg_replace('/([\r\n]+)/', '$1	', $ret);
 	    		}
 	    	}
 	    	
-	    	if($force_empty_result) $result = $this->emptyXMLSet();
+	    	if($force_empty_result) $result = '<error>Nothing here</error>';
 	    	
+	    	return $result;
+	    }
+	    
+	    /**
+	     * Courtesy of <a href="http://forums.devnetwork.net/viewtopic.php?p=213989">TJ at devnet</a> 
+	     */
+	    function _formatXmlString($xml) {
+
+	    	// add marker linefeeds to aid the pretty-tokeniser (adds a linefeed between all tag-end boundaries)
+	    	$xml = preg_replace('/(>)(<)(\/*)/', "$1\n$2$3", $xml);
+
+	    	// now indent the tags
+	    	$token      = strtok($xml, "\n");
+	    	$result     = ''; // holds formatted version as it is built
+	    	$pad        = 0; // initial indent
+	    	$matches    = array(); // returns from preg_matches()
+
+	    	// scan each line and adjust indent based on opening/closing tags
+	    	while ($token !== false) :
+
+		    	// test for the various tag states
+	
+		    	// 1. open and closing tags on same line - no change
+		    	if (preg_match('/.+<\/\w[^>]*>$/', $token, $matches)) :
+		    	$indent=0;
+		    	// 2. closing tag - outdent now
+		    	elseif (preg_match('/^<\/\w/', $token, $matches)) :
+		    	$pad--;
+		    	// 3. opening tag - don't pad this one, only subsequent tags
+		    	elseif (preg_match('/^<\w[^>]*[^\/]>.*$/', $token, $matches)) :
+		    	$indent=1;
+		    	// 4. no indentation needed
+		    	else :
+		    	$indent = 0;
+		    	endif;
+	
+		    	// pad the line with the required number of leading spaces
+		    	$line    = str_pad($token, strlen($token)+$pad, ' ', STR_PAD_LEFT);
+		    	$result .= $line . "\n"; // add to the cumulative result, with linefeed
+		    	$token   = strtok("\n"); // get the next token
+		    	$pad    += $indent; // update the pad size for subsequent lines
+	    	endwhile;
+
 	    	return $result;
 	    }
 
