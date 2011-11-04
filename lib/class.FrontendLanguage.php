@@ -40,7 +40,7 @@
 			}
 			
 			if( empty($this->available_language_drivers) ){
-				$message = '<code>%s</code>: At least one language driver must be installed. Supported language drivers are:';
+				$message = '<code>%1$s</code>: At least one language driver must be installed. Supported language drivers are:';
 				$message_params = array(FRONTEND_LOCALISATION_NAME);
 				
 				foreach( $this->supported_language_drivers as $name => $handle ){
@@ -228,9 +228,11 @@
 		}
 		
 		/**
-		 * Validate a language_driver.
+		 * Validate a language_driver; driver file exists and driver class exists in that file
 		 * 
-		 * @param unknown_type $driver_name
+		 * @param string $driver_name
+		 * 
+		 * @return boolean - true if succesfull, false otherwise
 		 */
 		private function _validateDriver($driver_name){
 			$driver_class = 'LanguageDriver' . $driver_name;
@@ -242,7 +244,7 @@
 				
 				// Driver class must exist
 				if (!class_exists($driver_class)) {
-					$message = __('code>%s</code>: Driver class <code>%s</code> doesn\'t exist in file <code>%s</code>.', array(FRONTEND_LOCALISATION_NAME, $driver_class, $driver_file));
+					$message = __('<code>%1$s</code>: Driver class <code>%2$s</code> doesn\'t exist in file <code>%3$s</code>.', array(FRONTEND_LOCALISATION_NAME, $driver_class, $driver_file));
 				
 					Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 					Symphony::$Log->pushToLog($message, E_NOTICE, true);
@@ -251,7 +253,7 @@
 				}
 			}
 			else {
-				$message = __('code>%s</code>: File <code>%s</code> doesn\'t exist.', array(FRONTEND_LOCALISATION_NAME, $driver_file));
+				$message = __('<code>%1$s</code>: File <code>%2$s</code> doesn\'t exist.', array(FRONTEND_LOCALISATION_NAME, $driver_file));
 				
 				Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);

@@ -3,6 +3,8 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	require_once('class.TranslationFile.php');
+	require_once('class.TranslationFileWriter.php');
+	
 	
 	/**
 	 * Takes care of a Translation Folder.
@@ -83,49 +85,52 @@
 		/**
 		 * Get requested Translation File.
 		 * 
-		 * @param string $filename
+		 * @param string $handle
 		 * 
-		 * @return TranslationFile
+		 * @return TranslationFile or null if it is not set
 		 */
-		public function getFile($filename){
-			return $this->t_files[$filename];
+		public function getFile($handle){
+			if( !empty($this->t_files[$handle]) )
+				return $this->t_files[$handle];
+				
+			return null;
 		}
 		
 		/**
-		 * Deletes a Translation File
+		 * Deletes a Translation File. Hardcoded extension.
 		 * 
-		 * @param string $filename
+		 * @param string $handle
 		 */
-		public function deleteFile($filename){
-			General::deleteFile($this->path . '/' . $this->langauge_code . '/' . $filename);
-			unset($this->t_files[$filename]);
+		public function deleteFile($handle){
+			if( General::deleteFile($this->path . '/' . $this->langauge_code . '/' . $handle . '.xml') ){
+				unset($this->t_files[$handle]);
+				return true;
+			}
+			
+			return false;
 		}
 		
 		/**
 		 * Synchronize Translation Files with Symphony Pages.
 		 */
 		public function updateFilesForPages(){
-			// get all pages
-			$query = "SELECT `id`, `handle`, `parent` FROM `tbl_pages` ORDER BY `handle`";
-			
-			try {
-				$pages = Symphony::Database()->fetch($query, 'id');
-				
-			} catch (DatabaseException $e) {
-				Symphony::$Log->pushToLog('It died in TranslationFolder class trying to fetch all pages... Poor fellow.', E_NOTICE, true);
-			}
+			$pages = FLPageManager::instance()->listAll();
 			
 			foreach ($pages as $page) {
-				$filename = $page['handle'];
+				$handle = $page['handle'];
+				
 				while( !empty($page['parent']) ){
 					$page = $pages[$page['parent']];
-					$filename = $page['handle'] . '_' . $filename;
+					$handle = $page['handle'] . '_' . $handle;
 				}
 				
-				$filename = Symphony::Configuration()->get('page_name_prefix','frontend_localisation'). $filename . '.xml';
+				$handle = Symphony::Configuration()->get('page_name_prefix','frontend_localisation'). $handle;
 				
-				if( empty($this->t_files[$filename]) ) {
-					$this->addFile($filename, '');
+				if( empty($this->t_files[$handle]) ) {
+					$this->addFile($handle, '');
+				}
+				else{
+					$this->t_files[$handle]->ensureStructure();
 				}
 			}
 		}
@@ -138,41 +143,79 @@
 		public function updateFiles(array $ref_files){
 			if( !empty($ref_files) && is_array($ref_files) ){
 				
-				foreach ($ref_files as $ref_filename => $ref_t_file) {
-					$this->addFile($ref_filename);
+				foreach ($ref_files as $ref_handle => $ref_t_file) {
+					$this->addFile($ref_handle);
 					
-					if( !$this->t_files[$ref_filename]->isTranslated() ){
-						
-						// make sure source file has needed XML structure
-						if( $ref_t_file->ensureStructure() ){
-							$this->t_files[$ref_filename]->setRefContent($ref_t_file);
-						}
-						
-						// else set default template content
-						else{
-							$this->t_files[$ref_filename]->setContent();
-						}
+					// make sure source file has needed XML structure
+					if( $ref_t_file->ensureStructure() ){
+						$this->syncFilesData($ref_t_file, $this->t_files[$ref_handle]);
 					}
+
+					// else set default template content
 					else{
-						$this->t_files[$ref_filename]->ensureStructure();
+						$this->t_files[$ref_handle]->setContent();
 					}
 				}
 			}
 		}
 		
+		
+		/**
+		 * Synchronize business data for $dest Translation from $source Translation.
+		 * It only inserts missing items without their value.
+		 * 
+		 * @param TranslationFile $source
+		 * @param TranslationFile $dest
+		 * 
+		 * @return boolean - true in succes, false otherwise
+		 */
+		public function syncFilesData(TranslationFile $source, TranslationFile $dest){
+			$tf_writer = new TranslationFileWriter();
+			
+			$source_trans = $tf_writer->convertXMLtoArray($source->getContentXML());
+			$dest_trans = $tf_writer->convertXMLtoArray($dest->getContentXML());
+			
+			$translations = array();
+			
+			foreach( $source_trans as $xPath => $items ){
+				
+				if( array_key_exists($xPath, $dest_trans) ){
+					foreach( $items as $handle => $value ){
+						
+						if( array_key_exists($handle, $dest_trans[$xPath]) ){
+							$translations[$xPath][$handle] = $dest_trans[$xPath][$handle];
+						}
+						else{
+							$translations[$xPath][$handle] = '';
+						}
+					}
+				}
+				
+				else{
+					foreach( $items as $handle => $value ){
+						$translations[$xPath][$handle] = '';
+					}
+				}
+			}
+			
+			$data = $tf_writer->convertArraytoString($dest->getContentXML(), $translations);
+			
+			return (boolean) $dest->setData($data);
+		}
+		
 		/**
 		 * Translation File generator.
 		 * 
-		 * @param string $filename - Name of the file
+		 * @param string $handle - Handle of the file
 		 * @param string $content (optional) - content of file.
 		 */
-		public function addFile($filename, $content = null) {
-			if( empty($this->t_files[$filename]) ){
-				$this->t_files[$filename] = new TranslationFile($this, $filename);
+		public function addFile($handle, $content = null) {
+			if( empty($this->t_files[$handle]) ){
+				$this->t_files[$handle] = new TranslationFile($this, $handle);
 			}
 			
 			if( $content != null ){
-				$this->t_files[$filename]->setContent($content);
+				$this->t_files[$handle]->setContent($content);
 			}
 		}
 		
@@ -186,7 +229,7 @@
 		 */
 		public function changeFilenamesPrefix($old_prefix, $new_prefix){
 			foreach( $this->t_files as $t_file ){
-				$name = $t_file->getFilename();
+				$name = $t_file->getHandle();
 				
 				// make sure this is a Translation File for a Page (begins with prefix)
 				if( strpos($name, $old_prefix) == 0 ){
@@ -197,9 +240,9 @@
 						
 						// if filename couldn't be changed, rollback changes (fingers crossed)
 						foreach( $this->t_files as $b_t_file ){
-							$b_name = $b_t_file->getFilename();
+							$b_name = $b_t_file->getHandle();
 							
-							if( $b_name != $t_file->getFilename() ){
+							if( $b_name != $t_file->getHandle() ){
 								$b_name = preg_replace("/{$new_prefix}/", $old_prefix, $b_name, 1);
 								$b_t_file->setFilename($b_name);
 							}
@@ -224,7 +267,7 @@
 			
 			if (!empty($structure['filelist'])) {
 				foreach ($structure['filelist'] as $filename) {
-					$this->addFile($filename);
+					$this->addFile( substr($filename,0,-4) );
 				}
 			}
 		}

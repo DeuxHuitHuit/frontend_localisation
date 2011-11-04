@@ -3,7 +3,8 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	require_once('class.TranslationFolder.php');
-	require_once('class.FrontendLocalisationPageManager.php');
+	require_once('class.FrontendLanguage.php');
+	require_once('class.FLPageManager.php');
 	
 	/**
 	 * Manages Translation Folders and Files.
@@ -32,8 +33,18 @@
 		
 		
 		
-		public function __construct($translation_path) {
-			$this->path = $translation_path;
+		/**
+		 * Constructor. On initialization, discover existing translation files.
+		 * 
+		 * @param string $translation_path (optional) - path to translations. Defaults to `/workspace/translations/`
+		 */
+		public function __construct($translation_path = null) {
+			if( is_string($translation_path) && !empty($translation_path) ){
+				$this->path = $translation_path;
+			}
+			else{
+				$this->path = DOCROOT . Symphony::Configuration()->get('translation_path','frontend_localisation');
+			}
 			
 			$this->_discoverFolders();
 		}
@@ -54,10 +65,13 @@
 		 * 
 		 * @param string $name
 		 * 
-		 * @return TranslationFolder
+		 * @return TranslationFolder or null if it is not set.
 		 */
 		public function getFolder($language_code){
-			return $this->t_folders[$language_code];
+			if( isset($this->t_folders[$language_code]) )
+				return $this->t_folders[$language_code];
+			
+			return null;
 		}
 		
 		/**
@@ -66,17 +80,16 @@
 		 * @param array $current_page - page info. Must include id, handle and parent.
 		 */
 		public function createTranslationFile(array $current_page){
-			$page_manager = new FrontendLocalisationPageManager();
 			
 			// if it has a parent, build entire ascending line
 			if( !empty($current_page['parent']) ){
-				$filename = $this->_createAncestorFilename( $current_page['parent'], $page_manager->listAll() );
+				$handle = $this->_createAncestorFilename( $current_page['parent'], FLPageManager::instance()->listAll() );
 			}
 			
-			$filename = Symphony::Configuration()->get('page_name_prefix','frontend_localisation') . $filename . $current_page['handle'] . '.xml';
+			$handle = Symphony::Configuration()->get('page_name_prefix','frontend_localisation') . $handle . $current_page['handle'];
 			
 			foreach( $this->t_folders as $t_folder ){
-				$t_folder->addFile($filename);
+				$t_folder->addFile($handle);
 			}
 		}
 		
@@ -86,35 +99,34 @@
 		 * @param array $current_page - page info. Must include id, old_handle, new_handle and parent.
 		 */
 		public function editTranslationFiles(array $current_page){
-			$page_manager = new FrontendLocalisationPageManager();
-			$pages = $page_manager->listAll();
+			$pages = FLPageManager::instance()->listAll();
 			
-			// get ancestor filename part
-			$ancestor_filename = '';
+			// get ancestor handle part
+			$ancestor_handle = '';
 			if( !empty($current_page['parent']) ){
-				$ancestor_filename = $this->_createAncestorFilename($current_page['parent'], $pages);
+				$ancestor_handle = $this->_createAncestorFilename($current_page['parent'], $pages);
 			}
 			
 			// get children of this page, including self
-			$descendant_filenames = array();
-			$this->_createDescendantFilenames($current_page['id'], $pages, '', $descendant_filenames);
+			$descendant_handles = array();
+			$this->_createDescendantFilenames($current_page['id'], $pages, '', $descendant_handles);
 			
 			$page_prefix = Symphony::Configuration()->get('page_name_prefix','frontend_localisation');
-			$filenames = array();
+			$handles = array();
 			
-			foreach( $descendant_filenames as $desc_filename ){
-				$desc_filename = trim($desc_filename, '_');
+			foreach( $descendant_handles as $desc_handle ){
+				$desc_handle = trim($desc_handle, '_');
 				
-				$old_filename = $page_prefix . $ancestor_filename . $desc_filename . '.xml';
-				$new_filename = $page_prefix . $ancestor_filename . preg_replace("/{$current_page['old_handle']}/", $current_page['new_handle'], $desc_filename, 1) . '.xml';
+				$old_handle = $page_prefix . $ancestor_handle . $desc_handle;
+				$new_handle = $page_prefix . $ancestor_handle . preg_replace("/{$current_page['old_handle']}/", $current_page['new_handle'], $desc_handle, 1);
 				
-				$filenames[$old_filename] = $new_filename;
+				$handles[$old_handle] = $new_handle;
 			}
 			
 			// update files
 			foreach( $this->t_folders as $t_folder ){
-				foreach( $filenames as $old_filename => $new_filename ){
-					$t_folder->getFile($old_filename)->setFilename($new_filename);
+				foreach( $handles as $old_handle => $new_handle ){
+					$t_folder->getFile($old_handle)->setFilename($new_handle);
 				}
 			}
 		}
@@ -125,24 +137,23 @@
 		 * @param array $page_ids
 		 */
 		public function deleteTranslationFiles(array $page_ids){
-			$filenames = array();
-			$page_manager = new FrontendLocalisationPageManager();
-			$pages = $page_manager->listAll();
+			$handles = array();
+			$pages = FLPageManager::instance()->listAll();
 			
-			// build filenames to be deleted
+			// build handles to be deleted
 			foreach( $page_ids as $page_id ){
-				if( $this->_hasChildren($page_id) ) continue;
+				if( FLPageManager::instance()->hasChildren($page_id) ) continue;
 				
-				$filename = '';
+				$handle = '';
 				if( !empty($pages[$page_id]['parent']) ){
-					$filename = $this->_createAncestorFilename($pages[$page_id]['parent'], $pages);
+					$handle = $this->_createAncestorFilename($pages[$page_id]['parent'], $pages);
 				}
-				$filenames[] = Symphony::Configuration()->get('page_name_prefix','frontend_localisation') . $filename . $pages[$page_id]['handle'] . '.xml';
+				$handles[] = Symphony::Configuration()->get('page_name_prefix','frontend_localisation') . $handle . $pages[$page_id]['handle'];
 			}
 			
 			foreach( $this->t_folders as $t_folder ){
-				foreach( $filenames as $filename ){
-					$t_folder->deleteFile($filename);
+				foreach( $handles as $handle ){
+					$t_folder->deleteFile($handle);
 				}
 			}
 		}
@@ -159,7 +170,7 @@
 				// try to change all Files in this Folder
 				if( !$t_folder->changeFilenamesPrefix($old_prefix, $new_prefix) ){
 					
-					// if a filename couldn't be changed, rollback changes (fingers crossed)
+					// if a handle couldn't be changed, rollback changes (fingers crossed)
 					foreach ($this->t_folders as $b_t_folder) {
 						if( $b_t_folder->getLanguageCode() != $t_folder->getLanguageCode() ){
 							$b_t_folder->changeFilenamesPrefix($new_prefix, $old_prefix);
@@ -225,7 +236,7 @@
 				else{
 					Administration::instance()->Page->pageAlert(
 						__(
-							'<code>%s</code>: Failed to remove <code>%s</code> folder.', 
+							'<code>%1$s</code>: Failed to remove <code>%2$s</code> folder.', 
 							array(FRONTEND_LOCALISATION_NAME, $language_code)
 						), 
 						Alert::ERROR
@@ -240,15 +251,64 @@
 		 * @param string $language_code
 		 */
 		public function addFolder($language_code){
+			if( !is_string($language_code) || empty($language_code) ) return false;
+			
 			$folder = $this->path.'/'.$language_code;
 			
 			if( !is_dir($folder) ){
-				General::realiseDirectory($folder);
+				if( !General::realiseDirectory($folder) ) return false;
 			}
 			
 			if( empty($this->t_folders[$language_code]) ){
 				$this->t_folders[$language_code] = new TranslationFolder($this->path, $language_code);
 			}
+			
+			return true;
+		}
+		
+		/**
+		 * Synchronize business data for $dest Translation from $source Translation.
+		 * It only inserts missing items without their value.
+		 * 
+		 * @param string $handle
+		 */
+		public function updateFile($handle){
+			if( !is_string($handle) || empty($handle) ) return false;
+			
+			$reference_language = FrontendLanguage::instance()->referenceLanguage();
+			
+			// make sure reference folder exists
+			if( !$this->addFolder($reference_language) ) return false;
+			
+			$ref_t_file = $this->t_folders[$reference_language]->getFile($handle);
+			
+			// make sure ref_file exists
+			if( empty($ref_t_file) ) return false;
+			
+			$ref_t_file->ensureStructure();
+			$valid = true;
+			
+			foreach( FrontendLanguage::instance()->languageCodes() as $language_code ){
+				
+				if( $language_code === $reference_language ) continue;
+				
+				if( !$this->addFolder($language_code) ){
+					$valid = false;
+					continue;
+				}
+				
+				$t_folder = $this->t_folders[$language_code];
+				
+				$t_file = $t_folder->getFile($handle);
+				if( empty($t_file) || !$t_file->ensureStructure() ){
+					$valid = false;
+					continue;
+				}
+				
+				$t_folder->syncFilesData($ref_t_file, $t_file);
+			}
+			
+			return $valid;
 		}
 		
 		
@@ -309,32 +369,23 @@
 		}
 		
 		/**
-		 * Creates the filename for given page, having all pages.
+		 * Creates the handle for given page, having all pages.
 		 * 
 		 * @param integer $page_id - target page id
 		 * @param array $pages - all pages
 		 * 
-		 * @return string - filename
+		 * @return string - handle
 		 */
 		private function _createAncestorFilename($page_id, $pages){
 			$page = $pages[$page_id];
 			
-			$filename = $page['handle'] . '_';
+			$handle = $page['handle'] . '_';
 			while( !empty($page['parent']) ){
 				$page = $pages[$page['parent']];
-				$filename = $page['handle'] . '_' . $filename;
+				$handle = $page['handle'] . '_' . $handle;
 			}
 			
-			return $filename;
-		}
-		
-		/**
-		 * Checks if given page has children.
-		 * 
-		 * @param integer $page_id
-		 */
-		private function _hasChildren($page_id) {
-			return (boolean)Symphony::Database()->fetchVar('id', 0, " SELECT `id` FROM `tbl_pages` WHERE parent = '{$page_id}' LIMIT 1");
+			return $handle;
 		}
 		
 		/**
@@ -342,16 +393,16 @@
 		 * 
 		 * @param integer $page_id - start page
 		 * @param array $pages - all Symphony pages
-		 * @param string $filename - internal used to store current filename
-		 * @param array &$filenames - resulting array
+		 * @param string $handle - internal used to store current handle
+		 * @param array &$handles - resulting array
 		 */
-		private function _createDescendantFilenames($page_id, $pages, $filename, &$filenames){
-			$filename .= '_' . $pages[$page_id]['handle'];
-			$filenames[] = $filename;
+		private function _createDescendantFilenames($page_id, $pages, $handle, &$handles){
+			$handle .= '_' . $pages[$page_id]['handle'];
+			$handles[] = $handle;
 			
 			foreach( $pages as $page ){
 				if( $page['parent'] == $page_id ){
-					$this->_createDescendantFilenames($page['id'], $pages, $filename, $filenames);
+					$this->_createDescendantFilenames($page['id'], $pages, $handle, $handles);
 				}
 			}
 		}

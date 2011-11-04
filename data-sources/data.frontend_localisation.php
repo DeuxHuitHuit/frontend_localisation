@@ -2,7 +2,7 @@
 
 	require_once(TOOLKIT . '/class.datasource.php');
 	require_once(TOOLKIT . '/class.xsltprocess.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FrontendLocalisationPageManager.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLPageManager.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TranslationManager.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FrontendLanguage.php');
 
@@ -30,13 +30,12 @@
 
 	    	$page_id = $this->_env['param']['current-page-id'];
 	    	
-	    	$page_manager = new FrontendLocalisationPageManager();
-	    	$pages = $page_manager->listAll();
+	    	$pages = FLPageManager::instance()->listAll(array('translations'));
 	    	
 	    	$translation_path = Symphony::Configuration()->get('translation_path','frontend_localisation');
 	    	
 	    	if( !empty($translation_path) ){
-		    	$translation_manager = new TranslationManager(DOCROOT . $translation_path);
+		    	$translation_manager = new TranslationManager();
 		    	$translations = preg_split('/,/i', $pages[$page_id]['translations'], -1, PREG_SPLIT_NO_EMPTY);
 		    	
 		    	if( !empty($translations) ){
@@ -44,7 +43,7 @@
 		    		
 			    	foreach( $translation_manager->getFolder( FrontendLanguage::instance()->getLangaugeCode() )->getFiles() as $t_file ){
 			    		
-			    		if( in_array($t_file->getFilename(), $translations) ){
+			    		if( in_array($t_file->getHandle(), $translations) ){
 			    			$result_value .= $this->_addFile($t_file);
 			    		}
 			    	}
@@ -73,7 +72,7 @@
 	    	$template->setAttribute('match', '/');
 
 	    	$instruction = new XMLElement('xsl:copy-of');
-	    	$instruction->setAttribute('select', "/data/*[name() != 'meta']");
+	    	$instruction->setAttribute('select', "/translation/data/*");
 
 	    	$template->appendChild($instruction);
 	    	$stylesheet->appendChild($template);

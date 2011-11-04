@@ -1,0 +1,81 @@
+div.translations ul.tabs {
+	float: left;
+	margin: 0;
+	width: 100%;
+	border-bottom: 1px solid #E4E4DE;
+}
+
+div.translations ul.tabs li {
+	color: #aaaa99;
+	cursor: pointer;
+	text-decoration: none;
+	float: left;
+	display: block;
+	padding: 2px 8px;
+	margin: 0px 3px -1px 0px;
+	border: 1px solid #E4E4DE;
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-topright: 3px;
+	background-color: #F9F9F9;
+}
+
+div.translations ul.tabs li:hover {
+	color: #444;
+}
+
+div.translations ul.tabs li.active {
+	border-bottom: 1px solid #F5F5F3;
+	background-color: #F5F5F3;
+	color: #888;
+	cursor: default;
+}
+
+div.translations .tab-panel {
+	padding: 0 10px 0 10px;
+	background-color: #F5F5F3;
+	border: 1px solid #E4E4DE;
+	border-top: 0;
+	overflow: auto;
+	clear: both;
+}
+
+div.translations label {
+	display: block;
+}
+
+div.translations div.xPath {
+	float: left;
+	margin-bottom: 0.5em;
+	margin-top: 1.2em;
+	width: 100%;
+}
+
+div.translations div.xPath label {
+	margin: 0.7em 0 0 0;
+}
+
+div.translations div.xPath div.item_wrapper {
+	float: left;
+	margin: 15px 0 0 0;
+	width: 100%;
+}
+
+div.translations div.xPath div.item_wrapper div.reference_wrapper {
+	float: left;
+	margin: 0;
+	width: 100%;
+}
+
+div.translations div.xPath div.item_wrapper div.handle_wrapper {
+	float: left;
+	margin: 0;
+	width: 29%;
+}
+
+div.translations div.xPath div.item_wrapper div.value_wrapper {
+	float: right;
+	margin: 0;
+	width: 69%;
+}
