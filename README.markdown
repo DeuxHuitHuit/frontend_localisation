@@ -4,7 +4,7 @@ Frontend Localisation
 Offers a frontend localisation mechanism using XML files.
 
 * Version: 0.3 beta
-* Build Date: 2011-11-04
+* Build Date: 2011-11-03
 * Authors:
 	- [Xander Group](http://www.xandergroup.ro)
 	- Vlad Ghita
@@ -31,10 +31,10 @@ For problem 2, this extension offers a translation mechanism using XML files. Mo
 For site builders:
 
 * allows association of Pages to Translation files and vice-versa.
-* allows editing of Translation Files in Admin
+* @todo allows editing of Translation Files in Admin
 * changeble `Language Driver`
 * changeble `Reference Language`
-* changeble `Translation Path`
+* @todo changeble `Translation Path`
 * changeable `Page name prefix` to distinguish Pages' Translation Files from other Translation Files.
 * Translations consolidation on unsinstall
 * one button update of all language Translations referencing `Reference Language`
@@ -87,9 +87,10 @@ On Preferences page you can select:
 - `Consolidate Translations` is set default to `checked`. When this is checked, on uninstall, translation folders will **not** be deleted.
 - pushing `Update Translation Files` button will update all languages Translations with reference to `Reference Language`. ***If a translation file is not marked as translated (`/data/meta/translated` is anything but `yes`), its contents will be changed to its reference file contents***.
 
+
 #### 4.2.2 Managing Translations ####
 
-##### Translation File's XML structure ##### 
+Translation File's XML structure:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <translation>
@@ -99,32 +100,19 @@ On Preferences page you can select:
         </meta>
         <data>
             <item handle="" />
-            <other-xml-node>that will not be displayed <b>in Admin but</b> will be set to frontend via the Datasource</other-xml-node>
 		</data>
     </translation>
 
-`translation`, `meta` and `data` nodes are mandatory. The extension [ensures this structure](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.TranslationFile.php#L152-187) to keep the file usable. **As a rule of thumb, modify only `/translation/meta/name` and `/translation/data` values**.<br />
+`translation`, `meta` and `data` nodes are mandatory. At some extent, the extension [ensures this structure](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.TranslationFile.php#L152-187) to keep the file usable. **As a rule of thumb, modify only `/translation/meta/name` and `/translation/data` values**.
+
 Business information must be added as XML child elements of `data` node. This is **your** responsibility. It's your choice how to build your data. See **4.2.3** for an example.
 
-
-##### Adding Translations to Pages #####
+**Adding Translations to Pages**
 
 1. Create / Edit a page.
 2. Add Translations the same way you add Events and Datasources.
 3. Add Datasource `Frontend Localisation` to your page.
 4. Inspect XML output in debug -> `/data/frontend-localisation`.
-
-
-##### Editing Translation Files in Admin #####
-
-A new navigation item called `Translations` is added to Administration menu. Here you can edit all Translation Files.<br />
-Translation files can be added to multiple pages at once.<br />
-Only Developers can edit translation `name`, `handle`, `related pages` and `handles` of translation items.<br />
-Authors can only edit translation `values`.<br />
-NB.1: **On translation interface, only translation items will appear to be editable.** (XML nodes with strcuture <item handle="__handle__">__value__</item>)<br />
-NB.2: **&, <** are not allowed (yet) when editing through the interface due to some encoding problems.
-
-
 
 #### 4.2.3 An example ####
 
@@ -174,6 +162,8 @@ If Frontend language is english and in `/translations/en` I have:
         </data>
     </translation>
 
+**Note that ampersands** `&` ** are not allowed when editing through the interface due to some encoding problems.**
+
 If I attach these Translations to a page, XML output will look like this:
 
     <data>
@@ -218,10 +208,16 @@ will output
 
 ##### Easy access #####
 
-In `master.xsl` I like to add this:
+In `master.xml` I like to add this:
 
     <xsl:variable name="__">
         <xsl:copy-of select="/data/frontend-localisation" />
+    </xsl:variable>
+
+or all `item` nodes if their handle is unique (so no conflicts appear):
+
+    <xsl:variable name="__">
+        <xsl:copy-of select="/data/frontend-localisation//item" />
     </xsl:variable>
 
 Now use `$__/item[ @handle='xxxxxx' ]` to output what you need.

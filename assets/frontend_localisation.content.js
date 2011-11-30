@@ -1,5 +1,5 @@
 jQuery(document).ready(function() {
-	var field = new MultilingualField(jQuery('.translations'));
+	var field = new Translations(jQuery('.translations'));
 	
 	jQuery('.xPath .reference_value').click(function(event){
 		event.preventDefault();
@@ -9,13 +9,13 @@ jQuery(document).ready(function() {
 	
 });
 
-function MultilingualField(field) {
+function Translations(field) {
 	this.field = field;
 	
 	this.init();
 }
 
-MultilingualField.prototype.init = function() {
+Translations.prototype.init = function() {
 	var self = this,
 		activeTab = this.field.find('ul.tabs li.active');
 	
@@ -34,7 +34,7 @@ MultilingualField.prototype.init = function() {
 	this.setActiveTab(activeTab.attr('class').split(' ')[0]);
 }
 
-MultilingualField.prototype.setActiveTab = function(tab_name) {
+Translations.prototype.setActiveTab = function(tab_name) {
 	var self = this;
 	
 	// hide all tab panels

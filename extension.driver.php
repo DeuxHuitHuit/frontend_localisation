@@ -65,7 +65,7 @@
 			return array(
 				'name' => FRONTEND_LOCALISATION_NAME,
 				'version' => '0.3beta',
-				'release-date' => '2011-11-04',
+				'release-date' => '2011-11-03',
 				'author' => array(
 					array(
 						'name' => 'Xander Group',

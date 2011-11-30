@@ -5,6 +5,8 @@
 	require_once(EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
 	require_once 'class.LanguageDriver.php';
 	
+	
+	
 	final class LanguageDriverLanguageRedirect extends LanguageDriver
 	{
 		protected $language_codes = array();

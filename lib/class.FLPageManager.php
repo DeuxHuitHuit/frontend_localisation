@@ -51,10 +51,14 @@
 				$pages = Symphony::Database()->fetch($query, 'id');
 			} 
 			catch (DatabaseException $dbe) {
-				Administration::instance()->Page->pageAlert($dbe->getMessage(), Alert::ERROR);
+				if( Symphony::Engine() instanceof Administration ){
+					Symphony::Engine()->Page->pageAlert($dbe->getMessage(), Alert::ERROR);
+				}
 			} 
 			catch (Exception $e){
-				Administration::instance()->Page->pageAlert(__('In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.'), Alert::ERROR);
+				if( Symphony::Engine() instanceof Administration ){
+					Symphony::Engine()->Page->pageAlert(__('In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.'), Alert::ERROR);
+				}
 			}
 			
 			return (array) $pages;

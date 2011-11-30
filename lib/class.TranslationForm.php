@@ -1,6 +1,6 @@
 <?php
 
-	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');	
+	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLPageManager.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TranslationFileWriter.php');
@@ -13,10 +13,10 @@
 		
 		/**
 		 * Render form elements for a Translation.
-		 * 
+		 *
 		 * @param array $fields - form fields
 		 * @param array $errors - form errors
-		 * 
+		 *
 		 * @return XMLElement - entire form
 		 */
 		public function render(array $fields, array $errors) {
@@ -56,7 +56,7 @@
 			
 			// Handle - text input
 			
-			$label = Widget::Label(__('Handle'));		
+			$label = Widget::Label(__('Handle'));
 			$label->appendChild(Widget::Input(
 				'fields[handle]', General::sanitize($fields['handle']), 'text', $attributes
 			));
@@ -90,7 +90,7 @@
 					/* Tabs */
 					
 					$li = new XMLElement(
-						'li', 
+						'li',
 						($all_languages[$language_code] ? $all_languages[$language_code] : __('Unknown Lang').' : '.$language_code),
 						array( 'class' => $language_code . ($language_code == $reference_language ? ' active' : '') )
 					);
@@ -116,6 +116,11 @@
 								$value = $value['value'];
 							}
 							
+							// remove extra-items not matching in reference_language
+							else{
+								if( !isset($fields['translations'][$reference_language][$xPath][$handle]) ) continue;
+							}
+							
 							$item_wrapper = new XMLElement('div', null, array('class' => 'item_wrapper'));
 							
 							
@@ -128,7 +133,7 @@
 								Widget::Input(
 									"fields[translations][{$language_code}][{$xPath}][{$id}][handle]", empty($handle)? '' : $handle,
 									'text',
-									$attributes
+									$reference_language != $language_code ? array('disabled' => 'disabled') : $attributes
 								)
 							);
 							if( isset($errors['translations'][$language_code][$xPath][$id]['handle']) ){
@@ -259,9 +264,9 @@
 		
 		/**
 		 * Sanitize given fields, except $fields['translations'].
-		 * 
+		 *
 		 * @param array $fields - form fields.
-		 * 
+		 *
 		 * @return array - sanitized fields.
 		 */
 		public function cleanFields(array $fields){
@@ -290,10 +295,12 @@
 			
 			$clean['old_handle'] = General::sanitize($fields['old_handle']);
 			
-			foreach( $fields['translations'] as $language_code => $translations ){
-				foreach( $translations as $xPath => $items ){
-					foreach( $items as $id => $item ){
-						$item['value'] = $this->_replaceAmpersands( General::sanitize($item['value']) );
+			if( isset($fields['translations']) && is_array($fields['translations']) ){
+				foreach( $fields['translations'] as $language_code => $translations ){
+					foreach( $translations as $xPath => $items ){
+						foreach( $items as $id => $item ){
+							$item['value'] = $this->_replaceAmpersands( General::sanitize($item['value']) );
+						}
 					}
 				}
 			}

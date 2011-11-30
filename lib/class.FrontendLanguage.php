@@ -14,8 +14,8 @@
 		 * Supported language drivers.
 		 * @var array
 		 *   - pairs of $driver_name => $driver_handle.
-		 *   - $driver_name is made of driver class name from LanguageDriver{$driver_name}
-		 *   - $driver_handle is name of extension folder in extensions
+		 *   - $driver_name comes from driver class namem "LanguageDriver{$driver_name}"
+		 *   - $driver_handle is name of extension folder in "/extensions"
 		 */
 		private $supported_language_drivers = array(
 			'LanguageRedirect' => 'language_redirect',
@@ -27,6 +27,11 @@
 		 */
 		private $available_language_drivers = array();
 		
+		/**
+		 * Current language driver
+		 * 
+		 * @var LanguageDriver
+		 */
 		private $language_driver;
 		
 		
@@ -135,7 +140,7 @@
 		}
 		
 		/**
-		 * Returns supported languages codes.
+		 * Returns supported language codes.
 		 * 
 		 * @return array
 		 */

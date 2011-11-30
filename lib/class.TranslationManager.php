@@ -34,7 +34,7 @@
 		
 		
 		/**
-		 * Constructor. On initialization, discover existing translation files.
+		 * Manages Translation Folders and Files.
 		 * 
 		 * @param string $translation_path (optional) - path to translations. Defaults to `/workspace/translations/`
 		 */

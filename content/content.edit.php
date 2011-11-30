@@ -185,12 +185,14 @@
 				
 				// if there are any translations at all
 				if( is_array($fields['translations']) ){
+					$reference_language = FrontendLanguage::instance()->referenceLanguage();
+					
 					foreach( $fields['translations'] as $language_code => $translations ){
 						
 						foreach( $translations as $xPath => $items ){
 							
 							foreach( $items as $id => $item ){
-								if( empty($item['handle']) ){
+								if( empty($item['handle']) && ($language_code == $reference_language) ){
 									$this->_errors['translations'][$language_code][$xPath][$id]['handle'] = __('Handle is a required field.');
 								}
 								
@@ -206,7 +208,7 @@
 								}
 								
 								// store translation item
-								$file_translations[$language_code][$xPath][ $item['handle'] ] = $item['value'];
+								$file_translations[$language_code][$xPath][ $fields['translations'][$reference_language][$xPath][$id]['handle'] ] = $item['value'];
 							}
 						}
 					}
