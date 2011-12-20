@@ -15,7 +15,7 @@ Offers a frontend localisation mechanism using XML files.
 Thank you all other Symphony & Extensions developers for your inspirational work.
 
 
-@todo - polish Frontend Language classes. They look ugly.
+@todo - polish Frontend Language classes. They look ugly.<br/>
 @todo - implementation for PO and I18N <br/>
 @todo - per translation option for storage (convertion from one type to another)<br/>
 @todo - rework of FL_Translations Datasource
