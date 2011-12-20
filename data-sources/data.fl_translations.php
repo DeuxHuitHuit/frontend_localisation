@@ -3,18 +3,18 @@
 	require_once(TOOLKIT . '/class.datasource.php');
 	require_once(TOOLKIT . '/class.xsltprocess.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLPageManager.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TranslationManager.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TManager.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FrontendLanguage.php');
 
-	Class datasourcefrontend_localisation extends Datasource{
-
+	Class datasourcefl_translations extends Datasource{
+		
 		public function about(){
 			return array(
-				'name' => 'Frontend Localisation',
+				'name' => 'FL: Translations',
 				'author' => array(
 					'name' => 'Xander Group',
 					'email' => 'symphonycms@xandergroup.ro',
-					'website' => 'www.xandergroup.ro'
+					'website' => 'www.xanderadvertising.com'
 				),
 				'version' => '1.0',
 				'release-date' => '2011-10-24',
@@ -26,38 +26,36 @@
 		}
 
 	    public function grab(&$param_pool=NULL){
-	    	$result = new XMLElement('frontend-localisation');
+	    	$result = new XMLElement('fl-translations');
 
-	    	$page_id = $this->_env['param']['current-page-id'];
+// 	    	$page_id = $this->_env['param']['current-page-id'];
+// 	    	$translation_path = Symphony::Configuration()->get('translation_path','frontend_localisation');
 	    	
-	    	$pages = FLPageManager::instance()->listAll(array('translations'));
+// 	    	$pages = FLPageManager::instance()->listAll(array('translations'));
 	    	
-	    	$translation_path = Symphony::Configuration()->get('translation_path','frontend_localisation');
-	    	
-	    	if( !empty($translation_path) ){
-		    	$translation_manager = new TranslationManager();
-		    	$translations = preg_split('/,/i', $pages[$page_id]['translations'], -1, PREG_SPLIT_NO_EMPTY);
+// 	    	if( !empty($translation_path) ){
+// 		    	$translations = preg_split('/,/i', $pages[$page_id]['translations'], -1, PREG_SPLIT_NO_EMPTY);
 		    	
-		    	if( !empty($translations) ){
-		    		$result_value = '';
+// 		    	if( !empty($translations) ){
+// 		    		$result_value = '';
 		    		
-			    	foreach( $translation_manager->getFolder( FrontendLanguage::instance()->getLangaugeCode() )->getFiles() as $t_file ){
+// 			    	foreach( TManager::instance()->getFolder( FrontendLanguage::instance()->getLangaugeCode() )->getTranslations() as $translation ){
 			    		
-			    		if( in_array($t_file->getHandle(), $translations) ){
-			    			$result_value .= $this->_addFile($t_file);
-			    		}
-			    	}
+// 			    		if( in_array($translation->getHandle(), $translations) ){
+// 			    			$result_value .= $this->_addFile($translation);
+// 			    		}
+// 			    	}
 					
-			    	$result->setValue( $this->_formatXmlString($result_value) );
-		    	}
-	    	}
+// 			    	$result->setValue( $this->_formatXmlString($result_value) );
+// 		    	}
+// 	    	}
 			
 	        return $result;
 	    }
 	    
 	    
 	    
-	    private function _addFile(TranslationFile $t_file){
+	    private function _addFile(Translation $translation){
 	    	$result = '';
 	    	$force_empty_result = false;
 	    	
@@ -81,7 +79,7 @@
 
 	    	$xsl = $stylesheet->generate(true);
 
-	    	$xml = $t_file->getContent();
+	    	$xml = $translation->getContent();
 
 	    	// Handle where there is `$xml` and the XML is valid
 	    	if(strlen($xml) > 0 && !General::validateXML($xml, $errors, false, new XsltProcess)){
@@ -105,7 +103,7 @@
 	    	// If `force_empty_result` is false and `$result` is not an instance of
 	    	// XMLElement, build the `$result`.
 	    	if(!$force_empty_result) {
-
+				
 	    		$proc = new XsltProcess;
 	    		$ret = $proc->process($xml, $xsl);
 
@@ -138,9 +136,9 @@
 	    }
 	    
 	    /**
-	     * Courtesy of <a href="http://forums.devnetwork.net/viewtopic.php?p=213989">TJ at devnet</a> 
+	     * Courtesy of <a href="http://forums.devnetwork.net/viewtopic.php?p=213989">TJ at devnet</a>
 	     */
-	    function _formatXmlString($xml) {
+	    private function _formatXmlString($xml) {
 
 	    	// add marker linefeeds to aid the pretty-tokeniser (adds a linefeed between all tag-end boundaries)
 	    	$xml = preg_replace('/(>)(<)(\/*)/', "$1\n$2$3", $xml);

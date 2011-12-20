@@ -3,18 +3,14 @@
 	
 	/**
 	 * Borrowed from EDUI extension. Thanks @ekoes.
-	 * 
+	 *
 	 * @package Frontend Localisation
-	 * 
+	 *
 	 * @author Vlad Ghita
 	 */
 	final class FLPageManager implements Singleton {
 		
 		private static $instance;
-		
-		private function __construct(){}
-		
-		
 		
 		/**
 		 * This function returns an instance of the FrontendLanguage class.
@@ -33,9 +29,9 @@
 		
 		/**
 		 * Get a list of Symphony Pages indexed by `id`. Default values returned are `id`, `title`, `handle` and `parent`.
-		 * 
+		 *
 		 * @param array $fields - extra fields
-		 * 
+		 *
 		 * @return array  - found pages
 		 */
 		public function listAll(array $fields = array()){
@@ -49,12 +45,12 @@
 			
 			try {
 				$pages = Symphony::Database()->fetch($query, 'id');
-			} 
+			}
 			catch (DatabaseException $dbe) {
 				if( Symphony::Engine() instanceof Administration ){
 					Symphony::Engine()->Page->pageAlert($dbe->getMessage(), Alert::ERROR);
 				}
-			} 
+			}
 			catch (Exception $e){
 				if( Symphony::Engine() instanceof Administration ){
 					Symphony::Engine()->Page->pageAlert(__('In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.'), Alert::ERROR);
@@ -66,7 +62,7 @@
 
 		/**
 		 * Checks if given page has children.
-		 * 
+		 *
 		 * @param integer $page_id
 		 */
 		public function hasChildren($page_id) {

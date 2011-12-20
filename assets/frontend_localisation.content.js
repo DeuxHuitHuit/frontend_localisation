@@ -1,12 +1,15 @@
 jQuery(document).ready(function() {
 	var field = new Translations(jQuery('.translations'));
 	
-	jQuery('.xPath .reference_value').click(function(event){
+	jQuery('.translations .context .reference_value').click(function(event){
 		event.preventDefault();
-		jQuery(event.currentTarget).parent().find('textarea:eq(0)').toggle('fast');
+		
+		$target = jQuery(event.currentTarget);
+		$target.parent().find('textarea:eq(0)').toggle('fast', function(){
+			$target.find('.fl_plus, .fl_minus').toggle();
+		});
 	});
-	jQuery('.xPath textarea[name=\'reference_value\']').hide();
-	
+	jQuery('.translations .context textarea[name=\'reference_value\'], .fl_minus').hide();
 });
 
 function Translations(field) {

@@ -2,33 +2,19 @@
 	
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
+	
+	
 	require_once(TOOLKIT . '/class.administrationpage.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLPageManager.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TranslationManager.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TranslationFileWriter.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TForm.php');
+	
+	
 	
 	class contentExtensionFrontend_localisationIndex extends AdministrationPage {
 		
 		/**
-		 * Translation Manager
-		 * 
-		 * @var TranslationManager
-		 */
-		private $translation_manager = null;
-		
-		
-		
-		public function __construct($parent){
-			parent::__construct($parent);
-			
-			$this->translation_manager = new TranslationManager();
-		}
-		
-		
-		
-		/**
 		 * Displays all Translations on Index page.
-		 * 
+		 *
 		 * @see _dev/symphony/lib/toolkit/AdministrationPage::view()
 		 */
 		public function view() {
@@ -52,7 +38,7 @@
 
 			/* Build the table */
 			
-			$t_files = $this->translation_manager->getFolder( Symphony::Configuration()->get('reference_language','frontend_localisation') )->getFiles();
+			$translations = TManager::instance()->getFolder( Symphony::Configuration()->get('reference_language','frontend_localisation') )->getTranslations();
 			
 			$thead = array(
 				array(__('Title'), 'col'),
@@ -62,7 +48,7 @@
 			$tbody = array();
 
 			// If there are no records, display default message
-			if (!is_array($t_files) or empty($t_files)) {
+			if (!is_array($translations) or empty($translations)) {
 				$tbody = array(Widget::TableRow(array(
 					Widget::TableData(__('None found.'), 'inactive', null, count($thead))
 				), 'odd'));
@@ -72,15 +58,15 @@
 			else{
 				$bOdd = true;
 				
-				foreach ($t_files as $handle => $t_file) {
+				foreach ($translations as $handle => $translation) {
 					$edit_url = URL . '/symphony/extension/frontend_localisation/edit/' . $handle . '/';
 					
 					$col_title = Widget::TableData(Widget::Anchor(
-						$t_file->getName(), $edit_url
+						$translation->meta()->get('name'), $edit_url
 					));
-					$col_title->appendChild(Widget::Input("items[{$t_file->getHandle()}]", null, 'checkbox'));
+					$col_title->appendChild(Widget::Input("items[{$translation->getHandle()}]", null, 'checkbox'));
 					
-					$col_pages = Widget::TableData( $this->_createPageList($t_file) );
+					$col_pages = Widget::TableData( $this->_createPageList($translation) );
 					
 					$tbody[] = Widget::TableRow(array($col_title, $col_pages), ($bOdd ? 'odd' : NULL));
 					
@@ -105,7 +91,7 @@
 				
 				$options = array(
 					array(null, false, __('With Selected...')),
-					array('delete', false, __('Delete'))							
+					array('delete', false, __('Delete'))
 				);
 				
 				$tableActions->appendChild(Widget::Select('with-selected', $options));
@@ -117,20 +103,20 @@
 		
 		/**
 		 * Implements actions on Index page.
-		 * 
+		 *
 		 * @see _dev/symphony/lib/toolkit/AdministrationPage::action()
 		 */
-		function __actionIndex(){
+		public function __actionIndex(){
 
 			$checked = @array_keys($_POST['items']);
 
-			if(is_array($checked) && !empty($checked)){
+			if( is_array($checked) && !empty($checked) ){
 				switch($_POST['with-selected']) {
 
 					case 'delete':
 						
-						$t_folders = $this->translation_manager->getFolders();
-						$tf_writer = new TranslationFileWriter();
+						$t_folders = TManager::instance()->getFolders();
+						$t_linker = new TLinker();
 						
 						$pages = FLPageManager::instance()->listAll(array('translations'));
 						
@@ -138,7 +124,8 @@
 							
 							// remove files from HDD
 							foreach( $t_folders as $t_folder ){
-								$t_folder->deleteFile($handle);
+								/* @var $t_folder TFolder */
+								$t_folder->deleteTranslation($handle);
 							}
 							
 							// unlink from Pages
@@ -146,26 +133,26 @@
 								$page_translations = explode(',', $page['translations']);
 								
 								if( in_array($handle, $page_translations) ){
-									$tf_writer->unlinkTranslationFromPage($handle, $page_id);
+									$t_linker->unlinkFromPage($handle, $page_id);
 								}
 							}
 							
 						}
 
 						redirect($this->_Parent->getCurrentPageURL());
-						break;  	
+						break;
 				}
 			}
-		}	
+		}
 		
 		
 		
 		/**
-		 * Creates the pagelist for a Translation File
-		 * 
-		 * @param TranslationFile $t_file
+		 * Creates the pagelist for a Translation
+		 *
+		 * @param Translation $translation
 		 */
-		private function _createPageList($t_file) {
+		private function _createPageList($translation) {
 			$value = '';
 			
 			$pages = FLPageManager::instance()->listAll(array('translations'));
@@ -175,7 +162,7 @@
 				foreach( $pages as $page_id => $page ){
 					$page_translations = explode(',', $page['translations']);
 					
-					if( in_array($t_file->getHandle(), $page_translations) ){
+					if( in_array($translation->getHandle(), $page_translations) ){
 						$link = URL . '/symphony/blueprints/pages/edit/' . $page_id;
 						
 						$value .= "<a href=\"{$link}\">".Administration::instance()->resolvePageTitle($page_id)."</a><br />";
@@ -188,7 +175,7 @@
 				foreach( $pages as $page_id => $page ){
 					$page_translations = explode(',', $page['translations']);
 					
-					if( in_array($t_file->getHandle(), $page_translations) ){
+					if( in_array($translation->getHandle(), $page_translations) ){
 						$value .= '/' . Administration::instance()->resolvePageTitle($page_id) . '<br />';
 					}
 				}

@@ -45,37 +45,42 @@ div.translations label {
 	display: block;
 }
 
-div.translations div.xPath {
+div.translations div.context {
 	float: left;
 	margin-bottom: 0.5em;
 	margin-top: 1.2em;
 	width: 100%;
 }
 
-div.translations div.xPath label {
+div.translations div.context label {
 	margin: 0.7em 0 0 0;
 }
 
-div.translations div.xPath div.item_wrapper {
+div.translations div.context div.item_wrapper {
 	float: left;
 	margin: 15px 0 0 0;
 	width: 100%;
 }
 
-div.translations div.xPath div.item_wrapper div.reference_wrapper {
+div.translations div.context div.item_wrapper div.reference_wrapper {
 	float: left;
 	margin: 0;
 	width: 100%;
 }
 
-div.translations div.xPath div.item_wrapper div.handle_wrapper {
+div.translations div.context div.item_wrapper div.handle_wrapper {
 	float: left;
 	margin: 0;
 	width: 29%;
 }
 
-div.translations div.xPath div.item_wrapper div.value_wrapper {
+div.translations div.context div.item_wrapper div.value_wrapper {
 	float: right;
 	margin: 0;
 	width: 69%;
+}
+
+div.translations h2,
+div.translations label.reference_value span{
+	font-weight: bold;
 }

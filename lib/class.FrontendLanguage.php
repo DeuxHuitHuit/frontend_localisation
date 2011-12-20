@@ -2,6 +2,8 @@
 
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
+	
+	
 	/**
 	 * Manager that deals with existing multiple implementations of frontend language switchers;
 	 * It provides some neat convenince methods to operate with frontend languages.
@@ -22,14 +24,14 @@
 		);
 		
 		/**
-		 * Available language drivers. A language driver is available if his extension is enabled and 
+		 * Available language drivers. A language driver is available if his extension is enabled and
 		 * @var array
 		 */
 		private $available_language_drivers = array();
 		
 		/**
 		 * Current language driver
-		 * 
+		 *
 		 * @var LanguageDriver
 		 */
 		private $language_driver;
@@ -38,7 +40,7 @@
 		
 		private function __construct(){
 			foreach( $this->supported_language_drivers as $name => $handle ){
-				if( Symphony::ExtensionManager()->fetchStatus($handle) == EXTENSION_ENABLED 
+				if( Symphony::ExtensionManager()->fetchStatus($handle) == EXTENSION_ENABLED
 				    && $this->_validateDriver($name) ){
 					$this->available_language_drivers[] = $name;
 				}
@@ -83,7 +85,7 @@
 		
 		/**
 		 * Returns supported frontend language drivers
-		 * 
+		 *
 		 * @return array
 		 */
 		public function getSupportedLanguageDrivers(){
@@ -92,7 +94,7 @@
 		
 		/**
 		 * Returns available frontend language drivers
-		 * 
+		 *
 		 * @return array
 		 */
 		public function getAvailableLanguageDrivers(){
@@ -101,7 +103,7 @@
 		
 		/**
 		 * Returns default language driver.
-		 * 
+		 *
 		 * @return string - first element of $supported_language_drivers array
 		 */
 		public function getDefaultLanguageDriverName(){
@@ -110,7 +112,7 @@
 		
 		/**
 		 * Returns current language driver
-		 * 
+		 *
 		 * @return LanguageDriver
 		 */
 		public function getLanguageDriver(){
@@ -119,7 +121,7 @@
 		
 		/**
 		 * Changes Language Driver to give parameter
-		 * 
+		 *
 		 * @param string $driver_name - Name of new language driver
 		 */
 		public function setLanguageDriver($driver_name){
@@ -132,16 +134,26 @@
 		
 		/**
 		 * Returns current frontend language code.
-		 * 
+		 * @deprecated use getLanguageCode() instead.
+		 *
 		 * @return string
 		 */
 		public function getLangaugeCode(){
+			return $this->getLanguageCode();
+		}
+		
+		/**
+		 * Returns current frontend language code.
+		 *
+		 * @return string
+		 */
+		public function getLanguageCode(){
 			return (string) $this->language_driver->getLanguageCode();
 		}
 		
 		/**
 		 * Returns supported language codes.
-		 * 
+		 *
 		 * @return array
 		 */
 		public function languageCodes(){
@@ -150,7 +162,7 @@
 		
 		/**
 		 * Returns all languages
-		 * 
+		 *
 		 * @return array - Defaults to inner $allLanguages
 		 */
 		public function allLanguages(){
@@ -159,16 +171,16 @@
 		
 		/**
 		 * Returns all current driver details.
-		 * 
+		 *
 		 * @return array
 		 */
 		public function driverDetails(){
 			return (array) $this->language_driver->getDriverDetails();
 		}
-
+		
 		/**
 		 * Returns name of current driver.
-		 * 
+		 *
 		 * @return string
 		 */
 		public function driverName(){
@@ -177,7 +189,7 @@
 		
 		/**
 		 * Returns handle of current driver.
-		 * 
+		 *
 		 * @return string
 		 */
 		public function driverHandle(){
@@ -186,7 +198,7 @@
 		
 		/**
 		 * Returns if current driver is enabled or not.
-		 * 
+		 *
 		 * @return boolean - true if EXTENSION_ENABLED, false otherwise
 		 */
 		public function driverStatus(){
@@ -195,7 +207,7 @@
 		
 		/**
 		 * Returns reference language code of current driver.
-		 * 
+		 *
 		 * @return string
 		 */
 		public function referenceLanguage(){
@@ -206,19 +218,19 @@
 		
 		/**
 		 * Returns newly entered language codes on preferences page set by current driver.
-		 * 
+		 *
 		 * @param array $context - entire form data from Preferences page
 		 * @return array - new laguage codes
 		 */
 		public function savedLanguages($context){
 			return (array) $this->language_driver->getSavedLanguages($context);
-		}		
-
+		}
+		
 		
 		
 		/**
 		 * Gets a new instance of a LanguageDriver
-		 * 
+		 *
 		 * @param string $driver_name (optional) - Contains driver name
 		 */
 		private function _newLanguageDriver($driver_name = null){
@@ -234,9 +246,9 @@
 		
 		/**
 		 * Validate a language_driver; driver file exists and driver class exists in that file
-		 * 
+		 *
 		 * @param string $driver_name
-		 * 
+		 *
 		 * @return boolean - true if succesfull, false otherwise
 		 */
 		private function _validateDriver($driver_name){
@@ -250,7 +262,7 @@
 				// Driver class must exist
 				if (!class_exists($driver_class)) {
 					$message = __('<code>%1$s</code>: Driver class <code>%2$s</code> doesn\'t exist in file <code>%3$s</code>.', array(FRONTEND_LOCALISATION_NAME, $driver_class, $driver_file));
-				
+					
 					Administration::instance()->Page->pageAlert($message, Alert::ERROR);
 					Symphony::$Log->pushToLog($message, E_NOTICE, true);
 					

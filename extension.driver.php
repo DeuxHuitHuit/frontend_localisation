@@ -3,7 +3,7 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	
-	require_once('lib/class.TranslationManager.php');
+	require_once('lib/class.TManager.php');
 	require_once('lib/class.FrontendLanguage.php');
 
 	
@@ -13,73 +13,31 @@
 	
 	final class extension_frontend_localisation extends Extension {
 
-		const CHECKBOX_YES = 'yes';
-		
-		/**
-		 * Manages Translation Folders.
-		 * 
-		 * @var TranslationManager
-		 */
-		private $translation_manager = null;
-		
-		/**
-		 * Cache current language codes for internal use.
-		 * 
-		 * @var array
-		 */
-		private $language_codes = array();
-		
-		/**
-		 * Cache reference language for internal use.
-		 * 
-		 * @var string
-		 */
-		private $reference_language = '';
-		
-		/**
-		 * Cache translation path for internal use.
-		 * 
-		 * @var string
-		 */
-		private $translation_path = '';
-		
-		
-		
-		public function __construct($args) {
-			parent::__construct($args);
-			
-			if( Symphony::ExtensionManager()->fetchStatus(FRONTEND_LOCALISATION_GROUP) == EXTENSION_ENABLED
-			    && FrontendLanguage::instance() != null ){
-			    
-				$this->language_codes = (array) FrontendLanguage::instance()->languageCodes();
-				$this->reference_language = (string) FrontendLanguage::instance()->referenceLanguage();
-				$this->translation_path = (string) Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
-			
-				$this->translation_manager = new TranslationManager();
-			}
-		}
-		
-		
-		
 		public function about(){
 			return array(
-				'name' => FRONTEND_LOCALISATION_NAME,
-				'version' => '0.3beta',
-				'release-date' => '2011-11-03',
-				'author' => array(
-					array(
-						'name' => 'Xander Group',
-						'email' => 'symphonycms@xandergroup.ro',
-						'website' => 'www.xandergroup.ro'
+					'name' => FRONTEND_LOCALISATION_NAME,
+					'version' => '0.5 beta',
+					'release-date' => '2011-12-20',
+					'author' => array(
+							array(
+									'name' => 'Xander Group',
+									'email' => 'symphonycms@xandergroup.ro',
+									'website' => 'www.xandergroup.ro'
+							),
+							array(
+									'name' => 'Vlad Ghita',
+									'email' => 'vlad.ghita@xandergroup.ro',
+							),
 					),
-					array(
-						'name' => 'Vlad Ghita',
-						'email' => 'vlad.ghita@xandergroup.ro',
-					),
-				),
-				'description' => __('Offers a frontend localisation mechanism using XML files.')
+					'description' => __('Offers a frontend localisation mechanism using XML, GNU PO or JAVA Style formats.')
 			);
 		}
+		
+		
+		
+		const CHECKBOX_YES = 'yes';
+		
+		
 		
 		public function install() {
 			// depends on FrontendLanguage
@@ -110,7 +68,8 @@
 			Symphony::Configuration()->set('language_driver', FrontendLanguage::instance()->getDefaultLanguageDriverName(), FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('reference_language', FrontendLanguage::instance()->referenceLanguage(), FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('translation_path', '/workspace/translations', FRONTEND_LOCALISATION_GROUP);
-			Symphony::Configuration()->set('page_name_prefix', 'pagina_', FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('page_name_prefix', 'p_', FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('storage_format', 'xml', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('consolidate_translations', self::CHECKBOX_YES, FRONTEND_LOCALISATION_GROUP);
 			
 			Administration::instance()->saveConfig();
@@ -118,8 +77,7 @@
 			/* Translations */
 			General::realiseDirectory(DOCROOT . Symphony::Configuration()->get('translation_path', FRONTEND_LOCALISATION_GROUP));
 			
-			$this->translation_manager = new TranslationManager(DOCROOT . '/workspace/translations');
-			$this->translation_manager->updateFolders();
+			TManager::instance()->updateFolders();
 			
 			return true;
 		}
@@ -131,8 +89,8 @@
 				// General::deleteDirectory(DOCROOT . $this->translation_path);
 				/*  in Symphony 2.3 */
 				
-				if( !empty($this->translation_path) && is_dir(DOCROOT . $this->translation_path) ){
-					TranslationManager::deleteFolder(DOCROOT . $this->translation_path);
+				if( is_dir(DOCROOT . $this->translation_path) ){
+					TManager::deleteFolder(DOCROOT . $this->translation_path);
 				}
 			}
 			
@@ -169,11 +127,6 @@
 		
 		public function getSubscribedDelegates(){
 			return array(
-				array(
-					'page' => '/backend/',
-					'delegate' => 'InitaliseAdminPageHead',
-					'callback' => 'dInitaliseAdminPageHead'
-				),
 				array(
 					'page' => '/blueprints/pages/',
 					'delegate' => 'AppendPageContent',
@@ -213,13 +166,13 @@
 				array(
 					'page' => '/system/preferences/',
 					'delegate' => 'CustomActions',
-					'callback' => 'dCustomActions' 
+					'callback' => 'dCustomActions'
 				),
 				
 				array(
 					'page' => '/system/preferences/',
 					'delegate' => 'Save',
-					'callback' => 'dSavePreferences' 
+					'callback' => 'dSavePreferences'
 				),
 			);
 		}
@@ -227,20 +180,8 @@
 		
 		
 		/**
-		 * Add necessary assets to content pages head
-		 */
-		public function dInitaliseAdminPageHead() {
-			$callback = Administration::instance()->getPageCallback();
-			
-			if ( $callback['pageroot'] === '/extension/frontend_localisation/edit/' ) {
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/'.FRONTEND_LOCALISATION_GROUP.'/assets/frontend_localisation.content.js', 203, false);
-				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/'.FRONTEND_LOCALISATION_GROUP.'/assets/frontend_localisation.content.css', "screen");
-			}
-		}
-		
-		/**
 		 * Append Translations select to Page edit menu.
-		 * 
+		 *
 		 * @param array $context - see delegate description
 		 */
 		public function dAppendPageContent(array $context){
@@ -257,19 +198,19 @@
 			
 			$label = Widget::Label(__('Translations'));
 			
-			$t_files = $this->translation_manager->getFolder( Symphony::Configuration()->get('reference_language','frontend_localisation') )->getFiles();
+			$translations = TManager::instance()->getFolder( Symphony::Configuration()->get('reference_language','frontend_localisation') )->getTranslations();
 			$options = array();
 
-			if( is_array($t_files) && !empty($t_files) ){
+			if( is_array($translations) && !empty($translations) ){
 				if( !is_array($context['fields']['translations']) ){
 					$context['fields']['translations'] = array();
 				}
 				
-				foreach( $t_files as $t_file ){
-					$handle = $t_file->getHandle();
+				foreach( $translations as $translation ){
+					$handle = $translation->getHandle();
 					
 					$options[] = array(
-						$handle, in_array($handle, $context['fields']['translations']), $t_file->getName()
+						$handle, in_array($handle, $context['fields']['translations']), $translation->meta()->get('name')
 					);
 				}
 			}
@@ -283,7 +224,7 @@
 		
 		/**
 		 * Prepare Translations select data for DB insert.
-		 * 
+		 *
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreCreate(array $context){
@@ -292,12 +233,12 @@
 		}
 		
 		/**
-		 * On page creation, add a Translation File in all Translation Folders.
-		 * 
+		 * On page creation, add a Translation in all Translation Folders.
+		 *
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePostCreate(array $context){
-			$this->translation_manager->createTranslationFile(
+			TManager::instance()->createTranslation(
 				array(
 					'id' => $context['page_id'],
 					'handle' => $context['fields']['handle'],
@@ -307,41 +248,40 @@
 		}
 		
 		/**
-		 * On changing page handle, update corresponding Translation Files.
-		 * 
+		 * On changing page handle, update corresponding Translations.
+		 *
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreEdit(array $context){
 			// prepare translations data for DB insert
-			$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : NULL;
+			$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : '';
+			
+			$current_page = Symphony::Database()->fetchRow(0, "SELECT `handle`, `parent` FROM `tbl_pages` WHERE id = '{$context['page_id']}' LIMIT 1");
 			
 			// update translation filenames if needed
-			$current_page = Symphony::Database()->fetchRow(0, "SELECT `handle` FROM `tbl_pages` WHERE id = '{$context['page_id']}' LIMIT 1");
-			
-			if ( $context['fields']['handle'] != $current_page['handle'] ) {
-				$this->translation_manager->editTranslationFiles(array(
+			if( ($context['fields']['handle'] != $current_page['handle']) || ($context['fields']['parent'] != $current_page['parent']) ){
+				TManager::instance()->editTranslation(array(
 						'id' => $context['page_id'],
 						'old_handle' => $current_page['handle'],
 						'new_handle' => $context['fields']['handle'],
-						'parent' => $context['fields']['parent']
+						'old_parent' => $current_page['parent'],
+						'new_parent' => $context['fields']['parent']
 				));
-				
-				// @todo update pages which contain this Translation File ...
 			}
 		}
 		
 		/**
-		 * On deleting one or more pages, delete corresponding Translation Files.
-		 * 
+		 * On deleting one or more pages, delete corresponding Translations.
+		 *
 		 * @param array $context - see delegate description
-		 */		
+		 */
 		public function dPagePreDelete(array $context){
-			$this->translation_manager->deleteTranslationFiles($context['page_ids']);
+			TManager::instance()->deleteTranslation($context['page_ids']);
 		}
 		
 		/**
 		 * On preferences page add extension settings.
-		 * 
+		 *
 		 * @param array $context - see delegate description
 		 */
 		public function dAddCustomPreferenceFieldsets(array $context) {
@@ -350,31 +290,30 @@
 			$group->appendChild(new XMLElement('legend', __(FRONTEND_LOCALISATION_NAME)));
 			
 			$group->appendChild( $this->_addLanguageDriver() );
-			$group->appendChild(new XMLElement('p', __('The Symphony extension that drives your frontend langauge management.'), array('class' => 'help')));
+			$group->appendChild(new XMLElement('p', __('The Symphony extension that drives your frontend language management.'), array('class' => 'help')));
 			
 			$group->appendChild( $this->_addReferenceLanguage() );
 			$group->appendChild(new XMLElement('p', __('Language translations that will be used as reference when updating other languages translations.'), array('class' => 'help')));
 			
-			$group->appendChild( $this->_addTranslationPath() );
-			$group->appendChild(new XMLElement('p', __('Path where you would like to store translations.'), array('class' => 'help')));
-			
-			$prefix_label = Widget::Label(__('Pages prefix'));
-			$prefix_label->appendChild(Widget::Input('settings['.FRONTEND_LOCALISATION_GROUP.'][page_name_prefix]', Symphony::Configuration()->get('page_name_prefix',FRONTEND_LOCALISATION_GROUP)));
-			$group->appendChild($prefix_label);
-			$group->appendChild(new XMLElement('p', __('This prefix will be added for Symphony Pages translations for easier management. e.g.: <code>pagina_cotact.xml</code>'), array('class' => 'help')));
+			$group->appendChild( $this->_addStorageFormat() );
+			$group->appendChild(new XMLElement('p', __('Storage format to use for translations.'), array('class' => 'help')));
 			
 			$consolidate_checkbox = Widget::Input('settings['.FRONTEND_LOCALISATION_GROUP.'][consolidate_translations]', self::CHECKBOX_YES, 'checkbox');
 			if(Symphony::Configuration()->get('consolidate_translations', FRONTEND_LOCALISATION_GROUP) == self::CHECKBOX_YES) { $consolidate_checkbox->setAttribute('checked', 'checked'); }
 			$group->appendChild(Widget::Label($consolidate_checkbox->generate() . ' ' . __('Consolidate translations')));
-			$group->appendChild(new XMLElement('p', __('Check this to preserve translation files for languages being removed by <code>Language driver</code>.'), array('class' => 'help')));
+			$group->appendChild(new XMLElement('p', __('Check this to preserve Translations for languages being removed by <code>Language driver</code>.'), array('class' => 'help')));
 			
 			$update_folders = new XMLElement('span', NULL, array('class' => 'frame'));
-			$update_folders->appendChild(new XMLElement('button', __('Update translation files'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][update_files]', 'type' => 'submit')));
+			$update_folders->appendChild(new XMLElement('button', __('Update Translations'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][update_translations]', 'type' => 'submit')));
 			$group->appendChild($update_folders);
 			
-//			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
-//			$convert->appendChild(new XMLElement('button', __('Convert XML to Translations'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert]', 'type' => 'submit')));
-//			$group->appendChild($convert);
+// 			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
+// 			$convert->appendChild(new XMLElement('button', __('Convert XML to Translations'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert]', 'type' => 'submit')));
+// 			$group->appendChild($convert);
+			
+			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
+			$convert->appendChild(new XMLElement('button', __('Convert v0.3 to v0.5'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert_0.3_to_0.5]', 'type' => 'submit')));
+			$group->appendChild($convert);
 			
 			$context['wrapper']->appendChild($group);
 		}
@@ -383,24 +322,21 @@
 		 * On preferences page, personalize custom form actions.
 		 */
 		public function dCustomActions(){
-			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['update_files']) ){
-				$this->translation_manager->updateFolders();
+			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['update_translations']) ){
+				TManager::instance()->updateFolders();
 			}
 			
 			// This is here to ensure compatibility with XS_XML_PAGES (another extension, precursor of this extension)
 			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert']) ){
-				$t_folders = $this->translation_manager->getFolders();
+				$t_folders = TManager::instance()->getFolders();
 				
 				$all_languages = FrontendLanguage::instance()->allLanguages();
 				
-				foreach( $t_folders as $t_folder ){
-					$t_files = $t_folder->getFiles();
+				foreach( $t_folders as $language_code => $t_folder ){
+					$translations = $t_folder->getTranslations();
 					
-					$all_languages = (array) FrontendLanguage::instance()->allLanguages();
-					$language_code = $t_folder->getLanguageCode();
-					
-					foreach( $t_files as $t_file ){
-						$old_dom = $t_file->getContentXML();
+					foreach( $translations as $translation ){
+						$old_dom = $translation->getContentXML();
 						
 						$new_dom = new DOMDocument('1.0', 'UTF-8');
 						$new_dom->formatOutput = true;
@@ -410,7 +346,7 @@
 						$new_dom_meta = $new_dom->createElement('meta');
 						
 						$new_dom_meta->appendChild(
-							$new_dom->createElement('name', $t_file->getHandle())
+							$new_dom->createElement('name', $translation->getHandle())
 						);
 						
 						$new_dom_language = $new_dom->createElement('language', $all_languages[$language_code]);
@@ -433,7 +369,107 @@
 						$new_dom_translation->appendChild( $new_dom_data );
 						$new_dom->appendChild( $new_dom_translation );
 			
-						$t_file->setContent( $new_dom->saveXML() );
+						$translation->setContent( $new_dom->saveXML() );
+					}
+				}
+			}
+			
+			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert_0.3_to_0.5']) ){
+				$all_languages = FrontendLanguage::instance()->allLanguages();
+				$langauge_codes = FrontendLanguage::instance()->languageCodes();
+				
+				foreach( $langauge_codes as $language_code ){
+
+					$path = WORKSPACE . '/translations/' . $language_code;
+					
+					$structure = (array) General::listStructure($path);
+					
+					if (!empty($structure['filelist'])) {
+						foreach ($structure['filelist'] as $filename) {
+							$handle = substr($filename,0,-4);
+							
+							$old_doc = new DOMDocument('1.0', 'UTF-8');
+							$old_doc->load($path . '/' . $filename);
+							
+							$xPath = new DOMXPath($old_doc);
+							
+							
+							// Translation meta
+							
+							$dom_meta = new DOMDocument('1.0', 'UTF-8');
+							$dom_meta->formatOutput = true;
+							
+							$dom_meta_info = $dom_meta->createElement('meta');
+							
+							// name
+							$dom_meta_info->appendChild(
+								$dom_meta->createElement('name', General::sanitize($xPath->query('/translation/meta/name')->item(0)->nodeValue) )
+							);
+							
+							
+							// language
+							$dom_meta_language = $dom_meta->createElement('language');
+							$dom_meta_language->appendChild( $dom_meta->createElement('name', General::sanitize($all_languages[$language_code])) );
+							$dom_meta_language->appendChild( $dom_meta->createElement('code', $language_code) );
+							$dom_meta_language->appendChild( $dom_meta->createElement('handle', Lang::createHandle($all_languages[$language_code])) );
+							$dom_meta_info->appendChild($dom_meta_language);
+							
+							// storage format
+							$dom_meta_info->appendChild(
+								$dom_meta->createElement('storage_format', 'xml' )
+							);
+							
+							$dom_meta->appendChild( $dom_meta_info );
+							
+							General::writeFile($path.'/'.$handle.'.meta.xml', $dom_meta->saveXML());
+							
+							
+							// Translation data
+							
+							// 1. convert
+							
+							$dom_data = new DOMDocument('1.0', 'UTF-8');
+							$dom_data->formatOutput = true;
+							
+							$dom_data_info = $dom_data->createElement('data');
+							
+							foreach( $xPath->query('/translation/data')->item(0)->childNodes as $old_data_child ){
+								if( $old_data_child instanceof DOMElement ){
+									$dom_data_info->appendChild( $dom_data->importNode($old_data_child, true) );
+								}
+							}
+							
+							$dom_data->appendChild( $dom_data_info );
+							
+							
+							// 2. create CDATAs
+							
+							unset($xPath);
+							$xPath = new DOMXPath($dom_data);
+							
+							foreach( $xPath->query("//item[ @handle != '' ]") as $item ){
+								/* @var $item DOMElement */
+								$value = $dom_data->saveXML($item);
+								
+								// suppress opening element
+								$value = substr($value, strpos($value, '>') + 1);
+								
+								// suppress closing element
+								$value = substr($value, 0, strrpos($value, '<'));
+								
+								$item->nodeValue = '';
+								
+								/* @var $doc_item_cdata DOMCDATASection */
+								$doc_item_cdata = $dom_data->createCDATASection( $value );
+								
+								$item->appendChild($doc_item_cdata);
+							}
+							
+							General::writeFile($path.'/'.$handle.'.data.xml', $dom_data->saveXML());
+							
+							
+							General::deleteFile($path . '/' . $filename);
+						}
 					}
 				}
 			}
@@ -441,11 +477,10 @@
 		
 		/**
 		 * On preferences page, take custom actions when saving preferences.
-		 * 
+		 *
 		 * @param $context - see delegate description
 		 */
 		public function dSavePreferences(array $context) {
-			
 			/* First check language driver. If it changed, other settings are irrelevant */
 			
 			$old_language_driver = Symphony::Configuration()->get('language_driver',FRONTEND_LOCALISATION_GROUP);
@@ -462,42 +497,7 @@
 			}
 			
 			
-			/* Change Translations folder */
 			
-			$old_translation_path = Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
-			$new_translation_path = $context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path'];
-			
-			if ( $old_translation_path != $new_translation_path ) {
-				try {
-					if( rename(DOCROOT . $old_translation_path, DOCROOT . $new_translation_path) ){
-						Symphony::Configuration()->set('translation_path', $new_translation_path, FRONTEND_LOCALISATION_GROUP);
-					}
-					else{
-						unset($context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path']);
-					}
-				} catch (Exception $e) {
-					unset($context['settings'][FRONTEND_LOCALISATION_GROUP]['translation_path']);
-				}
-			}
-			
-			
-			/* Change prefix for pages Translations */
-			
-			$old_prefix = Symphony::Configuration()->get('page_name_prefix',FRONTEND_LOCALISATION_GROUP);
-			$new_prefix = $context['settings'][FRONTEND_LOCALISATION_GROUP]['page_name_prefix'];
-			
-			if ( $old_prefix != $new_prefix ) {
-				if( $this->translation_manager->changeFilenamesPrefix($old_prefix, $new_prefix) ){
-					Symphony::Configuration()->set('page_name_prefix', $new_prefix, FRONTEND_LOCALISATION_GROUP);
-				}
-				else{
-					$message = __('<code>%1$s</code>: couldn\'t change prefix for pages\' Translation Files.', array(FRONTEND_LOCALISATION_NAME));
-					Administration::instance()->Page->pageAlert($message, Alert::ERROR);
-					$context['errors'][] = $message;
-				}
-			}
-			
-				
 			/* Check if we should keep translations for removed langauges */
 			
 			$old_consolidate = Symphony::Configuration()->get('consolidate_translations',FRONTEND_LOCALISATION_GROUP);
@@ -508,7 +508,9 @@
 			}
 			
 			
+			
 			$new_languages = FrontendLanguage::instance()->savedLanguages($context);
+			
 			
 			
 			/* Update Reference Language */
@@ -523,19 +525,23 @@
 			Symphony::Configuration()->set('reference_language', $reference_language, FRONTEND_LOCALISATION_GROUP);
 			
 			
+			
 			/* Manage translation folders */
 			
+			$old_languages = FrontendLanguage::instance()->languageCodes();
+			
 			// update translation folders for new languages
-			$added_languages = array_diff($new_languages, $this->language_codes);
+			$added_languages = array_diff($new_languages, $old_languages);
 			if ( !empty($added_languages) ) {
-				$this->translation_manager->updateFolders($added_languages);
+				TManager::instance()->updateFolders($added_languages);
 			}
 			
 			// delete translation folders for deleted languages
-			$deleted_languages = array_diff($this->language_codes, $new_languages);
+			$deleted_languages = array_diff($old_languages, $new_languages);
 			if ( !empty($deleted_languages) && ($new_consolidate != self::CHECKBOX_YES) ) {
-				$this->translation_manager->deleteFolders($deleted_languages);
+				TManager::instance()->deleteFolders($deleted_languages);
 			}
+			
 			
 			
 			Administration::instance()->saveConfig();
@@ -547,14 +553,14 @@
 		
 		/**
 		 * Convenience method; builds language_driver selectbox.
-		 * 
+		 *
 		 * @return XMLElement - selectbox containing supported language drivers
 		 */
 		private function _addLanguageDriver() {
 			$label = Widget::Label(__('Language driver'));
 			
 			$options = array();
-			foreach (FrontendLanguage::instance()->getAvailableLanguageDrivers() as $driver_name) {
+			foreach( FrontendLanguage::instance()->getAvailableLanguageDrivers() as $driver_name ){
 				$options[] = array($driver_name, ($driver_name == FrontendLanguage::instance()->driverName() ), $driver_name );
 			}
 			
@@ -565,51 +571,44 @@
 		
 		/**
 		 * Convenience method; builds reference_language selectbox.
-		 * 
+		 *
 		 * @return XMLElement - selectbox containing supported language codes
 		 */
 		private function _addReferenceLanguage() {
 			$label = Widget::Label(__('Reference language'));
+			$reference_language = FrontendLanguage::instance()->referenceLanguage();
 			
 			$options = array();
-			foreach ($this->language_codes as $language_code) {
-				$options[] = array($language_code, ($language_code == $this->reference_language), $language_code );
+			foreach (FrontendLanguage::instance()->languageCodes() as $language_code) {
+				$options[] = array($language_code, ($language_code == $reference_language), $language_code );
 			}
 			
 			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][reference_language]', $options) );
 			
 			return $label;
 		}
-		
+
 		/**
-		 * Convenience method; builds translation_path selectbox.
-		 * 
-		 * @return XMLElement - selectbox containing allowed workspace directories
+		 * Convenience method; builds reference_language selectbox.
+		 *
+		 * @return XMLElement - selectbox containing supported language codes
 		 */
-		private function _addTranslationPath() {
-			$ignore = array(
-				'/workspace/events',
-				'/workspace/data-sources',
-				'/workspace/pages',
-				'/workspace/utilities'
-			);
+		private function _addStorageFormat() {
+			$label = Widget::Label(__('Default storage format'));
 			
-			$directories = General::listDirStructure(WORKSPACE, null, true, DOCROOT, $ignore);
-
-			$label = Widget::Label(__('Translation path'));
-
+			$current_storage_format = Symphony::Configuration()->get('storage_format', FRONTEND_LOCALISATION_GROUP);
+		
 			$options = array();
-			$options[] = array('/workspace', false, '/workspace');
-			if(!empty($directories) && is_array($directories)){
-				foreach($directories as $d) {
-					$d = '/' . trim($d, '/');
-					if(!in_array($d, $ignore)) $options[] = array($d, (Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP) == $d), $d);
-				}
+			foreach( TManager::instance()->getSupportedStorageFormats() as $storage_format => $info ){
+				$options[] = array(
+					$storage_format,
+					($storage_format == $current_storage_format),
+					$info['description']
+				);
 			}
-			
-			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][translation_path]', $options, $attributes) );
-			
+		
+			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][storage_format]', $options) );
+		
 			return $label;
 		}
-		
 	}
