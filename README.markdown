@@ -16,8 +16,8 @@ Thank you all other Symphony & Extensions developers for your inspirational work
 
 
 @todo - implementation for PO and I18N
-@todo - per translation option for storage (convertion from one type to another)
-@todo - rework of FL_Translations Datasource
+  @todo - per translation option for storage (convertion from one type to another)
+  @todo - rework of FL_Translations Datasource
 
 
 ## 1 Synopsis ##
