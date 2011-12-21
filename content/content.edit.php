@@ -44,7 +44,7 @@
 			// If we're editing, make sure the item exists
 			
 			if( $this->_context[0] ){
-				$translations = TManager::instance()->getFolder( FrontendLanguage::instance()->referenceLanguage() )->getTranslations();
+				$translations = TManager::instance()->getFolder( FLang::instance()->referenceLanguage() )->getTranslations();
 				
 				if( !$handle = $this->_context[0] ) redirect(URL . '/symphony/extension/frontend_localisaion');
 				
@@ -117,7 +117,7 @@
 					$translation = $t_folder->getTranslation( $handle );
 					
 					$fields['name'][$language_code] = $translation->meta()->get('name');
-					$fields['translations'][$language_code] = $translation->data()->getAsTArray();
+					$fields['translations'][$language_code] = $translation->getParser()->asTArray($translation);
 				}
 			}
 
@@ -181,7 +181,7 @@
 				
 				// if there are any translations at all
 				if( is_array($fields['translations']) ){
-					$reference_language = FrontendLanguage::instance()->referenceLanguage();
+					$reference_language = FLang::instance()->referenceLanguage();
 					
 					foreach( $fields['translations'] as $language_code => $translations ){
 						foreach( $translations as $context => $items ){
@@ -213,7 +213,7 @@
 				}
 				// default to empty translations data
 				else{
-					foreach( FrontendLanguage::instance()->languageCodes() as $language_code ){
+					foreach( FLang::instance()->ld()->languageCodes() as $language_code ){
 						$file_translations[$language_code] = array();
 					}
 				}
@@ -254,7 +254,9 @@
 								$translation->setName($fields['name'][$language_code]);
 								
 								// set tranlsation strings
-								$translation->data()->setFromTArray($translations);
+								$content = $translation->getParser()->TArray2string($translations);
+								
+								$translation->data()->setContent($content);
 							}
 						}
 					}

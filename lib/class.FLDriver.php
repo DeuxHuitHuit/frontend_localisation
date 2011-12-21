@@ -5,7 +5,7 @@
 	/**
 	 * Contains mandatory data a Language Driver must provide 
 	 */
-	abstract class LanguageDriver
+	abstract class FLDriver
 	{
 		/**
 		 * Array containing lang_code->lang_name pairs of Languages.
@@ -194,21 +194,21 @@
 		);
 		
 		/**
-		 * Returns all languages
+		 * Getter for all languages array.
 		 * 
 		 * @return array - Defaults to inner $all_languages
 		 */
-		public function getAllLanguages(){
+		public function allLanguages(){
 			return (array) $this->all_languages;
 		}
 		
 		/**
-		 * Returns all driver details.
+		 * Returns driver details.
 		 * 
 		 * @return array
 		 */
 		public function getDriverDetails(){
-			return (array) Symphony::ExtensionManager()->about($this->getHandle());
+			return (array) Symphony::ExtensionManager()->about( $this->getHandle() );
 		}
 		
 		/**
@@ -217,18 +217,12 @@
 		 * @return boolean - true if EXTENSION_ENABLED, false otherwise
 		 */
 		public function getDriverStatus(){
-			return (boolean) (Symphony::ExtensionManager()->fetchStatus($this->getHandle()) == EXTENSION_ENABLED);
+			return (boolean) (Symphony::ExtensionManager()->fetchStatus( $this->getHandle()) == EXTENSION_ENABLED );
 		}
 		
-		/**
-		 * Returns name of driver.
-		 * 
-		 * @return string
-		 */
-		abstract public function getName();
 		
 		/**
-		 * Returns handle of driver.
+		 * Return driver handle.
 		 * 
 		 * @return string
 		 */
@@ -239,28 +233,28 @@
 		 * 
 		 * @return string
 		 */
-		abstract public function getLanguageCode();
+		abstract public function languageCode();
 		
 		/**
 		 * Returns reference language code.
 		 * 
 		 * @return string
 		 */
-		abstract public function getReferenceLanguage();
-
+		abstract public function referenceLanguage();
+		
 		/**
 		 * Returns supported languages codes.
 		 * 
 		 * @return array
 		 */
-		abstract public function getLanguageCodes();
-
+		abstract public function languageCodes();
+		
 		/**
-		 * Returns newly entered language codes
+		 * Returns newly entered language codes.
 		 * 
 		 * @param array $context - entire form data from Preferences page
+		 * 
 		 * @return array - new laguage codes
 		 */
 		abstract public function getSavedLanguages($context);
-		
 	}

@@ -70,6 +70,13 @@
 		 */
 		private $t_folders = array();
 		
+		/**
+		 * Translation Parsers. Caches them for easy access.
+		 * 
+		 * @var array
+		 */
+		private $t_parsers = array();
+		
 		
 		
 		/**
@@ -151,6 +158,25 @@
 		 */
 		public function getStorageFormat(){
 			return (string) $this->storage_format;
+		}
+		
+		/**
+		 * Get a TParser instance for Translation transform.
+		 * 
+		 * @param string $storage_format
+		 * 
+		 * @return TParser - Appropriate TParser for $storage_format
+		 */
+		public function getParser($storage_format){
+			if( !($this->t_parsers[$storage_format] instanceof TParser) ){
+				$this->loadStorageClass($storage_format, 'TParser');
+				
+				$class_name = strtoupper($storage_format).'_TParser';
+				
+				$this->t_parsers[$storage_format] = new $class_name();
+			}
+			
+			return $this->t_parsers[$storage_format];
 		}
 		
 		
@@ -256,7 +282,7 @@
 		public function syncTranslation($handle){
 			if( !is_string($handle) || empty($handle) ) return false;
 		
-			$reference_language = FrontendLanguage::instance()->referenceLanguage();
+			$reference_language = FLang::instance()->referenceLanguage();
 		
 			// make sure reference folder exists
 			if( !$this->addFolder($reference_language) ) return false;
@@ -268,7 +294,7 @@
 		
 			$valid = true;
 		
-			foreach( FrontendLanguage::instance()->languageCodes() as $language_code ){
+			foreach( FLang::instance()->ld()->languageCodes() as $language_code ){
 		
 				if( $language_code === $reference_language ) continue;
 		
@@ -331,7 +357,7 @@
 				}
 			}
 		
-			// else rollback changes
+			// else try to rollback changes
 			else{
 				foreach( $passed as $translation ){
 					$translation->delete();
@@ -356,13 +382,13 @@
 			
 			// if no languages desired, update all folders
 			if( empty($language_codes) ){
-				$language_codes = FrontendLanguage::instance()->languageCodes();
+				$language_codes = FLang::instance()->ld()->languageCodes();
 			}
 			
 			if( !empty($language_codes) ){
 			
 				// update folder for reference language
-				$reference_language = FrontendLanguage::instance()->referenceLanguage();
+				$reference_language = FLang::instance()->referenceLanguage();
 				if (empty($this->t_folders[$reference_language])) {
 					$this->addFolder($reference_language);
 				}
@@ -387,7 +413,7 @@
 		public function deleteFolders(array $language_codes = null){
 			// if no languages desired, delete all folders
 			if( empty($language_codes) ){
-				$language_codes = FrontendLanguage::instance()->languageCodes();
+				$language_codes = FLang::instance()->ld()->languageCodes();
 			}
 			
 			foreach( $language_codes as $language_code ){
@@ -412,7 +438,7 @@
 		 * @param string $language_code
 		 */
 		public function addFolder($language_code){
-			if( !is_string($language_code) || empty($language_code) || !in_array($language_code, FrontendLanguage::instance()->languageCodes() )) return false;
+			if( !is_string($language_code) || empty($language_code) || !in_array($language_code, FLang::instance()->ld()->languageCodes() )) return false;
 			
 			if( empty($this->t_folders[$language_code]) ){
 				if( !General::realiseDirectory($this->path.'/'.$language_code) ) return false;
@@ -420,6 +446,43 @@
 				$this->t_folders[$language_code] = new TFolder($this, $language_code);
 			}
 			
+			return true;
+		}
+		
+		
+		
+		/**
+		 * Loads a Translation resource identified by `$class` abstract class name.
+		 *
+		 * 		- If class file doesn't exist, `Exception` is thrown.
+		 * 		- If class doesn't exist in file, `Exception` is thrown.
+		 * 
+		 * @param string $storage_format
+		 * @param string $class - abstract base class name.
+		 * 		e.g. $class=='TParser' and $storage_format=='xml' => required class is `XML_TParser`
+		 *
+		 * @throws Exception - will be catched by Symphony's default error handler.
+		 */
+		public function loadStorageClass($storage_format, $class){
+			if( !array_key_exists($storage_format, $this->supported_storage_formats) ){
+				throw new Exception("Storage format `{$storage_format}` is not supported.`");
+			}
+			
+			$file_name = EXTENSIONS . '/frontend_localisation/lib/'. $storage_format .'/class.'. $class .'.php';
+		
+			// $class file must exist
+			if( !is_file($file_name) ){
+				throw new Exception("File '`{$file_name}`' doesn't exist.`");
+			}
+			
+			require_once ($file_name);
+			$class_name = strtoupper($storage_format).'_'.$class;
+			
+			// $class must exist
+			if( !class_exists($class_name) ){
+				throw new Exception("Class `{$class_name}` could not be found in file `{$file_name}`.`");
+			}
+		
 			return true;
 		}
 		
@@ -471,7 +534,7 @@
 			$structure = General::listStructure($this->path);
 		
 			if( !empty($structure['dirlist']) ){
-				$language_codes = FrontendLanguage::instance()->languageCodes();
+				$language_codes = FLang::instance()->ld()->languageCodes();
 		
 				foreach( $structure['dirlist'] as $language_code ){
 					if( in_array($language_code, $language_codes) ){

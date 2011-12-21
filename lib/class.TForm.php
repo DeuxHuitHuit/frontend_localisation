@@ -60,8 +60,8 @@
 			
 			if( is_array($fields['translations']) ){
 				
-				$all_languages = FrontendLanguage::instance()->allLanguages();
-				$reference_language = FrontendLanguage::instance()->referenceLanguage();
+				$all_languages = FLang::instance()->ld()->allLanguages();
+				$reference_language = FLang::instance()->referenceLanguage();
 				
 				$content_wrapper = new XMLElement('div');
 				$content_wrapper->setAttribute('class', 'translations');

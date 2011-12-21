@@ -4,13 +4,13 @@
 	require_once(TOOLKIT . '/class.xsltprocess.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLPageManager.php');
 	require_once(EXTENSIONS . '/frontend_localisation/lib/class.TManager.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FrontendLanguage.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
 
 	Class datasourcefl_translations extends Datasource{
 		
 		public function about(){
 			return array(
-				'name' => 'FL: Translations',
+				'name' => 'FLang: Translations',
 				'author' => array(
 					'name' => 'Xander Group',
 					'email' => 'symphonycms@xandergroup.ro',
@@ -28,66 +28,83 @@
 	    public function grab(&$param_pool=NULL){
 	    	$result = new XMLElement('fl-translations');
 
-// 	    	$page_id = $this->_env['param']['current-page-id'];
-// 	    	$translation_path = Symphony::Configuration()->get('translation_path','frontend_localisation');
+	    	$page_id = $this->_env['param']['current-page-id'];
+	    	$translation_path = Symphony::Configuration()->get('translation_path','frontend_localisation');
 	    	
-// 	    	$pages = FLPageManager::instance()->listAll(array('translations'));
+	    	$pages = FLPageManager::instance()->listAll(array('translations'));
 	    	
-// 	    	if( !empty($translation_path) ){
-// 		    	$translations = preg_split('/,/i', $pages[$page_id]['translations'], -1, PREG_SPLIT_NO_EMPTY);
+	    	if( !empty($translation_path) ){
+		    	$handles = array_filter( explode(',', $pages[$page_id]['translations']) );
 		    	
-// 		    	if( !empty($translations) ){
-// 		    		$result_value = '';
+		    	if( !empty($handles) ){
+		    		$result_value = '';
 		    		
-// 			    	foreach( TManager::instance()->getFolder( FrontendLanguage::instance()->getLangaugeCode() )->getTranslations() as $translation ){
-			    		
-// 			    		if( in_array($translation->getHandle(), $translations) ){
-// 			    			$result_value .= $this->_addFile($translation);
-// 			    		}
-// 			    	}
+		    		$t_folder = TManager::instance()->getFolder( FLang::instance()->ld()->languageCode() );
+		    		
+		    		foreach( $handles as $handle ){
+		    			$handle = trim($handle);
+		    			
+		    			$translation = $t_folder->getTranslation($handle);
+		    			
+		    			if( $translation != null ){
+		    				$xml = '';
+		    				
+		    				// if XML, fetch as normal
+		    				if( $translation->meta()->get('storage_format') == 'xml' ){
+		    					$xml = $translation->data()->getContent();
+		    				}
+		    				
+		    				// else convert to XML
+		    				else{
+		    					$translations = $translation->getParser()->asTArray($translation);
+		    					$xml = TManager::instance()->getParser('xml')->TArray2string($translations);
+		    				}
+		    				
+		    				// process XML
+		    				$result_value .= $this->_addFile($xml);
+		    			}
+		    		}
 					
-// 			    	$result->setValue( $this->_formatXmlString($result_value) );
-// 		    	}
-// 	    	}
+			    	$result->setValue( $this->_formatXmlString($result_value) );
+		    	}
+	    	}
 			
 	        return $result;
 	    }
 	    
 	    
 	    
-	    private function _addFile(Translation $translation){
+	    private function _addFile($xml){
 	    	$result = '';
 	    	$force_empty_result = false;
-	    	
+	    
 	    	$stylesheet = new XMLElement('xsl:stylesheet');
 	    	$stylesheet->setAttributeArray(array('version' => '1.0', 'xmlns:xsl' => 'http://www.w3.org/1999/XSL/Transform'));
-
+	    
 	    	$output = new XMLElement('xsl:output');
 	    	$output->setAttributeArray(array('method' => 'xml', 'version' => '1.0', 'encoding' => 'utf-8', 'indent' => 'yes', 'omit-xml-declaration' => 'yes'));
 	    	$stylesheet->appendChild($output);
-
+	    
 	    	$template = new XMLElement('xsl:template');
 	    	$template->setAttribute('match', '/');
-
+	    
 	    	$instruction = new XMLElement('xsl:copy-of');
-	    	$instruction->setAttribute('select', "/translation/data/*");
-
+	    	$instruction->setAttribute('select', "data/*");
+	    
 	    	$template->appendChild($instruction);
 	    	$stylesheet->appendChild($template);
-
+	    
 	    	$stylesheet->setIncludeHeader(true);
-
+	    
 	    	$xsl = $stylesheet->generate(true);
-
-	    	$xml = $translation->getContent();
-
+	    
 	    	// Handle where there is `$xml` and the XML is valid
-	    	if(strlen($xml) > 0 && !General::validateXML($xml, $errors, false, new XsltProcess)){
+	    	if( strlen($xml) > 0 && !General::validateXML($xml, $errors, false, new XsltProcess) ){
 	    		$result .= '<error> XML returned is invalid.';
 	    		$result .= '<elemet>';
 	    		foreach($errors as $e) {
 	    			if(strlen(trim($e['message'])) == 0) continue;
-	    			 
+	    
 	    			$result .= '<item>';
 	    			$result .= General::sanitize($e['message']);
 	    			$result .= '</item>';
@@ -96,23 +113,22 @@
 	    		$result .= '</error>';
 	    	}
 	    	// If `$xml` is empty, set the `force_empty_result` to true.
-	    	elseif(strlen($xml) == 0){
+	    	elseif( strlen($xml) == 0 ){
 	    		$force_empty_result = true;
 	    	}
-
-	    	// If `force_empty_result` is false and `$result` is not an instance of
-	    	// XMLElement, build the `$result`.
-	    	if(!$force_empty_result) {
-				
+	    
+	    	// If `force_empty_result` is false build the `$result`.
+	    	if( !$force_empty_result ){
+	    		
 	    		$proc = new XsltProcess;
 	    		$ret = $proc->process($xml, $xsl);
-
+	    
 	    		if($proc->isErrors()){
 	    			$result .= '<error> XML returned is invalid.';
 	    			$result .= '<elemet>';
 	    			foreach($proc->getError() as $e) {
 	    				if(strlen(trim($e['message'])) == 0) continue;
-	    				
+	    
 	    				$result .= '<item>';
 	    				$result .= General::sanitize($e['message']);
 	    				$result .= '</item>';
@@ -120,20 +136,24 @@
 	    			$result .= '</elemet>';
 	    			$result .= '</error>';
 	    		}
-
-	    		else if(strlen(trim($ret)) == 0){
+	    
+	    		elseif( strlen(trim($ret)) == 0 ){
 	    			$force_empty_result = true;
 	    		}
-
+	    
 	    		else{
-	    			$result .= self::CRLF . preg_replace('/([\r\n]+)/', '$1	', $ret);
+	    			$result .= PHP_EOL . preg_replace('/([\r\n]+)/', '$1	', $ret);
 	    		}
 	    	}
 	    	
-	    	if($force_empty_result) $result = '<error>Nothing here</error>';
-	    	
+	    	if( $force_empty_result ){
+	    		$result = '<error>Nothing here</error>';
+	    	}
+	    
 	    	return $result;
 	    }
+	    
+	    
 	    
 	    /**
 	     * Courtesy of <a href="http://forums.devnetwork.net/viewtopic.php?p=213989">TJ at devnet</a>

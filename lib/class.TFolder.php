@@ -72,7 +72,7 @@
 		 *
 		 * @return string
 		 */
-		public function getLanguageCode(){
+		public function languageCode(){
 			return (string) $this->language_code;
 		}
 		

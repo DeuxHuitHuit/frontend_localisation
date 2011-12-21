@@ -134,6 +134,15 @@
 			return (string) $this->parent->getPath();
 		}
 		
+		/**
+		 * Access an Appropriate TParser for this type of Translation.
+		 * 
+		 * @return TParser
+		 */
+		public function getParser(){
+			return $this->parent->getManager()->getParser( $this->tf_meta->get('storage_format') );
+		}
+		
 		
 		
 		/**
@@ -174,8 +183,8 @@
 		 * @return boolean - true if succes, false otherwise
 		 */
 		public function syncFrom(Translation $ref){
-			$ref_trans = $ref->data()->getAsTArray();
-			$this_trans = $this->tf_data->getAsTArray();
+			$ref_trans = $ref->getParser()->asTArray($ref);
+			$this_trans = $this->getParser()->asTArray($this);
 			
 			$translations = array();
 			
@@ -209,7 +218,9 @@
 				}
 			}
 			
-			return (boolean) $this->tf_data->setFromTArray($translations);
+			$content = $this->getParser()->TArray2string($translations);
+			
+			return (boolean) $this->tf_data->setContent($content);
 		}
 		
 		
@@ -227,39 +238,10 @@
 		 * Initialize business data.
 		 */
 		private function _initialiseData(){
-			$this->_loadStorageClass('TFileData');
+			$this->parent->getManager()->loadStorageClass($this->tf_meta->get('storage_format'), 'TFileData');
 			
 			$data_class_name = strtoupper( $this->tf_meta->get('storage_format') ).'_TFileData';
 			$this->tf_data = new $data_class_name($this);
-		}
-		
-		/**
-		 * Loads a Translation resource identified by `$class` abstract class name.
-		 *
-		 * 		- If class file doesn't exist, `Exception` is thrown.
-		 * 		- If class doesn't exist in file, `Exception` is thrown.
-		 *
-		 * @param string $class - abstract base class name.
-		 * 		e.g. $class=='TParser' and $storage_format=='xml' => required class is `XML_TParser`
-		 *
-		 * @throws Exception - will be catched by Symphony's default error handler.
-		 */
-		private function _loadStorageClass($class){
-			$file_name = EXTENSIONS . '/frontend_localisation/lib/'. $this->tf_meta->get('storage_format') .'/class.'. $class .'.php';
-		
-			// $class file must exist
-			if( !is_file($file_name) ){
-				throw new Exception("File `{$file_name}` doesn't exist. Translation needs it there.`");
-			}
-		
-			require_once ($file_name);
-			$class_name = strtoupper($this->tf_meta->get('storage_format')).'_'.$class;
-		
-			if( !class_exists($class_name) ){
-				throw new Exception("Class `{$class_name}` could not be found in file {$file_name}.`");
-			}
-		
-			return true;
 		}
 	}
 	

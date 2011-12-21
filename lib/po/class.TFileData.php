@@ -9,9 +9,9 @@
 	
 	
 	/**
-	 * Deals with business data for GNU PO Translations.
+	 * Deals with business data access for PO Translations.
 	 *
-	 * @package XML
+	 * @package PO
 	 *
 	 * @author Vlad Ghita
 	 */
@@ -41,25 +41,10 @@
 			// set default content
 			if( empty($content) || !is_string($content) ){
 				
+				// $content = ...;
 			}
 			
 			return (boolean) parent::setContent($content);
-		}
-		
-		/**
-		 * @see TFileData::getAsTArray()
-		 */
-		public function getAsTArray(){
-			
-		}
-		
-		/**
-		 * @see TFileData::setFromTArray()
-		 */
-		public function setFromTArray(array $translations){
-			// $content = ...
-			
-			return (boolean) $this->setContent( $content );
 		}
 	}
 	

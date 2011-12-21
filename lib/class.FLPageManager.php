@@ -13,11 +13,11 @@
 		private static $instance;
 		
 		/**
-		 * This function returns an instance of the FrontendLanguage class.
-		 * It is the only way to create a new FrontendLanguage, as
+		 * This function returns an instance of the FLang class.
+		 * It is the only way to create a new FLang, as
 		 * it implements the Singleton interface
 		 *
-		 * @return FrontendLanguage
+		 * @return FLang
 		 */
 		public static function instance(){
 			if (!self::$instance instanceof FLPageManager) {

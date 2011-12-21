@@ -3,11 +3,11 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	require_once(EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
-	require_once 'class.LanguageDriver.php';
+	require_once 'class.FLDriver.php';
 	
 	
 	
-	final class LanguageDriverLanguageRedirect extends LanguageDriver
+	final class FLDriverLanguageRedirect extends FLDriver
 	{
 		protected $language_codes = array();
 		
@@ -16,23 +16,21 @@
 			$this->all_languages = (array) LanguageRedirect::instance()->getAllLanguages();
 		}
 		
-		public function getLanguageCodes(){
+		
+		
+		public function getHandle(){
+			return 'language_redirect';
+		}
+		
+		public function languageCodes(){
 			return (array) $this->language_codes;
 		}
 		
-		public function getReferenceLanguage(){
+		public function referenceLanguage(){
 			return (string) $this->language_codes[0];
 		}
 		
-		public function getName(){
-			return (string) 'LanguageRedirect';
-		}
-		
-		public function getHandle(){
-			return (string) 'language_redirect';
-		}
-		
-		public function getLanguageCode(){
+		public function languageCode(){
 			return LanguageRedirect::instance()->getLanguageCode();
 		}
 		

@@ -1,13 +1,13 @@
 <?php
 
 	require_once(TOOLKIT . '/class.datasource.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FrontendLanguage.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
 
 	Class datasourcefl_languages extends Datasource{
 
 		public function about(){
 			return array(
-				'name' => 'FL: Languages',
+				'name' => 'FLang: Languages',
 				'author' => array(
 					'name' => 'Xander Group',
 					'email' => 'symphonycms@xandergroup.ro',
@@ -26,9 +26,9 @@
 		public function grab(&$param_pool=NULL){
 			$result = new XMLElement('fl-languages');
 			
-			$current_language_code = FrontendLanguage::instance()->getLanguageCode();
-			$all_languages = FrontendLanguage::instance()->allLanguages();
-			$supported_language_codes = FrontendLanguage::instance()->languageCodes();
+			$current_language_code = FLang::instance()->ld()->languageCode();
+			$all_languages = FLang::instance()->ld()->allLanguages();
+			$supported_language_codes = FLang::instance()->ld()->languageCodes();
 			
 			$current_language_xml = new XMLElement('current-language', $all_languages[$current_language_code] ? $all_languages[$current_language_code] : $current_language_code);
 			$current_language_xml->setAttribute('handle', $current_language_code);

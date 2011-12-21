@@ -4,7 +4,7 @@
 	
 	
 	require_once('lib/class.TManager.php');
-	require_once('lib/class.FrontendLanguage.php');
+	require_once('lib/class.FLang.php');
 
 	
 	define_safe(FRONTEND_LOCALISATION_NAME, 'Frontend Localisation');
@@ -40,8 +40,8 @@
 		
 		
 		public function install() {
-			// depends on FrontendLanguage
-			if( FrontendLanguage::instance() == null ){
+			// depends on FLang
+			if( FLang::instance() == null ){
 				return false;
 			}
 			
@@ -65,8 +65,8 @@
 			} catch (Exception $e){}
 			
 			/* Configuration */
-			Symphony::Configuration()->set('language_driver', FrontendLanguage::instance()->getDefaultLanguageDriverName(), FRONTEND_LOCALISATION_GROUP);
-			Symphony::Configuration()->set('reference_language', FrontendLanguage::instance()->referenceLanguage(), FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('language_driver', FLang::instance()->getFLDriverClass(), FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('reference_language', FLang::instance()->referenceLanguage(), FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('translation_path', '/workspace/translations', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('page_name_prefix', 'p_', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('storage_format', 'xml', FRONTEND_LOCALISATION_GROUP);
@@ -289,7 +289,7 @@
 			$group->setAttribute('class', 'settings');
 			$group->appendChild(new XMLElement('legend', __(FRONTEND_LOCALISATION_NAME)));
 			
-			$group->appendChild( $this->_addLanguageDriver() );
+			$group->appendChild( $this->_addFLDriver() );
 			$group->appendChild(new XMLElement('p', __('The Symphony extension that drives your frontend language management.'), array('class' => 'help')));
 			
 			$group->appendChild( $this->_addReferenceLanguage() );
@@ -330,7 +330,7 @@
 			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert']) ){
 				$t_folders = TManager::instance()->getFolders();
 				
-				$all_languages = FrontendLanguage::instance()->allLanguages();
+				$all_languages = FLang::instance()->ld()->allLanguages();
 				
 				foreach( $t_folders as $language_code => $t_folder ){
 					$translations = $t_folder->getTranslations();
@@ -375,8 +375,8 @@
 			}
 			
 			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert_0.3_to_0.5']) ){
-				$all_languages = FrontendLanguage::instance()->allLanguages();
-				$langauge_codes = FrontendLanguage::instance()->languageCodes();
+				$all_languages = FLang::instance()->ld()->allLanguages();
+				$langauge_codes = FLang::instance()->ld()->languageCodes();
 				
 				foreach( $langauge_codes as $language_code ){
 
@@ -491,7 +491,7 @@
 				Symphony::Configuration()->set('reference_language', '', FRONTEND_LOCALISATION_GROUP);
 				Administration::instance()->saveConfig();
 				
-				FrontendLanguage::instance()->setLanguageDriver($new_language_driver);
+				FLang::instance()->setFLDriver($new_language_driver);
 				
 				return true;
 			}
@@ -509,7 +509,7 @@
 			
 			
 			
-			$new_languages = FrontendLanguage::instance()->savedLanguages($context);
+			$new_languages = FLang::instance()->ld()->getSavedLanguages($context);
 			
 			
 			
@@ -517,7 +517,7 @@
 			
 			$reference_language = $context['settings'][FRONTEND_LOCALISATION_GROUP]['reference_language'];
 			if( !in_array($reference_language, $new_languages) ){
-				$reference_language = FrontendLanguage::instance()->referenceLanguage();
+				$reference_language = FLang::instance()->referenceLanguage();
 			}
 			
 			if( empty($reference_language) ) return true;
@@ -528,7 +528,7 @@
 			
 			/* Manage translation folders */
 			
-			$old_languages = FrontendLanguage::instance()->languageCodes();
+			$old_languages = FLang::instance()->ld()->languageCodes();
 			
 			// update translation folders for new languages
 			$added_languages = array_diff($new_languages, $old_languages);
@@ -556,12 +556,12 @@
 		 *
 		 * @return XMLElement - selectbox containing supported language drivers
 		 */
-		private function _addLanguageDriver() {
+		private function _addFLDriver() {
 			$label = Widget::Label(__('Language driver'));
 			
 			$options = array();
-			foreach( FrontendLanguage::instance()->getAvailableLanguageDrivers() as $driver_name ){
-				$options[] = array($driver_name, ($driver_name == FrontendLanguage::instance()->driverName() ), $driver_name );
+			foreach( FLang::instance()->getAvailableDrivers() as $handle => $name ){
+				$options[] = array($handle, ($handle == FLang::instance()->ld()->getHandle()), $name );
 			}
 			
 			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][language_driver]', $options) );
@@ -576,10 +576,10 @@
 		 */
 		private function _addReferenceLanguage() {
 			$label = Widget::Label(__('Reference language'));
-			$reference_language = FrontendLanguage::instance()->referenceLanguage();
+			$reference_language = FLang::instance()->referenceLanguage();
 			
 			$options = array();
-			foreach (FrontendLanguage::instance()->languageCodes() as $language_code) {
+			foreach (FLang::instance()->ld()->languageCodes() as $language_code) {
 				$options[] = array($language_code, ($language_code == $reference_language), $language_code );
 			}
 			

@@ -9,9 +9,9 @@
 	
 	
 	/**
-	 * Deals with business data for JAVA Style Translations.
+	 * Deals with business data access for I18N Translations.
 	 *
-	 * @package XML
+	 * @package i18n
 	 *
 	 * @author Vlad Ghita
 	 */
@@ -41,25 +41,10 @@
 			// set default content
 			if( empty($content) || !is_string($content) ){
 				
+				// $content = ...;
 			}
 			
 			return (boolean) parent::setContent($content);
-		}
-		
-		/**
-		 * @see TFileData::getAsTArray()
-		 */
-		public function getAsTArray(){
-			
-		}
-		
-		/**
-		 * @see TFileData::setFromTArray()
-		 */
-		public function setFromTArray(array $translations){
-			// $content = ...
-			
-			return (boolean) $this->setContent( $content );
 		}
 	}
 	

@@ -97,8 +97,8 @@
 			}
 			
 			if( !isset($this->meta['language']) ){
-				$all_languages = FrontendLanguage::instance()->allLanguages();
-				$language_code = $this->parent->getFolder()->getLanguageCode();
+				$all_languages = FLang::instance()->ld()->allLanguages();
+				$language_code = $this->parent->getFolder()->languageCode();
 				
 				$this->set('language', array(
 						'name' => $all_languages[$language_code],
