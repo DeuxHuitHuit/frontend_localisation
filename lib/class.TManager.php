@@ -37,12 +37,12 @@
 				'xml' => array(
 						'description' => 'Home bred XML',
 				),
-				'po' => array(
-						'description' => 'GNU PO',
-				),
-				'i18n' => array(
-						'description' => 'JAVA Style',
-				)
+// 				'po' => array(
+// 						'description' => 'GNU PO',
+// 				),
+// 				'i18n' => array(
+// 						'description' => 'JAVA Style',
+// 				)
 		);
 		
 		/**

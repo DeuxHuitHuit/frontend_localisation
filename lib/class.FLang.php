@@ -53,12 +53,13 @@
 				$message = '<code>%1$s</code>: At least one language driver must be installed. Supported language drivers are:';
 				$message_params = array(FRONTEND_LOCALISATION_NAME);
 				
-				foreach( $this->supported_drivers as $handle => $class ){
-					$driver_info = Symphony::ExtensionManager()->about($handle);
-					$message .= ' <code>%s</code>,';
-					$message_params[] = $driver_info['name'];
+				$i = 2;
+				
+				foreach( $this->supported_drivers as $class ){
+					$message .= ' <code>%'.$i++.'$s</code>,';
+					$message_params[] = $class;
 				}
-				$message = trim($message, ',').'.'.
+				$message = trim($message, ',').'.';
 				
 				Administration::instance()->Page->pageAlert(__($message, $message_params), Alert::ERROR);
 				Symphony::$Log->pushToLog($message, E_NOTICE, true);

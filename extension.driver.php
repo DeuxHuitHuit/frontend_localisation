@@ -3,12 +3,15 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 	
+	
 	require_once('lib/class.TManager.php');
 	require_once('lib/class.FLang.php');
-
+	
+	
 	
 	define_safe(FRONTEND_LOCALISATION_NAME, 'Frontend Localisation');
 	define_safe(FRONTEND_LOCALISATION_GROUP, 'frontend_localisation');
+	
 	
 	
 	final class extension_frontend_localisation extends Extension {
@@ -16,8 +19,8 @@
 		public function about(){
 			return array(
 					'name' => FRONTEND_LOCALISATION_NAME,
-					'version' => '0.5 beta',
-					'release-date' => '2011-12-20',
+					'version' => '1.0',
+					'release-date' => '2011-12-23',
 					'author' => array(
 							array(
 									'name' => 'Xander Group',
@@ -40,8 +43,8 @@
 		
 		
 		public function install() {
-			// depends on FLang
-			if( FLang::instance() == null ){
+			// depends on a Language Driver
+			if( FLang::instance()->ld() == null ){
 				return false;
 			}
 			
@@ -51,7 +54,7 @@
 			} catch (DatabaseException $dbe){
 				// column already exists
 				if( $dbe->getDatabaseErrorCode() == 1060 ){
-					$message = __('<code>%1$s</code>: Column `translation` for `tbl_pages` already exists. Uninstall extension and then install it.', array(FRONTEND_LOCALISATION_NAME));
+					$message = __('<code>%1$s</code>: Column `translation` for `tbl_pages` already exists. Uninstall extension and re-install it after.', array(FRONTEND_LOCALISATION_NAME));
 				}
 				// other errors
 				else{
@@ -67,7 +70,7 @@
 			/* Configuration */
 			Symphony::Configuration()->set('language_driver', FLang::instance()->getFLDriverClass(), FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('reference_language', FLang::instance()->referenceLanguage(), FRONTEND_LOCALISATION_GROUP);
-			Symphony::Configuration()->set('translation_path', '/workspace/translations', FRONTEND_LOCALISATION_GROUP);
+			Symphony::Configuration()->set('translation_path', '/translations', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('page_name_prefix', 'p_', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('storage_format', 'xml', FRONTEND_LOCALISATION_GROUP);
 			Symphony::Configuration()->set('consolidate_translations', self::CHECKBOX_YES, FRONTEND_LOCALISATION_GROUP);
@@ -77,6 +80,7 @@
 			/* Translations */
 			General::realiseDirectory(DOCROOT . Symphony::Configuration()->get('translation_path', FRONTEND_LOCALISATION_GROUP));
 			
+			/* Update existing translations */
 			TManager::instance()->updateFolders();
 			
 			return true;
@@ -89,8 +93,10 @@
 				// General::deleteDirectory(DOCROOT . $this->translation_path);
 				/*  in Symphony 2.3 */
 				
-				if( is_dir(DOCROOT . $this->translation_path) ){
-					TManager::deleteFolder(DOCROOT . $this->translation_path);
+				$translation_path = Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
+				
+				if( is_dir(EXTENSIONS . $translation_path) && !empty($translation_path) ){
+					TManager::deleteFolder(DOCROOT . $translation_path);
 				}
 			}
 			

@@ -7,7 +7,7 @@
 
 		public function about(){
 			return array(
-				'name' => 'FLang: Languages',
+				'name' => 'FL: Languages',
 				'author' => array(
 					'name' => 'Xander Group',
 					'email' => 'symphonycms@xandergroup.ro',

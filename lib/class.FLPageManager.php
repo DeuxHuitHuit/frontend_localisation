@@ -53,7 +53,7 @@
 			}
 			catch (Exception $e){
 				if( Symphony::Engine() instanceof Administration ){
-					Symphony::Engine()->Page->pageAlert(__('In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.'), Alert::ERROR);
+					throw new Exception(__('In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.'));
 				}
 			}
 			
