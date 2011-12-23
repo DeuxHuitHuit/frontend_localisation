@@ -317,9 +317,9 @@
 // 			$convert->appendChild(new XMLElement('button', __('Convert XML to Translations'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert]', 'type' => 'submit')));
 // 			$group->appendChild($convert);
 			
-			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
-			$convert->appendChild(new XMLElement('button', __('Convert v0.3 to v0.5'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert_0.3_to_0.5]', 'type' => 'submit')));
-			$group->appendChild($convert);
+// 			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
+// 			$convert->appendChild(new XMLElement('button', __('Convert Translations to 1.0'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert_0.3_to_0.5]', 'type' => 'submit')));
+// 			$group->appendChild($convert);
 			
 			$context['wrapper']->appendChild($group);
 		}

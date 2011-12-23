@@ -111,8 +111,8 @@
 		'Storage format to use for translations.' =>
 		'Metoda de stocare folosită pentru traduceri.',
 		
-		'Convert v0.3 to v0.5' =>
-		'Conversie de la v.03beta la 1.0',
+		'Convert Translations to 1.0' =>
+		'Conversie Traduceri la 1.0',
 		
 		'Reference value' => 
 		'Valoarea de referinţă',

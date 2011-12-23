@@ -17,7 +17,7 @@ Thank you all other Symphony & Extensions developers for your inspirational work
 
 
 
-## 1 Synopsis ##
+# 1 Synopsis #
 
 Frontend localisation in Symphony (and other systems) implies coverage of two problems:<br />
 1. Frontend language detection and (optional) redirect mechanism.<br />
@@ -28,7 +28,7 @@ For problem 2, this extension offers a translation mechanism for creating and ed
 
 
 
-## 2 Features ##
+# 2 Features #
 For site builders:
 
 * Admin UI for Translations management
@@ -44,7 +44,7 @@ For PHP developers:
 
 
 
-## 3 Installation ##
+# 3 Installation #
 
 1. Make sure you have at least one language driver installed. [Language Redirect](https://github.com/klaftertief/language_redirect), for example.
 1. Upload the `frontend_localisation` folder found in this archive to your Symphony `extensions` folder.    
@@ -52,15 +52,15 @@ For PHP developers:
 
 
 
-## 4 Usage ##
+# 4 Usage #
 
-### 4.1 Frontend Language ###
+## 4.1 Frontend Language ##
 
-#### 4.1.1 @ PHP developers ####
+### 4.1.1 @ PHP developers ###
 
 This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.
 
-##### Adding a Language Driver #####
+<b>Adding a Language Driver</b>
 
 1. In [$supported_drivers](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php#L22) array add the driver. @see property doscription.
 2. Create a new class named `FLDriver<driver_name>` that extends `FLDriver` abstract class. Save it in file `/frontend_localisation/lib/class.FLDriver<driver_name>.php`.
@@ -69,24 +69,24 @@ This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_l
 
 
 
-#### 4.1.2 @ Site builders ####
+### 4.1.2 @ Site builders ###
 
 On Preferences page you can select:
 
 - `Language Driver` you want to use from supported and integrated ones. The Language Driver provides Frontend language information for the system.
 - `Reference Language` should be the main language of your site.
-- `Default storage format` is used as default when saving Translations.
 
 
-### 4.2 Translation Manager ###
+## 4.2 Translation Manager ##
 
-#### 4.2.1 Preferences page ####
+### 4.2.1 Preferences page ###
 
+- `Default storage format` is used as default when creating new Translations.
 - `Consolidate Translations` is set default to `checked`. When this is checked, on uninstall, translation folders will **not** be deleted.
 - pushing `Update Translations` button will update all languages Translations with reference to `Reference Language`.
 
 
-#### 4.2.2 Managing Translations ####
+### 4.2.2 Managing Translations ###
 
 1. Add new translations through Admin interface.
 2. Add new translations for selected `$storage_format` (XML, PO, I18N) directly in the file from the filesystem at `[...]/workspace/translations`. Modify the `reference_language` translation. The correspondant files for the rest of languages will be automatically updated when you visit that Translation edit page in Admin or whe you push the `Update Translations` button on Preferences.<br />
@@ -97,7 +97,13 @@ I hope in the future the Admin interface wil supply the <b>create new item</b> f
 
 
 
-## 5 Compatibility ##
+#5 Upgrading #5
+
+If you're upgrading from > 0.2beta to 1.0, uncomment [these lines](https://github.com/vlad-ghita/frontend_localisation/blob/master/extension.driver.php#L320-322), go to Preferences page and push the `Convert Translations to 1.0` button. Comment the lines back and you're good to go.
+
+
+
+# 6 Compatibility #
 
          Symphony | Frontend Localisation
 ------------------|----------------
@@ -111,7 +117,7 @@ Language Redirect | Frontend Localisation
 
 
 
-## 6 Changelog ##
+# 7 Changelog #
 
 - 1.0 : 23 dec 2011
     * Initial release.
