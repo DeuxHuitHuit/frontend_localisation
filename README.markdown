@@ -1,7 +1,7 @@
 Frontend Localisation
 ==============
 
-Offers a frontend localisation mechanism using XML files.
+Offers an integrated solution to localise the Frontend of your site.
 
 * Version: 1.0
 * Build Date: 2011-12-23
