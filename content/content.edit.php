@@ -129,7 +129,7 @@
 				array(
 					__('Symphony'),
 					__('Translations'),
-					$fields['name']
+					$fields['name'][FLang::instance()->referenceLanguage()]
 				)
 			));
 			$this->appendSubheading(($fields['name']? $fields['name'] : __('Untitled')));
