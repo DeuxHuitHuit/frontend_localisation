@@ -124,15 +124,17 @@
 			
 			// Start building the page
 			
+			$reference_language = FLang::instance()->referenceLanguage();
+			
 			$this->setTitle(__(
 				($fields['name'] ? '%1$s &ndash; %2$s &ndash; %3$s' : '%1$s &ndash; %2$s'),
 				array(
 					__('Symphony'),
 					__('Translations'),
-					$fields['name'][FLang::instance()->referenceLanguage()]
+					$fields['name'][$reference_language]
 				)
 			));
-			$this->appendSubheading(($fields['name'][FLang::instance()->referenceLanguage()]? $fields['name'][FLang::instance()->referenceLanguage()] : __('Untitled')));
+			$this->appendSubheading(($fields['name'][$reference_language]? $fields['name'][$reference_language] : __('Untitled')));
 			
 			
 			// Append form elements
