@@ -31,7 +31,7 @@ For problem 2, this extension offers a translation mechanism for creating and ed
 # 2 Features #
 For site builders:
 
-* Admin UI for Translations management
+* Admin UI for Translations management (usable by Authors as well)
 * changeble `Language Driver`
 * changeble `Reference Language`
 * Translations consolidation on uninstall
