@@ -120,7 +120,7 @@
 					$fields['translations'][$language_code] = $translation->getParser()->asTArray($translation);
 				}
 			}
-
+			
 			
 			// Start building the page
 			
@@ -132,7 +132,7 @@
 					$fields['name'][FLang::instance()->referenceLanguage()]
 				)
 			));
-			$this->appendSubheading(($fields['name']? $fields['name'] : __('Untitled')));
+			$this->appendSubheading(($fields['name'][FLang::instance()->referenceLanguage()]? $fields['name'][FLang::instance()->referenceLanguage()] : __('Untitled')));
 			
 			
 			// Append form elements
