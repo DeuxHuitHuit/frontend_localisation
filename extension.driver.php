@@ -192,7 +192,9 @@
 		 */
 		public function dAppendPageContent(array $context){
 			// prepare translations array
-			$context['fields']['translations'] = preg_split('/,/i', $context['fields']['translations'], -1, PREG_SPLIT_NO_EMPTY);
+			if( is_string($context['fields']['translations']) ){
+				$context['fields']['translations'] = preg_split('/,/i', $context['fields']['translations'], -1, PREG_SPLIT_NO_EMPTY);
+			}
 			
 			// generate select
 			$fieldset = new XMLElement('fieldset');
@@ -259,7 +261,6 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreEdit(array $context){
-			// prepare translations data for DB insert
 			$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : '';
 			
 			$current_page = Symphony::Database()->fetchRow(0, "SELECT `handle`, `parent` FROM `tbl_pages` WHERE id = '{$context['page_id']}' LIMIT 1");

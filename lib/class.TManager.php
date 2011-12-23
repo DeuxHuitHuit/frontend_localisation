@@ -203,7 +203,7 @@
 				$t_folder->addTranslation($handle);
 			}
 			
-			//
+			// perhaps do something funky here
 			if( Symphony::ExtensionManager()->fetchStatus('page_lhandles') == EXTENSION_ENABLED ){
 				
 			}

@@ -74,7 +74,14 @@
 			if( !is_string($setting) || empty($setting) ) return false;
 			if( ($child != null) && !is_string($child) ) return false;
 			
-			$value = General::sanitize($value);
+			if( is_array($value) ){
+				foreach( $value as $k => $v ){
+					$value[$k] = General::sanitize($v);
+				}
+			}
+			else{
+				$value = General::sanitize($value);
+			}
 			
 			if( !empty($child) ){
 				$this->meta[$setting][$child] = $value;

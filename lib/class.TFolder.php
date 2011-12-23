@@ -125,8 +125,10 @@
 		 * @param string $handle
 		 */
 		public function deleteTranslation($handle){
-			if( $this->translations[$handle]->delete() ){
-				unset($this->translations[$handle]);
+			if( !empty($this->translations[$handle]) ){
+				if( $this->translations[$handle]->delete() ){
+					unset($this->translations[$handle]);
+				}
 			}
 			
 			return true;
