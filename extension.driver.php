@@ -78,7 +78,7 @@
 			Administration::instance()->saveConfig();
 			
 			/* Translations */
-			General::realiseDirectory(DOCROOT . Symphony::Configuration()->get('translation_path', FRONTEND_LOCALISATION_GROUP));
+			General::realiseDirectory(WORKSPACE . Symphony::Configuration()->get('translation_path', FRONTEND_LOCALISATION_GROUP));
 			
 			/* Update existing translations */
 			TManager::instance()->updateFolders();
@@ -95,8 +95,8 @@
 				
 				$translation_path = Symphony::Configuration()->get('translation_path',FRONTEND_LOCALISATION_GROUP);
 				
-				if( is_dir(EXTENSIONS . $translation_path) && !empty($translation_path) ){
-					TManager::deleteFolder(DOCROOT . $translation_path);
+				if( is_dir(WORKSPACE . $translation_path) && !empty($translation_path) ){
+					TManager::deleteFolder(WORKSPACE . $translation_path);
 				}
 			}
 			

@@ -151,9 +151,6 @@
 		
 			if( !empty($errors) ){
 				// log the error somewhere
-				echo 'Tried to save contents in META file.<br />';
-				die(var_dump($errors));
-		
 				return false;
 			}
 		

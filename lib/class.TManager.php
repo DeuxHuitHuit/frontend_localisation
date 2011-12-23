@@ -85,16 +85,21 @@
 		 * @param string $translation_path - path to translations.
 		 */
 		private function __construct() {
-			$this->path = DOCROOT . Symphony::Configuration()->get('translation_path','frontend_localisation');
+			$this->path = WORKSPACE . Symphony::Configuration()->get('translation_path','frontend_localisation');
+			
+			// make sure translation folder exists
+			General::realiseDirectory($this->path);
 			
 			$storage_format = Symphony::Configuration()->get('storage_format','frontend_localisation');
 			
+			// make sure storage format is supported
 			$this->storage_format = array_key_exists($storage_format, $this->supported_storage_formats) ? $storage_format : 'xml';
 			
 			$dir_storage = EXTENSIONS . '/frontend_localisation/lib/' . $this->storage_format . '/';
 			
+			// if necessary storage files are missing, abort
 			if( !is_dir($dir_storage) ){
-				die("Storage directory `{$dir_storage}` doesn't exist. Translation Manager needs it there.`");
+				throw new Exception("Storage directory `{$dir_storage}` doesn't exist. Translation Manager needs it there.`");
 			}
 			
 			$this->_discoverFolders();
