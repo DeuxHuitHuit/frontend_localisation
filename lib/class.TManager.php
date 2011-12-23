@@ -35,13 +35,13 @@
 		 */
 		private $supported_storage_formats = array(
 				'xml' => array(
-						'description' => 'Home bred XML',
+						'description' => 'XML',
 				),
 // 				'po' => array(
 // 						'description' => 'GNU PO',
 // 				),
 // 				'i18n' => array(
-// 						'description' => 'JAVA Style',
+// 						'description' => 'JAVA properties',
 // 				)
 		);
 		
