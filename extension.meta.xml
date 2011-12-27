@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension id="frontend_localisation" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+
+	<name>Frontend Localisation</name>
+
+	<description>Offers an integrated solution to localise the Frontend of your site.</description>
+
+	<repo type="github">https://github.com/vlad-ghita/frontend_localisation</repo>
+
+	<url type="discuss">http://symphony-cms.com/download/extensions/view/82249/</url>
+
+	<types>
+		<type>Interface</type>
+		<type>Multilingual</type>
+		<type>Workflow</type>
+	</types>
+
+	<authors>
+		<author>
+			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
+			<email>vlad_micutul@yahoo.com</email>
+			<website>http://www.xanderadvertising.com</website>
+		</author>
+	</authors>
+
+	<dependencies>
+		<dependency version="1.02">https://github.com/klaftertief/language_redirect</dependency>
+	</dependencies>
+
+	<releases>
+		<release version="1.0" date="2011-12-23" min="2.2">Initial stable release.</release>
+	</releases>
+
+</extension>

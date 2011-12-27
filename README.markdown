@@ -100,24 +100,3 @@ I hope in the future the Admin interface wil supply the <b>create new item</b> f
 #5 Upgrading #
 
 If you're upgrading from > 0.2beta to 1.0, uncomment [these lines](https://github.com/vlad-ghita/frontend_localisation/blob/master/extension.driver.php#L320-322), go to Preferences page and push the `Convert Translations to 1.0` button. Comment the lines back and you're good to go.
-
-
-
-# 6 Compatibility #
-
-         Symphony | Frontend Localisation
-------------------|----------------
-      2.0 — 2.1.* | Not compatible
-      2.2 - *     | [latest](https://github.com/vlad-ghita/frontend_localisation)
-
-Language Redirect | Frontend Localisation
-------------------|----------------
-        * — 1.0.1 | Not compatible
-    1.0.2 - *     | [latest](https://github.com/vlad-ghita/frontend_localisation)
-
-
-
-# 7 Changelog #
-
-- 1.0 : 23 dec 2011
-    * Initial release.
