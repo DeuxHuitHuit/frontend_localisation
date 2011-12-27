@@ -29,7 +29,7 @@
 	</dependencies>
 
 	<releases>
-		<release version="1.0" date="2011-12-23" min="2.2">Initial stable release.</release>
+		<release version="1.0" date="2011-12-23" min="2.2.x">Initial stable release.</release>
 	</releases>
 
 </extension>
