@@ -203,6 +203,7 @@
 				foreach ($structure['filelist'] as $filename) {
 					
 					// get information from filename
+					// [storage_format][meta/data][handle]
 					$bits = array_map('strrev', explode('.', strrev($filename), 3));
 					
 					if( $bits[1] == 'meta' ){
