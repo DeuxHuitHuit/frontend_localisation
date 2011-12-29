@@ -37,12 +37,12 @@
 				'xml' => array(
 						'description' => 'XML',
 				),
-				'po' => array(
-						'description' => 'GNU PO',
-				),
-				'i18n' => array(
-						'description' => 'JAVA properties',
-				)
+// 				'po' => array(
+// 						'description' => 'GNU PO',
+// 				),
+// 				'i18n' => array(
+// 						'description' => 'JAVA properties',
+// 				)
 		);
 		
 		/**
