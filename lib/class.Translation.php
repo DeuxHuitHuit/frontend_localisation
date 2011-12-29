@@ -4,10 +4,6 @@
 	
 	
 	
-	require_once ('class.TFileMeta.php');
-	
-	
-	
 	/**
 	 * Management for a Translation. Provides access to meta information and business data.
 	 *
@@ -51,16 +47,20 @@
 		/**
 		 * Creates a new Translation holding meta information and business data.
 		 *
-		 * @param TFolder $parent - parent Translation Folder
+		 * @param TFolder $parent - parent TFolder
 		 * @param string $handle - handle of the file
-		 * @param string $storage_format - storage format to use when saving business data
+		 * @param mixed $meta - meta information
+		 * 		- TFileMeta object
+		 * 		- Array = an array with meta information
+		 * 
+		 * @see TFileMeta::meetRequirements()
 		 */
-		public function __construct(TFolder $t_folder, $handle, $storage_format){
+		public function __construct(TFolder $t_folder, $handle, $meta){
 			$this->parent = $t_folder;
 			$this->handle = $handle;
 			
-			$this->_initialiseMeta($storage_format);
-			$this->_initialiseData();
+			$this->setMeta($meta);
+			$this->setData();
 		}
 		
 		
@@ -108,8 +108,55 @@
 			
 			// 2. Change handle
 			$this->handle = $handle;
-			$this->_initialiseMeta($this->tf_meta->get('storage_format'));
-			$this->_initialiseData();
+			$this->setMeta( array($this->tf_meta->get('storage_format')) );
+			$this->setData();
+			
+			return true;
+		}
+		
+		/**
+		 * Setter for business data. It deletes old Data file and creates a new one with default content.
+		 * To be effective, you must change storage_format before calling this.
+		 */
+		public function setData(){
+			// delete old_data
+			if( $this->tf_data instanceof TFileData ){
+				General::deleteFile( $this->getPath() .'/'. $this->tf_data->getFilename() );
+			}
+			
+			// set new data
+			$this->parent->getManager()->loadStorageClass($this->tf_meta->get('storage_format'), 'TFileData');
+			
+			$data_class_name = strtoupper( $this->tf_meta->get('storage_format') ).'_TFileData';
+			$this->tf_data = new $data_class_name($this);
+			
+			return true;
+		}
+		
+		/**
+		 * Setter for Translation meta information.
+		 *
+		 * @param mixed $meta - new meta information
+		 * 		- TFileMeta = an object with file information
+		 * 		- Array = an array with meta information
+		 *
+		 * @return boolean - true if success, false otherwise.
+		 * 
+		 * @see TFileMeta::meetRequirements()
+		 */
+		public function setMeta($meta){
+			if( $meta instanceof TFileMeta ){
+				$this->tf_meta = $meta;
+				$this->tf_meta->setTranslation($this);
+			}
+			
+			elseif( is_array($meta) ){
+				$this->tf_meta = new TFileMeta($this, $meta);
+			}
+			
+			else{
+				return false;
+			}
 			
 			return true;
 		}
@@ -222,26 +269,4 @@
 			
 			return (boolean) $this->tf_data->setContent($content);
 		}
-		
-		
-		
-		/**
-		 * Initialize Meta information.
-		 *
-		 * @param string $storage_format - desired storage format.
-		 */
-		private function _initialiseMeta($storage_format){
-			$this->tf_meta = new TFileMeta($this, $storage_format);
-		}
-		
-		/**
-		 * Initialize business data.
-		 */
-		private function _initialiseData(){
-			$this->parent->getManager()->loadStorageClass($this->tf_meta->get('storage_format'), 'TFileData');
-			
-			$data_class_name = strtoupper( $this->tf_meta->get('storage_format') ).'_TFileData';
-			$this->tf_data = new $data_class_name($this);
-		}
 	}
-	

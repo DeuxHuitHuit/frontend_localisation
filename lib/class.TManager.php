@@ -37,12 +37,12 @@
 				'xml' => array(
 						'description' => 'XML',
 				),
-// 				'po' => array(
-// 						'description' => 'GNU PO',
-// 				),
-// 				'i18n' => array(
-// 						'description' => 'JAVA properties',
-// 				)
+				'po' => array(
+						'description' => 'GNU PO',
+				),
+				'i18n' => array(
+						'description' => 'JAVA properties',
+				)
 		);
 		
 		/**
@@ -92,7 +92,7 @@
 			
 			$storage_format = Symphony::Configuration()->get('storage_format','frontend_localisation');
 			
-			// make sure storage format is supported
+			// make sure default storage format is supported
 			$this->storage_format = array_key_exists($storage_format, $this->supported_storage_formats) ? $storage_format : 'xml';
 			
 			$dir_storage = EXTENSIONS . '/frontend_localisation/lib/' . $this->storage_format . '/';
@@ -200,12 +200,9 @@
 			$handle = Symphony::Configuration()->get('page_name_prefix','frontend_localisation') . $handle . $current_page['handle'];
 			
 			foreach( $this->t_folders as $t_folder ){
-				$t_folder->addTranslation($handle);
-			}
-			
-			// perhaps do something funky here
-			if( Symphony::ExtensionManager()->fetchStatus('page_lhandles') == EXTENSION_ENABLED ){
-				
+				/* @var $t_folder TFolder */
+				$translation = $t_folder->addTranslation($handle, array('type' => 'page'));
+				$translation->setName($handle);
 			}
 		}
 		
@@ -330,18 +327,16 @@
 		 */
 		public function changeTranslationHandle($old_handle, $new_handle){
 			$valid = true;
-			$passed = array();
+			$changed = array();
 		
 			// try to rename files
 			foreach( $this->t_folders as $t_folder ){
 				/* @var $t_folder TFolder */
-				$translation = $t_folder->getTranslation($old_handle);
-				$passed[] = $translation;
-		
-				if( !$translation->setHandle($new_handle) ){
-					$valid = false;
-					break;
-				}
+				$valid = $t_folder->changeTranslationHandle($old_handle, $new_handle);
+				
+				$changed[] = $t_folder->getTranslation($new_handle);
+				
+				if( !$valid ) break;
 			}
 		
 			// if renaming went well
@@ -356,7 +351,7 @@
 				}
 		
 				// remove old files
-				foreach( $passed as $translation ){
+				foreach( $changed as $translation ){
 					General::deleteFile($translation->getPath() .'/'. $translation->meta()->getFilename($old_handle));
 					General::deleteFile($translation->getPath() .'/'. $translation->data()->getFilename($old_handle));
 				}
@@ -364,9 +359,11 @@
 		
 			// else try to rollback changes
 			else{
-				foreach( $passed as $translation ){
+				foreach( $changed as $translation ){
+					/* @var $translation Translation */
 					$translation->delete();
 					$translation->setHandle($old_handle);
+					$translation->setName($old_handle);
 				}
 			}
 		
@@ -384,7 +381,6 @@
 		 * @param array $languages_codes - desired languages to update
 		 */
 		public function updateFolders(array $language_codes = null) {
-			
 			// if no languages desired, update all folders
 			if( empty($language_codes) ){
 				$language_codes = FLang::instance()->ld()->languageCodes();
@@ -394,9 +390,8 @@
 			
 				// update folder for reference language
 				$reference_language = FLang::instance()->referenceLanguage();
-				if (empty($this->t_folders[$reference_language])) {
-					$this->addFolder($reference_language);
-				}
+				$this->addFolder($reference_language);
+				
 				$this->t_folders[$reference_language]->updateTranslationsForPages();
 				
 				
@@ -404,8 +399,8 @@
 				foreach ($language_codes as $language_code) {
 					if( $language_code === $reference_language ) continue;
 					
-					$this->addFolder($language_code);
-					$this->t_folders[$language_code]->updateTranslations( $this->t_folders[$reference_language]->getTranslations() );
+					$t_folder = $this->addFolder($language_code);
+					$t_folder->updateTranslations( $this->t_folders[$reference_language]->getTranslations() );
 				}
 			}
 		}
@@ -441,6 +436,8 @@
 		 * Translation Folder generator.
 		 *
 		 * @param string $language_code
+		 * 
+		 * @return TFolder
 		 */
 		public function addFolder($language_code){
 			if( !is_string($language_code) || empty($language_code) || !in_array($language_code, FLang::instance()->ld()->languageCodes() )) return false;
@@ -451,7 +448,7 @@
 				$this->t_folders[$language_code] = new TFolder($this, $language_code);
 			}
 			
-			return true;
+			return $this->t_folders[$language_code];
 		}
 		
 		
@@ -473,25 +470,55 @@
 				throw new Exception("Storage format `{$storage_format}` is not supported.`");
 			}
 			
-			$file_name = EXTENSIONS . '/frontend_localisation/lib/'. $storage_format .'/class.'. $class .'.php';
+			$filename = EXTENSIONS . '/frontend_localisation/lib/'. $storage_format .'/class.'. $class .'.php';
+			$class_name = strtoupper($storage_format).'_'.$class;
+			
+			return (boolean) $this->_loadClass($filename, $class_name);
+		}
 		
+		/**
+		 * Loads a Translation type identified by `$type`.
+		 * 
+		 * @param string $type
+		 * 
+		 * @throws Exception - will be catched by Symphony's default error handler.
+		 */
+		public function loadTranslationClass($type){
+			$type = ($type == 'page') ? ucfirst($type) : '';
+			
+			$filename = EXTENSIONS . '/frontend_localisation/lib/class.Translation'. $type .'.php';
+			$class_name = 'Translation'.$type;
+			
+			return (boolean) $this->_loadClass($filename, $class_name);
+		}
+		
+		
+		
+		/**
+		 * Attempts to load given class from desired filename.
+		 * 
+		 * @param string $filename
+		 * @param string $class_name
+		 * 
+		 * @return boolean - true if success
+		 * 
+		 * @throws Exception
+		 */
+		private function _loadClass($filename, $class_name){
 			// $class file must exist
-			if( !is_file($file_name) ){
-				throw new Exception("File '`{$file_name}`' doesn't exist.`");
+			if( !is_file($filename) ){
+				throw new Exception("File '`{$filename}`' doesn't exist.`");
 			}
 			
-			require_once ($file_name);
-			$class_name = strtoupper($storage_format).'_'.$class;
+			require_once ($filename);
 			
 			// $class must exist
 			if( !class_exists($class_name) ){
 				throw new Exception("Class `{$class_name}` could not be found in file `{$file_name}`.`");
 			}
-		
+			
 			return true;
 		}
-		
-		
 		
 		/**
 		 * Creates the handle for given page, having all pages.

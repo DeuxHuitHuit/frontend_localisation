@@ -95,6 +95,8 @@
 			
 			// Find values
 			
+			$reference_language = FLang::instance()->referenceLanguage();
+			
 			$fields = array();
 			
 			if( isset($_POST['fields']) ){
@@ -116,6 +118,11 @@
 					/* @var $t_folder TFolder */
 					$translation = $t_folder->getTranslation( $handle );
 					
+					if( $language_code == $reference_language ){
+						$fields['storage_format'] = $translation->meta()->get('storage_format');
+						$fields['type'] = $translation->meta()->get('type');
+					}
+					
 					$fields['name'][$language_code] = $translation->meta()->get('name');
 					$fields['translations'][$language_code] = $translation->getParser()->asTArray($translation);
 				}
@@ -123,8 +130,6 @@
 			
 			
 			// Start building the page
-			
-			$reference_language = FLang::instance()->referenceLanguage();
 			
 			$this->setTitle(__(
 				($fields['name'] ? '%1$s &ndash; %2$s &ndash; %3$s' : '%1$s &ndash; %2$s'),
@@ -228,7 +233,11 @@
 						TManager::instance()->changeTranslationHandle($fields['old_handle'], $fields['handle']);
 					}
 					
+					
 					// update linked pages
+					if( empty($fields['old_pages']) ) $fields['old_pages'] = '';
+					if( empty($fields['pages']) ) $fields['pages'] = array();
+					
 					$fields['old_pages'] = array_filter( explode('_', $fields['old_pages']) );
 					
 					$pages_plus =  array_diff($fields['pages'], $fields['old_pages']);
@@ -247,13 +256,27 @@
 						$t_folder = TManager::instance()->getFolder($language_code);
 						
 						if( !empty($t_folder) ){
-							$translation = $t_folder->getTranslation( $fields['old_handle'] );
+							$translation = $t_folder->getTranslation( $fields['handle'] );
 							
 							if( !empty($translation) ){
+								// if storage_format changed
+								if( $fields['old_storage_format'] != $fields['storage_format'] ){
+									$translation->meta()->set('storage_format', $fields['storage_format']);
+									$translation->setData();
+								}
+								
+								
+								// type changed to 'Page'
+								if( ($fields['old_type'] != $fields['type']) ){
+									$translation = $t_folder->setTranslationType($fields['handle'], $fields['type']);
+								}
+								
+								
 								// set name
 								if( empty($fields['name'][$language_code]) ) $fields['name'][$language_code] = $fields['handle'];
 								
 								$translation->setName($fields['name'][$language_code]);
+								
 								
 								// set tranlsation strings
 								$content = $translation->getParser()->TArray2string($translations);

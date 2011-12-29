@@ -38,7 +38,13 @@
 
 			/* Build the table */
 			
-			$translations = TManager::instance()->getFolder( Symphony::Configuration()->get('reference_language','frontend_localisation') )->getTranslations();
+			$language_code = Lang::get();
+			
+			if( !in_array($language_code, FLang::instance()->ld()->languageCodes()) ){
+				$language_code = Symphony::Configuration()->get('reference_language','frontend_localisation');
+			}
+			
+			$translations = TManager::instance()->getFolder( $language_code )->getTranslations();
 			
 			$thead = array(
 				array(__('Title'), 'col'),

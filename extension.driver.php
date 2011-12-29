@@ -19,8 +19,8 @@
 		public function about(){
 			return array(
 					'name' => FRONTEND_LOCALISATION_NAME,
-					'version' => '1.0',
-					'release-date' => '2011-12-23',
+					'version' => '1.1',
+					'release-date' => '2011-12-29',
 					'author' => array(
 							array(
 									'name' => 'Xander Group',
@@ -319,7 +319,7 @@
 // 			$group->appendChild($convert);
 			
 // 			$convert = new XMLElement('span', NULL, array('class' => 'frame'));
-// 			$convert->appendChild(new XMLElement('button', __('Convert Translations to 1.0'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert_0.3_to_0.5]', 'type' => 'submit')));
+// 			$convert->appendChild(new XMLElement('button', __('Convert Translations to 1.0'), array('name' => 'action['.FRONTEND_LOCALISATION_GROUP.'][convert_to_1.0]', 'type' => 'submit')));
 // 			$group->appendChild($convert);
 			
 			$context['wrapper']->appendChild($group);
@@ -381,7 +381,7 @@
 				}
 			}
 			
-			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert_0.3_to_0.5']) ){
+			if( isset($_POST['action'][FRONTEND_LOCALISATION_GROUP]['convert_to_1.0']) ){
 				$all_languages = FLang::instance()->ld()->allLanguages();
 				$langauge_codes = FLang::instance()->ld()->languageCodes();
 				
@@ -424,6 +424,11 @@
 							// storage format
 							$dom_meta_info->appendChild(
 								$dom_meta->createElement('storage_format', 'xml' )
+							);
+							
+							// type
+							$dom_meta_info->appendChild(
+								$dom_meta->createElement('type', '' )
 							);
 							
 							$dom_meta->appendChild( $dom_meta_info );
@@ -518,6 +523,8 @@
 			
 			$new_languages = FLang::instance()->ld()->getSavedLanguages($context);
 			
+			FLang::instance()->ld()->setLanguageCodes($new_languages);
+			
 			
 			
 			/* Update Reference Language */
@@ -525,6 +532,10 @@
 			$reference_language = $context['settings'][FRONTEND_LOCALISATION_GROUP]['reference_language'];
 			if( !in_array($reference_language, $new_languages) ){
 				$reference_language = FLang::instance()->referenceLanguage();
+				
+				if( !in_array($reference_language, $new_languages) ){
+					$reference_language = '';
+				}
 			}
 			
 			if( empty($reference_language) ) return true;
@@ -584,10 +595,11 @@
 		private function _addReferenceLanguage() {
 			$label = Widget::Label(__('Reference language'));
 			$reference_language = FLang::instance()->referenceLanguage();
+			$all_languages = FLang::instance()->ld()->allLanguages();
 			
 			$options = array();
 			foreach (FLang::instance()->ld()->languageCodes() as $language_code) {
-				$options[] = array($language_code, ($language_code == $reference_language), $language_code );
+				$options[] = array($language_code, ($language_code == $reference_language), $all_languages[$language_code] );
 			}
 			
 			$label->appendChild( Widget::Select('settings['.FRONTEND_LOCALISATION_GROUP.'][reference_language]', $options) );

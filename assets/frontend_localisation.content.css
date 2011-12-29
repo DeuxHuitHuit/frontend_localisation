@@ -84,3 +84,7 @@ div.translations h2,
 div.translations label.reference_value span{
 	font-weight: bold;
 }
+
+.primary .help, .secondary .help{
+	margin-top: 0.3em;
+}

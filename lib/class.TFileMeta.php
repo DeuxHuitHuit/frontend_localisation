@@ -25,16 +25,38 @@
 		 */
 		private $meta = array();
 		
-		public function __construct(Translation $translation, $storage_format){
+		/**
+		 * Create a new Meta file for a Translation.
+		 * 
+		 * @param Translation $translation (optional) - do not supply this if you intend to load directly from file.
+		 * @param mixed $settings - arguments
+		 * 		- array - containing initial settings
+		 * 		- string - a file from where to load the settings
+		 */
+		public function __construct($translation, $settings = array()){
 			parent::__construct($translation);
 	
 			$this->type = 'meta';
 			$this->extension = 'xml';
 			
-			if( !$this->_loadSettings() ){
-				// somehow flag that contents from file were scrambled
+			// $args points to a file
+			if( is_string($settings) ){
+				if( !$this->loadSettings($settings) ){
+					// somehow flag that contents from $args file were scrambled
+				}
 			}
-			$this->set('storage_format', $storage_format);
+			
+			// $args is an array containing settings
+			else{
+				if( !$this->loadSettings() ){
+					// somehow flag that contents from file were scrambled
+				}
+				
+				foreach( $settings as $setting => $value ){
+					$this->set($setting, $value);
+				}
+			}
+			
 			$this->meetRequirements();
 		}
 		
@@ -94,7 +116,18 @@
 		}
 		
 		/**
-		 * Make sure the meta file has the minimum information required (name, storage_format, language).
+		 * Make sure the meta file has the minimum information required
+		 * 
+		 * 	Array(
+		 * 		[name]
+		 * 		[language] => Array(
+		 * 			[name]
+		 * 			[language_code]
+		 * 			[handle]
+		 * 		)
+		 * 		[storage_format]
+		 * 		[type]
+		 * 	)
 		 *
 		 * @return (boolean) - true if succesfull, false otherwise
 		 */
@@ -109,7 +142,7 @@
 				
 				$this->set('language', array(
 						'name' => $all_languages[$language_code],
-						'language_code' => $language_code,
+						'code' => $language_code,
 						'handle' => General::createHandle( $all_languages[$language_code] )
 				));
 			}
@@ -119,7 +152,7 @@
 			}
 			
 			if( !isset($this->meta['type']) ){
-				$this->set('type', 'normal');
+				$this->set('type', '');
 			}
 			
 			// filter duplicates
@@ -185,15 +218,17 @@
 			return (boolean) $this->setContent( $doc->saveXML() );
 		}
 		
-		
-		
 		/**
 		 * Load settings from file.
+		 * 
+		 * @param string $filename (optional) - desired file
+		 * 
+		 * @return boolean - true if success, false otherwise
 		 */
-		private function _loadSettings(){
-			$file_contents = $this->getContent();
+		public function loadSettings($filename = null){
+			$file_contents = $this->getContent($filename);
 			
-			if( $file_contents == null) return false;
+			if( $file_contents == null ) return false;
 		
 			$doc = new DOMDocument('1.0', 'utf-8');
 			$doc->loadXML( $file_contents );
@@ -212,6 +247,8 @@
 		
 			return true;
 		}
+		
+		
 		
 		/**
 		 * Extract data for requested setting.

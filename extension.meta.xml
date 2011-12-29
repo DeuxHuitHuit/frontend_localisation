@@ -25,10 +25,15 @@
 	</authors>
 
 	<dependencies>
-		<dependency version="1.02">https://github.com/klaftertief/language_redirect</dependency>
+		<dependency version="1.02">language_redirect</dependency>
 	</dependencies>
 
 	<releases>
+		<release version="1.1" date="2011-12-29"><![CDATA[
+			* Fixed some bugs regarding storage_format switching.
+			* Titles for Symphony Page translations are now handled automatically.
+			* Comprehensive README.
+		]]></release>
 		<release version="1.0" date="2011-12-23" min="2.2.x">Initial stable release.</release>
 	</releases>
 

@@ -101,8 +101,11 @@
 						$t_linker = new TLinker();
 						
 						// link to Pages
-						foreach( $fields['pages'] as $page_id ){
-							$t_linker->linkToPage($fields['handle'], $page_id);
+						if( !empty($fields['pages']) ){
+							
+							foreach( $fields['pages'] as $page_id ){
+								$t_linker->linkToPage($fields['handle'], $page_id);
+							}
 						}
 						
 						$t_folders = TManager::instance()->getFolders();
@@ -112,10 +115,10 @@
 								/* @var $t_folder TFolder */
 								
 								// create Translation
-								$t_folder->addTranslation( $fields['handle'] );
+								$translation = $t_folder->addTranslation( $fields['handle'], array( 'storage_format' => $fields['storage_format'] ) );
 								
 								// set Name
-								$t_folder->getTranslation( $fields['handle'] )->setName($fields['handle']);
+								$translation->setName($fields['handle']);
 							}
 							
 							redirect(URL . "/symphony/extension/frontend_localisation/edit/{$fields['handle']}/created/");

@@ -41,28 +41,31 @@
 		    		
 		    		$t_folder = TManager::instance()->getFolder( FLang::instance()->ld()->languageCode() );
 		    		
-		    		foreach( $handles as $handle ){
-		    			$handle = trim($handle);
-		    			
-		    			$translation = $t_folder->getTranslation($handle);
-		    			
-		    			if( $translation != null ){
-		    				$xml = '';
-		    				
-		    				// if XML, fetch as normal
-		    				if( $translation->meta()->get('storage_format') == 'xml' ){
-		    					$xml = $translation->data()->getContent();
-		    				}
-		    				
-		    				// else convert to XML
-		    				else{
-		    					$translations = $translation->getParser()->asTArray($translation);
-		    					$xml = TManager::instance()->getParser('xml')->TArray2string($translations);
-		    				}
-		    				
-		    				// process XML
-		    				$result_value .= $this->_addFile($xml);
-		    			}
+		    		if( $t_folder instanceof TFolder ){
+			    		foreach( $handles as $handle ){
+			    			
+			    			$handle = trim($handle);
+			    			
+			    			$translation = $t_folder->getTranslation($handle);
+			    			
+			    			if( $translation instanceof Translation ){
+			    				$xml = '';
+			    				
+			    				// if XML, fetch as normal
+			    				if( $translation->meta()->get('storage_format') == 'xml' ){
+			    					$xml = $translation->data()->getContent();
+			    				}
+			    				
+			    				// else convert to XML
+			    				else{
+			    					$translations = $translation->getParser()->asTArray($translation);
+			    					$xml = TManager::instance()->getParser('xml')->TArray2string($translations);
+			    				}
+			    				
+			    				// process XML
+			    				$result_value .= $this->_addFile($xml);
+			    			}
+			    		}
 		    		}
 					
 			    	$result->setValue( $this->_formatXmlString($result_value) );

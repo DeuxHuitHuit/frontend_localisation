@@ -7,13 +7,19 @@
 			'email' => 'vlad.ghita@xandergroup.ro',
 			'website' => 'http://www.xanderadvertising.com'
 		),
-		'release-date' => '2011-12-23'
+		'release-date' => '2011-12-29'
 	);
 
 	/**
 	 * Frontend Localisation
 	 */
 	$dictionary = array(
+
+		'%1$s %2$s at %3$s. <a href="%4$s" accesskey="c">Create another?</a> <a href="%5$s" accesskey="a">%6$s</a>' => 
+		'%1$s %2$s la %3$s. <a href="%4$s" accesskey="c">Creaţi alta?</a> <a href="%5$s" accesskey="a">%6$s</a>',
+
+		'<code>%1$s</code>: Column `translation` for `tbl_pages` already exists. Uninstall extension and re-install it after.' => 
+		'<code>%1$s</code>: Coloana `translation` din `tbl_pages` există deja. Dezinstalaţi extensia şi reinstalaţi.',
 
 		'<code>%1$s</code>: Failed to remove <code>%2$s</code> folder.' => 
 		'<code>%1$s</code>: Ştergerea directorului <code>%2$s</code> nu a reuşit.',
@@ -27,6 +33,12 @@
 		'Consolidate translations' => 
 		'Consolideză traducerile',
 
+		'Context: ' => 
+		'Context: ',
+
+		'Convert Translations to 1.0' => 
+		'Conversie Traduceri la 1.0',
+
 		'Convert XML to Translations' => 
 		'Converteşte XML la traduceri',
 
@@ -36,11 +48,20 @@
 		'Create a new translation file' => 
 		'Crează o noua traducere',
 
+		'Default storage format' => 
+		'Metoda de stocare implicită',
+
 		'Frontend Translations' => 
 		'Traduceri Frontend',
 
+		'Handle is a required field' => 
+		'Handle este un câmp obligatoriu',
+
 		'Handle is a required field.' => 
 		'Handle este câmp obligatoriu',
+
+		'In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.' => 
+		'A murit în FLPageManager încercând sa aducă o listă de Pagini din Baza de date. Sărăcuţul.',
 
 		'Invalid XML.' => 
 		'XML invalid.',
@@ -60,8 +81,17 @@
 		'Reference language' => 
 		'Limba de referinţă',
 
+		'Reference value' => 
+		'Valoarea de referinţă',
+
 		'Save changes' => 
 		'Salvează modificările',
+
+		'Storage format to use for translations.' => 
+		'Metoda de stocare folosită pentru traduceri.',
+
+		'The Symphony extension that drives your frontend language management.' => 
+		'Extensia Symphony care coordonează limba de frontend.',
 
 		'The translation file you requested to edit does not exist.' => 
 		'Traducerea pe care aţi cerut-o nu există.',
@@ -77,6 +107,9 @@
 
 		'Translations' => 
 		'Traduceri',
+
+		'Translations synchronisation failed. Please contact site administrator.' => 
+		'Sincronizarea Traducerilor a eşuat. Contactaţi administratorul siteului.',
 
 		'Unknown Lang' => 
 		'Limbă necunoscută',
@@ -95,37 +128,20 @@
 
 		'updated' => 
 		'actualizată',
-		
-		'<code>%1$s</code>: Column `translation` for `tbl_pages` already exists. Uninstall extension and re-install it after.' =>
-		'<code>%1$s</code>: Coloana `translation` din `tbl_pages` există deja. Dezinstalaţi extensia şi reinstalaţi.',
-		
-		'%1$s %2$s at %3$s. <a href="%4$s" accesskey="c">Create another?</a> <a href="%5$s" accesskey="a">%6$s</a>' =>
-		'%1$s %2$s la %3$s. <a href="%4$s" accesskey="c">Creaţi alta?</a> <a href="%5$s" accesskey="a">%6$s</a>',
-		
-		'The Symphony extension that drives your frontend language management.' =>
-		'Extensia Symphony care coordonează limba de frontend.',
-		
-		'Default storage format' =>
-		'Metoda de stocare implicită',
-		
-		'Storage format to use for translations.' =>
-		'Metoda de stocare folosită pentru traduceri.',
-		
-		'Convert Translations to 1.0' =>
-		'Conversie Traduceri la 1.0',
-		
-		'Reference value' => 
-		'Valoarea de referinţă',
-		
-		'Translations synchronisation failed. Please contact site administrator.' =>
-		'Sincronizarea Traducerilor a eşuat. Contactaţi administratorul siteului.',
-		
-		'Handle is a required field' => 
-		'Handle este un câmp obligatoriu',
 
-		'In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.' => 
-		'A murit în FLPageManager încercând sa aducă o listă de Pagini din Baza de date. Sărăcuţul.',
+		'<code>%1$s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.' => 
+		'<code>%1$s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.',
 
-		'Context: ' => 
-		'Context: '
+		'Storage format' => 
+		'Metoda de stocare',
+
+		'Normal' => 
+		'Normal',
+
+		'Page' => 
+		'Pagină',
+
+		'Set type of Translation. <b>%1$s</b> for Symphony Pages, <b>%2$s</b> otherwise.' => 
+		'Selectare tip Traducere. <b>%1$s</b> pentru Paginile Symphony, altfel <b>%2$s</b>.',
+
 	);

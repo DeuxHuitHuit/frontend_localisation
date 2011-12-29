@@ -9,8 +9,6 @@
 	
 	final class FLDriverLanguageRedirect extends FLDriver
 	{
-		protected $language_codes = array();
-		
 		public function __construct(){
 			$this->language_codes = (array) LanguageRedirect::instance()->getSupportedLanguageCodes();
 			$this->all_languages = (array) LanguageRedirect::instance()->getAllLanguages();

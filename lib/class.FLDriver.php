@@ -7,6 +7,8 @@
 	 */
 	abstract class FLDriver
 	{
+		protected $language_codes = array();
+		
 		/**
 		 * Array containing lang_code->lang_name pairs of Languages.
 		 * 
@@ -241,6 +243,19 @@
 		 * @return string
 		 */
 		abstract public function referenceLanguage();
+		
+		/**
+		 * Set language codes from an array.
+		 * 
+		 * @param array $language_codes
+		 */
+		public function setLanguageCodes($language_codes){
+			if( !is_array($language_codes) ) return false;
+		
+			$this->language_codes = $language_codes;
+		
+			return true;
+		}
 		
 		/**
 		 * Returns supported languages codes.

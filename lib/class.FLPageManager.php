@@ -30,21 +30,22 @@
 		/**
 		 * Get a list of Symphony Pages indexed by `id`. Default values returned are `id`, `title`, `handle` and `parent`.
 		 *
-		 * @param array $fields - extra fields
+		 * @param array $fields (optional) - extra fields
+		 * @param string $index_by (optional) - element to index by. Defaults to `id`
 		 *
 		 * @return array  - found pages
 		 */
-		public function listAll(array $fields = array()){
-			$pages = array();
+		public function listAll(array $fields = array(), $index_by = 'id'){
+			$fields = array_merge($fields, array('title', 'handle', 'parent', 'translations'));
 			
-			$query = "SELECT `id`, `title`, `handle`, `parent`, `translations`";
+			$query = "SELECT `id`";
 			foreach( $fields as $field ){
 				$query .= ", `{$field}`";
 			}
 			$query .= " FROM `tbl_pages` ORDER BY `sortorder` ASC";
 			
 			try {
-				$pages = Symphony::Database()->fetch($query, 'id');
+				$pages = Symphony::Database()->fetch($query, $index_by);
 			}
 			catch (DatabaseException $dbe) {
 				if( Symphony::Engine() instanceof Administration ){

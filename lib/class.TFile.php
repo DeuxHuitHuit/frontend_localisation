@@ -36,18 +36,37 @@
 		protected $extension = '';
 		
 		
-		public function __construct(Translation $translation){
+		public function __construct($translation){
 			$this->parent = $translation;
 		}
 		
 		
 		/**
+		 * Setter for parent Translation
+		 * 
+		 * @param Translation $translation - new Translation
+		 * 
+		 * @return boolean - true if success, false otheriwse
+		 */
+		public function setTranslation(Translation $translation){
+			if( !$translation instanceof Translation ) return false;
+
+			$this->parent = $translation;
+			
+			return true;
+		}
+		
+		/**
 		 * Get content. If file not found, null returned.
-		 *
+		 * 
+		 * @param string $filename (optional) - desired file
+		 * 
 		 * @return mixed - if file exists, contents returned, else null.
 		 */
-		public function getContent(){
-			$filename = $this->parent->getPath() .'/'. $this->getFilename();
+		public function getContent( $filename = null ){
+			if( !is_string($filename) || ($filename == '') ){
+				$filename = $this->parent->getPath() .'/'. $this->getFilename();
+			}
 			
 			if( !is_file($filename) ) return null;
 			
