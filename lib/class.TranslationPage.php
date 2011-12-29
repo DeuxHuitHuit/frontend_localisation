@@ -4,6 +4,10 @@
 	
 	
 	
+	require_once ('class.Translation.php');
+	
+	
+	
 	/**
 	 * Management for Translation of a Symphony Page. It improves Translation's name management
 	 *
