@@ -168,7 +168,9 @@
 		 * 
 		 * @return boolean - true if success, false otherwise.
 		 */
-		public function setName($name){
+		public function setName($name = null){
+			if( empty($name) ) $name = $this->handle;
+			
 			return (boolean) $this->tf_meta->set('name', $name);
 		}
 		
@@ -230,6 +232,11 @@
 		 * @return boolean - true if succes, false otherwise
 		 */
 		public function syncFrom(Translation $ref){
+			// sync Meta
+			$this->tf_meta->set('type', $ref->tf_meta->get('type'));
+			$this->setName( $this->tf_meta->get('name') );
+			
+			// sync Data
 			$ref_trans = $ref->getParser()->asTArray($ref);
 			$this_trans = $this->getParser()->asTArray($this);
 			

@@ -19,8 +19,8 @@
 		public function about(){
 			return array(
 					'name' => FRONTEND_LOCALISATION_NAME,
-					'version' => '1.1',
-					'release-date' => '2011-12-29',
+					'version' => '1.2',
+					'release-date' => '2012-01-03',
 					'author' => array(
 							array(
 									'name' => 'Xander Group',
@@ -521,6 +521,7 @@
 			
 			
 			
+			$old_languages = FLang::instance()->ld()->languageCodes();
 			$new_languages = FLang::instance()->ld()->getSavedLanguages($context);
 			
 			FLang::instance()->ld()->setLanguageCodes($new_languages);
@@ -545,8 +546,6 @@
 			
 			
 			/* Manage translation folders */
-			
-			$old_languages = FLang::instance()->ld()->languageCodes();
 			
 			// update translation folders for new languages
 			$added_languages = array_diff($new_languages, $old_languages);

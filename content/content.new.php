@@ -119,6 +119,9 @@
 								
 								// set Name
 								$translation->setName($fields['handle']);
+								
+								// set default Content
+								$translation->data()->setContent();
 							}
 							
 							redirect(URL . "/symphony/extension/frontend_localisation/edit/{$fields['handle']}/created/");

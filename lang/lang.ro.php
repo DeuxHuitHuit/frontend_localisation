@@ -82,7 +82,7 @@
 		'Limba de referinţă',
 
 		'Reference value' => 
-		'Valoarea de referinţă',
+		'Referinţă',
 
 		'Save changes' => 
 		'Salvează modificările',

@@ -221,7 +221,7 @@
 									Widget::Label('<span class="fl_plus">(+)</span><span class="fl_minus">(-)</span> '.__('Reference value'), null, 'reference_value')
 							);
 							$value_wrapper->appendChild(
-									Widget::Textarea('reference_value', 1, 50, $fields['translations'][$reference_language][$context][$handle]['value'])
+									Widget::Textarea('reference_value', 2, 50, $fields['translations'][$reference_language][$context][$handle]['value'])
 							);
 						}
 			
@@ -230,7 +230,7 @@
 			
 						$value_label = Widget::Label(
 								__('Value'),
-								Widget::Textarea("fields[translations][{$language_code}][{$context}][{$handle}][value]", 1, 50, $item['value'])
+								Widget::Textarea("fields[translations][{$language_code}][{$context}][{$handle}][value]", 2, 50, $item['value'])
 								);
 						if( isset($errors['translations'][$language_code][$context][$handle]['value']) ){
 							$value_label = Widget::wrapFormElementWithError($value_label, $errors['translations'][$language_code][$context][$handle]['value']);
