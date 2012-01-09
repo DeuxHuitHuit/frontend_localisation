@@ -34,7 +34,7 @@
 			$fieldset = new XMLElement('fieldset', null, array('class' => 'primary'));
 			
 			// Handle
-			$this->_appendHandle($fields, $fieldset);			
+			$this->_appendHandle($fields, $fieldset);
 			
 			
 			// Wrapper for meta information
@@ -276,6 +276,8 @@
 				$old_pages .= in_array($page_id, $fields['pages']) ? $page_id.'_' : '';
 			}
 			
+			uasort($options, "fl_name_sort");
+			
 			$label->appendChild(Widget::Select('fields[pages][]', $options, array('multiple' => 'multiple', 'style' => 'height: 40em;')));
 			
 			if( isset($errors['pages']) ){
@@ -286,4 +288,8 @@
 			$wrapper->appendChild(Widget::Input( 'fields[old_pages]', trim($old_pages, '_'), 'hidden' ));
 		}
 		
+	}
+	
+	function fl_name_sort($a, $b){
+		return $a[2] > $b[2];
 	}

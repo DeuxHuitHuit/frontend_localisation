@@ -19,8 +19,8 @@
 		public function about(){
 			return array(
 					'name' => FRONTEND_LOCALISATION_NAME,
-					'version' => '1.2',
-					'release-date' => '2012-01-03',
+					'version' => '1.3',
+					'release-date' => '2012-01-08',
 					'author' => array(
 							array(
 									'name' => 'Xander Group',
@@ -39,6 +39,13 @@
 		
 		
 		const CHECKBOX_YES = 'yes';
+		
+		/**
+		 * Caches page handles changed when editing a page.
+		 *
+		 * @var array
+		 */
+		private $changed_handles = array();
 		
 		
 		
@@ -156,6 +163,12 @@
 					'delegate' => 'PagePreEdit',
 					'callback' => 'dPagePreEdit'
 				),
+					
+				array(
+					'page' => '/blueprints/pages/',
+					'delegate' => 'PagePostEdit',
+					'callback' => 'dPagePostEdit'
+				),
 				
 				array(
 					'page' => '/blueprints/pages/',
@@ -257,6 +270,7 @@
 		
 		/**
 		 * On changing page handle, update corresponding Translations.
+		 * Translation Name gets broken. Fix in dPagePostEdit()
 		 *
 		 * @param array $context - see delegate description
 		 */
@@ -267,13 +281,41 @@
 			
 			// update translation filenames if needed
 			if( ($context['fields']['handle'] != $current_page['handle']) || ($context['fields']['parent'] != $current_page['parent']) ){
-				TManager::instance()->editTranslation(array(
+				$this->changed_handles = TManager::instance()->editTranslation(array(
 						'id' => $context['page_id'],
 						'old_handle' => $current_page['handle'],
 						'new_handle' => $context['fields']['handle'],
 						'old_parent' => $current_page['parent'],
 						'new_parent' => $context['fields']['parent']
 				));
+				
+				// FL takes care of Translations
+				unset($context['fields']['translations']);
+			}
+		}
+		
+		/**
+		 * After changing page handle fix Translations' Names.
+		 *
+		 * @param array $context - see delegate description
+		 */
+		public function dPagePostEdit($context){
+			foreach( TManager::instance()->getFolders() as $language_code => $t_folder ){
+				/* @var $t_folder TFolder */
+				
+				// change all
+				if( !empty($this->changed_handles) ){
+					foreach( $this->changed_handles as $new_handle ){
+						$translation = $t_folder->getTranslation($new_handle);
+						
+						if( $translation instanceof Translation ) $translation->setName();
+					}
+				}
+				else{
+					$translation = $t_folder->getTranslation( TManager::instance()->getPageHandle($context['page_id']) );
+					
+					if( $translation instanceof Translation ) $translation->setName();
+				}
 			}
 		}
 		

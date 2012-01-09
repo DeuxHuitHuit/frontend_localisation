@@ -3,8 +3,8 @@ Frontend Localisation
 
 Offers an integrated solution to localise the Frontend of your site.
 
-* Version: 1.2
-* Build Date: 2012-01-03
+* Version: 1.3
+* Build Date: 2012-01-08
 * Authors:
 	- [Xander Group](http://www.xanderadvertising.com)
 	- Vlad Ghita

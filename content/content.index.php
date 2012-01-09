@@ -171,7 +171,7 @@
 					if( in_array($translation->getHandle(), $page_translations) ){
 						$link = URL . '/symphony/blueprints/pages/edit/' . $page_id;
 						
-						$value .= "<a href=\"{$link}\">".Administration::instance()->resolvePageTitle($page_id)."</a><br />";
+						$value .= "<a href=\"{$link}\">".Administration::instance()->resolvePageTitle($page_id)."</a>&#160;&#160;&#160;";
 					}
 				}
 			}

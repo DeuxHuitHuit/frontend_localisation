@@ -193,9 +193,9 @@
 					foreach( $fields['translations'] as $language_code => $translations ){
 						foreach( $translations as $context => $items ){
 							
-							foreach( $items as $handle => $item ){
+							foreach( $items as $old_handle => $item ){
 								if( empty($item['handle']) && ($language_code == $reference_language) && Administration::instance()->Author->isDeveloper() ){
-									$this->_errors['translations'][$language_code][$context][$handle]['handle'] = __('Handle is a required field.');
+									$this->_errors['translations'][$language_code][$context][$old_handle]['handle'] = __('Handle is a required field.');
 								}
 								
 								$valid_xml = true;
@@ -206,12 +206,12 @@
 								}
 								
 								if( $valid_xml !== true ){
-									$this->_errors['translations'][$language_code][$context][$handle]['value'] = __('Invalid XML.') . ' Error ' . $valid_xml['error'];
+									$this->_errors['translations'][$language_code][$context][$old_handle]['value'] = __('Invalid XML.') . ' Error ' . $valid_xml['error'];
 								}
 								
 								// store translation item
-								$file_translations[$language_code][$context][$handle] = array(
-									'handle' => $handle,
+								$file_translations[$language_code][$context][$old_handle] = array(
+									'handle' => $fields['translations'][$reference_language][$context][$old_handle]['handle'],
 									'value' => $item['value']
 								);
 							}
@@ -232,7 +232,6 @@
 					if( $fields['old_handle'] != $fields['handle'] ){
 						TManager::instance()->changeTranslationHandle($fields['old_handle'], $fields['handle']);
 					}
-					
 					
 					// update linked pages
 					if( empty($fields['old_pages']) ) $fields['old_pages'] = '';
@@ -303,7 +302,7 @@
 				foreach( $pages as $page_id => $page ){
 					$page_translations = array_filter( explode(',', $page['translations']) );
 					
-					if( in_array($handle, $page_translations) ){
+					if( in_array($fields['old_handle'], $page_translations) ){
 						$t_linker->unlinkFromPage($fields['old_handle'], $page_id);
 					}
 				}

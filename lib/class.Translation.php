@@ -52,7 +52,7 @@
 		 * @param mixed $meta - meta information
 		 * 		- TFileMeta object
 		 * 		- Array = an array with meta information
-		 * 
+		 *
 		 * @see TFileMeta::meetRequirements()
 		 */
 		public function __construct(TFolder $t_folder, $handle, $meta){
@@ -88,13 +88,14 @@
 		}
 		
 		/**
-		 * Setter for Translation handle. 
-		 * It will only create a new file with old file contents.
-		 * 
+		 * Setter for Translation handle.
+		 * It will only creates a new files with old files' contents.
+		 * To properly change a Translation Handle, use the secured TManager::changeTranslationHandle()
+		 *
 		 * @param string $handle - new handle
 		 *
 		 * @return boolean - true if success, false otherwise.
-		 * 
+		 *
 		 * @see TFile::setFilename()
 		 */
 		public function setHandle($handle){
@@ -108,8 +109,6 @@
 			
 			// 2. Change handle
 			$this->handle = $handle;
-			$this->setMeta( array($this->tf_meta->get('storage_format')) );
-			$this->setData();
 			
 			return true;
 		}
@@ -141,7 +140,7 @@
 		 * 		- Array = an array with meta information
 		 *
 		 * @return boolean - true if success, false otherwise.
-		 * 
+		 *
 		 * @see TFileMeta::meetRequirements()
 		 */
 		public function setMeta($meta){
@@ -163,9 +162,9 @@
 		
 		/**
 		 * The recommended way to set the Name of translation.
-		 * 
+		 *
 		 * @param string $name - new name
-		 * 
+		 *
 		 * @return boolean - true if success, false otherwise.
 		 */
 		public function setName($name = null){
@@ -185,7 +184,7 @@
 		
 		/**
 		 * Access an Appropriate TParser for this type of Translation.
-		 * 
+		 *
 		 * @return TParser
 		 */
 		public function getParser(){

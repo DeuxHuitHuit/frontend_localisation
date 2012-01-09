@@ -88,7 +88,7 @@
 		
 		/**
 		 * Getter for Translation Manager parent.
-		 * 
+		 *
 		 * @return TManager
 		 */
 		public function getManager(){
@@ -185,9 +185,9 @@
 		 * 			[storage_format] => '' (optional)
 		 * 			[type] => '' (optional)
 		 * 		)
-		 * 
+		 *
 		 * @return Translation
-		 * 
+		 *
 		 * @throws Exception
 		 */
 		public function addTranslation($handle, $meta = array()) {
@@ -221,10 +221,10 @@
 		
 		/**
 		 * Change Translation handle to new value.
-		 * 
+		 *
 		 * @param string $old_handle
 		 * @param string $new_handle
-		 * 
+		 *
 		 * @return boolean - true if success, false otherwise
 		 */
 		public function changeTranslationHandle($old_handle, $new_handle){
@@ -246,10 +246,10 @@
 		
 		/**
 		 * Change Translation type to new $type.
-		 * 
+		 *
 		 * @param string $handle
 		 * @param string $type
-		 * 
+		 *
 		 * @return Translation
 		 */
 		public function setTranslationType($handle, $type){

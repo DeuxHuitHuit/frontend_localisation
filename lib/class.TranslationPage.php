@@ -27,13 +27,23 @@
 				$title_field = 'plh_t-'.$this->getFolder()->languageCode();
 			}
 			
-			$pages = FLPageManager::instance()->listAll( array($title_field), 'handle' );
+			$pages = FLPageManager::instance()->listAll( array($title_field) );
 			
 			$bits = explode('_', $this->handle);
 			array_shift($bits);
 			
+			$p_id = null;
+			
 			while( $bit = array_shift($bits) ){
-				$name .= ' : '.$pages[$bit][$title_field];
+				
+				foreach( $pages as $page ){
+					if( ($page['handle'] == $bit) && ($page['parent'] == $p_id) ){
+						$p_id = $page['id'];
+						
+						$name .= ' : '.$pages[$p_id][$title_field];
+						break;
+					}
+				}
 			}
 			
 			return (boolean) parent::setName($name);

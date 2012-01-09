@@ -72,7 +72,7 @@
 		
 		/**
 		 * Translation Parsers. Caches them for easy access.
-		 * 
+		 *
 		 * @var array
 		 */
 		private $t_parsers = array();
@@ -167,9 +167,9 @@
 		
 		/**
 		 * Get a TParser instance for Translation transform.
-		 * 
+		 *
 		 * @param string $storage_format
-		 * 
+		 *
 		 * @return TParser - Appropriate TParser for $storage_format
 		 */
 		public function getParser($storage_format){
@@ -210,6 +210,8 @@
 		 * Edits Translation for given Page.
 		 *
 		 * @param array $current_page - page info. Must include id, old_handle, new_handle and parent.
+		 *
+		 * @return array - changed handles
 		 */
 		public function editTranslation(array $current_page){
 			$pages = FLPageManager::instance()->listAll();
@@ -246,6 +248,8 @@
 			foreach( $handles as $old_handle => $new_handle ){
 				$this->changeTranslationHandle($old_handle, $new_handle);
 			}
+			
+			return $handles;
 		}
 		
 		/**
@@ -327,8 +331,10 @@
 		 */
 		public function changeTranslationHandle($old_handle, $new_handle){
 			$valid = true;
+			
+			// keeps track of altered Translations
 			$changed = array();
-		
+			
 			// try to rename files
 			foreach( $this->t_folders as $t_folder ){
 				/* @var $t_folder TFolder */
@@ -346,8 +352,8 @@
 				$pages = $t_linker->getLinkedPages($old_handle);
 		
 				foreach( array_keys($pages) as $page_id ){
-					$t_linker->linkToPage($new_handle, $page_id);
 					$t_linker->unlinkFromPage($old_handle, $page_id);
+					$t_linker->linkToPage($new_handle, $page_id);
 				}
 		
 				// remove old files
@@ -436,7 +442,7 @@
 		 * Translation Folder generator.
 		 *
 		 * @param string $language_code
-		 * 
+		 *
 		 * @return TFolder
 		 */
 		public function addFolder($language_code){
@@ -458,7 +464,7 @@
 		 *
 		 * 		- If class file doesn't exist, `Exception` is thrown.
 		 * 		- If class doesn't exist in file, `Exception` is thrown.
-		 * 
+		 *
 		 * @param string $storage_format
 		 * @param string $class - abstract base class name.
 		 * 		e.g. $class=='TParser' and $storage_format=='xml' => required class is `XML_TParser`
@@ -478,9 +484,9 @@
 		
 		/**
 		 * Loads a Translation type identified by `$type`.
-		 * 
+		 *
 		 * @param string $type
-		 * 
+		 *
 		 * @throws Exception - will be catched by Symphony's default error handler.
 		 */
 		public function loadTranslationClass($type){
@@ -493,15 +499,32 @@
 		}
 		
 		
+		/**
+		 * Creates Page handle from Page ID.
+		 *
+		 * @param integer - Page ID
+		 *
+		 * return string - Page handle
+		 */
+		public function getPageHandle($page_id){
+			$pages = FLPageManager::instance()->listAll();
+			
+			$parent_handle = $this->_createAncestorFilename($page_id, $pages);
+			$prefix = Symphony::Configuration()->get('page_name_prefix','frontend_localisation');
+			
+			return (string) $prefix . trim($parent_handle, '_');
+		}
+		
+		
 		
 		/**
 		 * Attempts to load given class from desired filename.
-		 * 
+		 *
 		 * @param string $filename
 		 * @param string $class_name
-		 * 
+		 *
 		 * @return boolean - true if success
-		 * 
+		 *
 		 * @throws Exception
 		 */
 		private function _loadClass($filename, $class_name){
@@ -524,11 +547,13 @@
 		 * Creates the handle for given page, having all pages.
 		 *
 		 * @param integer $page_id - target page id
-		 * @param array $pages - all pages
+		 * @param array $pages (optional) - all pages
 		 *
 		 * @return string - handle
 		 */
-		private function _createAncestorFilename($page_id, $pages){
+		private function _createAncestorFilename($page_id, $pages = null){
+			if( empty($pages) ) $pages = FLPageManager::instance()->listAll();
+			
 			$page = $pages[$page_id];
 			
 			$handle = $page['handle'] . '_';
