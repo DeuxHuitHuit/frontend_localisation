@@ -18,6 +18,14 @@ Thank you all other Symphony & Extensions developers for your inspirational work
 
 
 
+## 0 @todo list ##
+
+- add support for GNU PO and JAVA properties.
+- implement `Add new item` | `Delete item` | `Item reordering (subgrouping)` features.
+
+
+
+
 
 ## 1 Synopsis ##
 
