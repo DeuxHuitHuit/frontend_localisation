@@ -198,18 +198,7 @@
 									$this->_errors['translations'][$language_code][$context][$old_handle]['handle'] = __('Handle is a required field.');
 								}
 								
-								$valid_xml = true;
-								
-								// allow empty values
-								if( $item['value'] !== ''){
-									General::validateXML($item['value'], $valid_xml, false);
-								}
-								
-								if( $valid_xml !== true ){
-									$this->_errors['translations'][$language_code][$context][$old_handle]['value'] = __('Invalid XML.') . ' Error ' . $valid_xml['error'];
-								}
-								
-								// store translation item
+								// mark for storage
 								$file_translations[$language_code][$context][$old_handle] = array(
 									'handle' => $fields['translations'][$reference_language][$context][$old_handle]['handle'],
 									'value' => $item['value']

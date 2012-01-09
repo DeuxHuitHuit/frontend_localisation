@@ -28,44 +28,39 @@
 			// Wrapper
 			$wrapper = new XMLElement('div', null, array('class' => 'group'));
 			
-			
-			
-			// Main
-			$fieldset = new XMLElement('fieldset', null, array('class' => 'primary'));
-			
-			// Handle
-			$this->_appendHandle($fields, $fieldset);
-			
-			
-			// Wrapper for meta information
-			$wrapper_meta = new XMLElement('div', null, array('class' => 'group'));
-			
-			// Storage format
-			$this->_appendStorageFormat($fields, $wrapper_meta);
-			// Type
-			$this->_appendType($fields, $wrapper_meta);
-			
-			$fieldset->appendChild($wrapper_meta);
-			
-			
-			// Translation content
-			if( is_array($fields['translations']) ){
-				$this->_appendContent($fields, $errors, $fieldset);
-			}
-			
-			$wrapper->appendChild($fieldset);
+				// Main
+				$fieldset = new XMLElement('fieldset', null, array('class' => 'primary'));
+				
+					// Handle
+					$this->_appendHandle($fields, $fieldset);
+				
+					// Wrapper for meta information
+					$wrapper_meta = new XMLElement('div', null, array('class' => 'group'));
+					
+						// Storage format
+						$this->_appendStorageFormat($fields, $wrapper_meta);
+						
+						// Type
+						$this->_appendType($fields, $wrapper_meta);
+					
+					$fieldset->appendChild($wrapper_meta);
+				
+					// Translation content
+					if( is_array($fields['translations']) ){
+						$this->_appendContent($fields, $errors, $fieldset);
+					}
+				
+				$wrapper->appendChild($fieldset);
 			
 			
 			
-			// Sidebar
-			$fieldset = new XMLElement('fieldset', null, array('class' => 'secondary'));
+				// Sidebar
+				$fieldset = new XMLElement('fieldset', null, array('class' => 'secondary'));
 			
-			// Pages
-			$this->_appendPages($fields, $errors, $fieldset);
+					// Pages
+					$this->_appendPages($fields, $errors, $fieldset);
 			
-			
-			
-			$wrapper->appendChild($fieldset);
+				$wrapper->appendChild($fieldset);
 			
 			return $wrapper;
 		}

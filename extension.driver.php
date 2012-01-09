@@ -19,7 +19,7 @@
 		public function about(){
 			return array(
 					'name' => FRONTEND_LOCALISATION_NAME,
-					'version' => '1.3',
+					'version' => '1.3.1',
 					'release-date' => '2012-01-08',
 					'author' => array(
 							array(
