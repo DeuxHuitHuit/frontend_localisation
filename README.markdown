@@ -154,7 +154,7 @@ If it's `French`, edit the `workspace/translations/fr` files. Always!
 
 On visiting in Admin the edit page of a Translation, the `DATA file` in all languages will be synchronised from the `Reference language`'s `DATA file`.
 
-`Translation synchronisation` = From reference translation to target translation, copy all items from reference while preserving original values from target.
+`Translation synchronisation` = From reference translation to target translation, copy all items from reference while preserving only corresponding items from target (extra items in target are lost).
 
 So, if your `Reference language` is `English` and you're creating items for `French`, on visiting translation page you **will** lose all content from French translation (English translation doesn't contain anything = copy `empty` to everywhere).
 
