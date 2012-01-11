@@ -189,7 +189,7 @@ Here's an example from my `master.data.xml`:
         </copyright>
         <page-not-found>
             <item handle="title"><![CDATA[Page not found]]></item>
-            <item handle="message"><![CDATA[Return to main pate in order to continue.]]></item>
+            <item handle="message"><![CDATA[Return to main page in order to continue.]]></item>
         </page-not-found>
     </data>
 
