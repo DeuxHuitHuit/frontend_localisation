@@ -73,7 +73,7 @@ For PHP developers:
 
 ## 4 Upgrading ##
 
-If you're upgrading from > 0.2beta to 1.0 or later, uncomment [these lines](https://github.com/vlad-ghita/frontend_localisation/blob/master/extension.driver.php#L320-322), go to Preferences page and push the `Convert Translations to 1.0` button. Comment the lines back and you're good to go.
+If you're upgrading from > 0.2beta to 1.0 or later, uncomment [these lines](https://github.com/vlad-ghita/frontend_localisation/blob/master/extension.driver.php#L363-365), go to Preferences page and push the `Convert Translations to 1.0` button. Comment the lines back and you're good to go.
 
 
 
