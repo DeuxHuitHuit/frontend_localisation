@@ -24,6 +24,21 @@
 			$this->setPageType('table');
 			$this->setTitle(__('%1$s &ndash; %2$s', array(__('Symphony'), __('Translations'))));
 			
+			$language_code = Lang::get();
+			
+			if( !in_array($language_code, FLang::instance()->ld()->languageCodes()) ){
+				$language_code = FLang::instance()->referenceLanguage();
+			
+				if( !in_array($language_code, FLang::instance()->ld()->languageCodes()) ){
+					$this->appendSubheading(__('There are no languages set by language driver.'));
+					
+					return;
+				}
+			}
+			
+			
+			/* Append heading */
+			
 			$create_new = null;
 			
 			if( $this->_Parent->Author->isDeveloper() ){
@@ -37,12 +52,6 @@
 		
 
 			/* Build the table */
-			
-			$language_code = Lang::get();
-			
-			if( !in_array($language_code, FLang::instance()->ld()->languageCodes()) ){
-				$language_code = Symphony::Configuration()->get('reference_language','frontend_localisation');
-			}
 			
 			$translations = TManager::instance()->getFolder( $language_code )->getTranslations();
 			
