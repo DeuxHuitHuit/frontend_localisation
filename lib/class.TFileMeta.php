@@ -17,7 +17,6 @@
 	 */
 	final class TFileMeta extends TFile
 	{
-		
 		/**
 		 * Settings of translation.
 		 *
@@ -26,8 +25,15 @@
 		private $meta = array();
 		
 		/**
+		 * Keeps track if meta data was changed during this sesstion or not.
+		 *
+		 * @var boolean
+		 */
+		private $changed = false;
+		
+		/**
 		 * Create a new Meta file for a Translation.
-		 * 
+		 *
 		 * @param Translation $translation (optional) - do not supply this if you intend to load directly from file.
 		 * @param mixed $settings - arguments
 		 * 		- array - containing initial settings
@@ -58,6 +64,8 @@
 			}
 			
 			$this->meetRequirements();
+			
+			$this->changed = false;
 		}
 		
 		
@@ -112,12 +120,14 @@
 				$this->meta[$setting] = $value;
 			}
 			
+			$this->changed = true;
+			
 			return true;
 		}
 		
 		/**
 		 * Make sure the meta file has the minimum information required
-		 * 
+		 *
 		 * 	Array(
 		 * 		[name]
 		 * 		[language] => Array(
@@ -198,9 +208,16 @@
 		}
 		
 		/**
-		 * Save settings to file.
+		 * The recommended way for saving the settings to file.
+		 * Saving will take places only if meta information has changed.
+		 *
+		 * @param boolean $force - force saving to bypass change check. True to bypass.
+		 *
+		 * @return boolean
 		 */
-		public function saveSettings(){
+		public function saveSettings($force = false){
+			if( $this->changed === false && $force === false ) return true;
+			
 			$this->meetRequirements();
 			
 			$doc = new DOMDocument('1.0', 'utf-8');
@@ -220,9 +237,9 @@
 		
 		/**
 		 * Load settings from file.
-		 * 
+		 *
 		 * @param string $filename (optional) - desired file
-		 * 
+		 *
 		 * @return boolean - true if success, false otherwise
 		 */
 		public function loadSettings($filename = null){
