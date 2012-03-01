@@ -25,7 +25,8 @@
 
 		public function grab(&$param_pool=NULL){
 			$result = new XMLElement('fl-languages');
-			
+
+			$reference_language = FLang::instance()->referenceLanguage();
 			$current_language_code = FLang::instance()->ld()->languageCode();
 			$all_languages = FLang::instance()->ld()->allLanguages();
 			$supported_language_codes = FLang::instance()->ld()->languageCodes();
@@ -35,11 +36,18 @@
 			$result->appendChild($current_language_xml);
 			
 			$supported_languages_xml = new XMLElement('supported-languages');
+
 			foreach($supported_language_codes as $language) {
 				$language_code = new XMLElement('item', $all_languages[$language] ? $all_languages[$language] : $language);
 				$language_code->setAttribute('handle', $language);
+
+				if( $language === $reference_language ){
+					$language_code->setAttribute('reference', 'yes');
+				}
+
 				$supported_languages_xml->appendChild($language_code);
 			}
+
 			$result->appendChild($supported_languages_xml);
 			
 			return $result;
