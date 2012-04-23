@@ -23,20 +23,20 @@
 
 	=== Usage ===
 
-		    <xsl:stylesheet version="1.0"
-		        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		        xmlns:fl="http://symphony-cms.com/functions"
-		        extension-element-prefixes="fl">
+			<xsl:stylesheet version="1.0"
+				xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+				xmlns:fl="http://symphony-cms.com/functions"
+				extension-element-prefixes="fl">
 
-		        <xsl:import href="fl_utilities.xsl"/>
-		        ...
-		    </xsl:stylesheet>
+				<xsl:import href="fl_utilities.xsl"/>
+				...
+			</xsl:stylesheet>
 
 
 	=== Instant grab™ a Translation ===
 
-	        <xsl:value-of select="fl:__([XPath]/[@handle])"/>
-	    
+			<xsl:value-of select="fl:__([XPath]/[@handle])"/>
+
 			[XPath] = the XPath from "/data/fl-translations" to "item"
 			[@handle] = handle of desired item
 	
@@ -48,20 +48,20 @@
 			<fl-translations>
 
 				// This comes from my data.p_page-404.xml file
-			    <p_page-404>
-		            <item handle="title">Page not found</item>
-		            <item handle="message"><![CDATA[<p>Requested page was not found. Return %1$s to continue.</p>]]></item>
-			    </p_page-404>
+				<p_page-404>
+					<item handle="title">Page not found</item>
+					<item handle="message"><![CDATA[<p>Requested page was not found. Return %1$s to continue.</p>]]></item>
+				</p_page-404>
 
-			    // This comes from my data.p_news.xml file
-			    <p_news>
+				// This comes from my data.p_news.xml file
+				<p_news>
 					<item handle="view-all"><![CDATA[View %1$s or head back to %2$s.]]></item>
 					<item handle="news-link"><![CDATA[all news]]></item>
 					<item handle="home-link"><![CDATA[our spify home page]]></item>
 				</p_news>
 
 				// This comes from my data.template-master.xml file
-			    <item handle="site-name">Xander Advertising</item>
+				<item handle="site-name">Xander Advertising</item>
 
 			</fl-translations>
 	
