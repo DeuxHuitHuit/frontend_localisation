@@ -1,116 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:exsl="http://exslt.org/common"
-	xmlns:fl="http://symphony-cms.com/functions"
-	xmlns:func="http://exslt.org/functions"
-	xmlns:str="http://exslt.org/strings"
-	extension-element-prefixes="exsl func str">
-	
-	
+		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+		xmlns:exsl="http://exslt.org/common"
+		xmlns:fl="http://symphony-cms.com/functions"
+		xmlns:func="http://exslt.org/functions"
+		xmlns:str="http://exslt.org/strings"
+		extension-element-prefixes="exsl func str">
+
+
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#Translation utilities
-	
-	version:  1.1
-	author:   Vlad Ghita
-	email:    vlad_micutul@yahoo.com
-	
-	
-	To use these functions add the "fl" namespace to your master (or wherever you feel
-	it suits best) stylesheet and import this utility. Add the namespace to all stylesheets
-	where you want to use these functions.
+		#Translation utilities
+
+		version:  1.1
+		author:   Vlad Ghita
+		email:    vlad_micutul@yahoo.com
 
 
-	=== Usage ===
-
-			<xsl:stylesheet version="1.0"
-				xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-				xmlns:fl="http://symphony-cms.com/functions"
-				extension-element-prefixes="fl">
-
-				<xsl:import href="fl_utilities.xsl"/>
-				...
-			</xsl:stylesheet>
+		To use these functions add the "fl" namespace to your master (or wherever you feel
+		it suits best) stylesheet and import this utility. Add the namespace to all stylesheets
+		where you want to use these functions.
 
 
-	=== Instant grab™ a Translation ===
+		=== Usage ===
 
-			<xsl:value-of select="fl:__([XPath]/[@handle])"/>
+				<xsl:stylesheet version="1.0"
+					xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+					xmlns:fl="http://symphony-cms.com/functions"
+					extension-element-prefixes="fl">
 
-			[XPath] = the XPath from "/data/fl-translations" to "item"
-			[@handle] = handle of desired item
-	
-	
-	=== Examples ===
-	
-	Given this XML result (?debug):
-	
-			<fl-translations>
-
-				// This comes from my data.p_page-404.xml file
-				<p_page-404>
-					<item handle="title">Page not found</item>
-					<item handle="message"><![CDATA[<p>Requested page was not found. Return %1$s to continue.</p>]]></item>
-				</p_page-404>
-
-				// This comes from my data.p_news.xml file
-				<p_news>
-					<item handle="view-all"><![CDATA[View %1$s or head back to %2$s.]]></item>
-					<item handle="news-link"><![CDATA[all news]]></item>
-					<item handle="home-link"><![CDATA[our spify home page]]></item>
-				</p_news>
-
-				// This comes from my data.template-master.xml file
-				<item handle="site-name">Xander Advertising</item>
-
-			</fl-translations>
-	
-	
-	// Take a guess what these do:
-	
-			<xsl:copy-of select="fl:__('p_page-404/title')"/>
-			<xsl:copy-of select="fl:__('site-name')"/>
-			<xsl:copy-of select="fl:__('p_page-404/message')"/> // disable-output-escaping="yes"
-			<xsl:value-of select="fl:__('p_page-404/message')"/>// disable-output-escaping="no"
+					<xsl:import href="fl_utilities.xsl"/>
+					...
+				</xsl:stylesheet>
 
 
-	// Replace params
+		=== Instant grab™ a Translation ===
 
-			<xsl:call-template name="fl__">
-				<xsl:with-param name="context" select="'p_news/view-all'"/>
-				<xsl:with-param name="reps">
-					<rep><xsl:value-of select="fl:__('p_news/news-link')"/></rep>
-					<rep><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
-				</xsl:with-param>
-			</xsl:call-template>
+				<xsl:value-of select="fl:__([XPath]/[@handle])"/>
+
+				[XPath] = the XPath from "/data/fl-translations" to "item"
+				[@handle] = handle of desired item
 
 
-	// Replace params slick:
+		=== Examples ===
 
-			<xsl:call-template name="fl__">
-				<xsl:with-param name="context" select="'p_news/view-all'"/>
-				<xsl:with-param name="reps">
-					<rep>
-						<a href="http://www.xanderadvertising.com" title="Xander Advertising">
-							<span style="color:red">
-								<xsl:value-of select="fl:__('p_news/news-link')"/>
-							</span>
-						</a>
-					</rep>
-					<rep>
-						<a href="{/data/params/root}">
-							<xsl:value-of select="fl:__('p_news/home-link')"/>
-						</a>
-					</rep>
-				</xsl:with-param>
-			</xsl:call-template>
+		Given this XML result (?debug):
 
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	
-	
+				<fl-translations>
+
+					// This comes from my data.p_page-404.xml file
+					<p_page-404>
+						<item handle="title">Page not found</item>
+						<item handle="message"><![CDATA[<p>Requested page was not found. Return %1$s to continue.</p>]]></item>
+					</p_page-404>
+
+					// This comes from my data.p_news.xml file
+					<p_news>
+						<item handle="view-all"><![CDATA[View %1$s or head back to %2$s.]]></item>
+						<item handle="news-link"><![CDATA[all news]]></item>
+						<item handle="home-link"><![CDATA[our spify home page]]></item>
+					</p_news>
+
+					// This comes from my data.template-master.xml file
+					<item handle="site-name">Xander Advertising</item>
+
+				</fl-translations>
+
+
+		// Take a guess what these do:
+
+				<xsl:copy-of select="fl:__('p_page-404/title')"/>
+				<xsl:copy-of select="fl:__('site-name')"/>
+				<xsl:copy-of select="fl:__('p_page-404/message')"/> // disable-output-escaping="yes"
+				<xsl:value-of select="fl:__('p_page-404/message')"/>// disable-output-escaping="no"
+
+
+		// Replace params
+
+				<xsl:call-template name="fl__">
+					<xsl:with-param name="context" select="'p_news/view-all'"/>
+					<xsl:with-param name="reps">
+						<rep><xsl:value-of select="fl:__('p_news/news-link')"/></rep>
+						<rep><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
+					</xsl:with-param>
+				</xsl:call-template>
+
+
+		// Replace params slick:
+
+				<xsl:call-template name="fl__">
+					<xsl:with-param name="context" select="'p_news/view-all'"/>
+					<xsl:with-param name="reps">
+						<rep>
+							<a href="http://www.xanderadvertising.com" title="Xander Advertising">
+								<span style="color:red">
+									<xsl:value-of select="fl:__('p_news/news-link')"/>
+								</span>
+							</a>
+						</rep>
+						<rep>
+							<a href="{/data/params/root}">
+								<xsl:value-of select="fl:__('p_news/home-link')"/>
+							</a>
+						</rep>
+					</xsl:with-param>
+				</xsl:call-template>
+
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<xsl:variable name="fl_translations" select="/data/fl-translations"/>
+
+
+
 
 	<!--
-		Instan grab™ a Translation
+		Instant grab™ a Translation
 
 		<xsl:value-of select="fl:__('site-name')"/>
 	-->
@@ -130,10 +133,15 @@
 		-->
 		<xsl:param name="disable-output-escaping" select="'yes'"/>
 
+		<!--
+			Translations pool
+		-->
+		<xsl:param name="translations" select="$fl_translations"/>
+
+
 		<xsl:variable name="translation">
-			<xsl:apply-templates select="/data/fl-translations" mode="fl_translate">
+			<xsl:apply-templates select="exsl:node-set($translations)" mode="fl_translate">
 				<xsl:with-param name="context" select="$context"/>
-				<xsl:with-param name="disable-output-escaping" select="$disable-output-escaping"/>
 			</xsl:apply-templates>
 		</xsl:variable>
 
@@ -148,8 +156,8 @@
 			</xsl:choose>
 		</func:result>
 	</func:function>
-	
-	
+
+
 	<xsl:template match="*" mode="fl_translate">
 		<xsl:param name="context"/>
 
@@ -228,12 +236,14 @@
 	-->
 	<xsl:template name="fl__">
 		<xsl:param name="context"/>
-		<xsl:param name="disable-output-escaping" select="'yes'"/>
 		<xsl:param name="reps"/>
+		<xsl:param name="disable-output-escaping" select="'yes'"/>
+		<xsl:param name="translations" select="$fl_translations"/>
+
 
 		<xsl:variable name="translation">
 			<xsl:call-template name="fl_replace-var">
-				<xsl:with-param name="haystack" select="fl:__($context, $disable-output-escaping)"/>
+				<xsl:with-param name="haystack" select="fl:__($context, $disable-output-escaping, $translations)"/>
 				<xsl:with-param name="reps" select="$reps"/>
 				<xsl:with-param name="idx" select="1"/>
 			</xsl:call-template>
@@ -284,11 +294,7 @@
 					</xsl:choose>
 				</xsl:variable>
 
-				<xsl:variable name="encoded_rep">
-					<xsl:call-template name="fl_encode">
-						<xsl:with-param name="node" select="$rep"/>
-					</xsl:call-template>
-				</xsl:variable>
+				<xsl:variable name="encoded_rep" select="fl:to-string($rep)"/>
 
 				<xsl:call-template name="fl_replace-var">
 					<xsl:with-param name="haystack" select="str:replace($haystack, $needle, $encoded_rep)"/>
@@ -303,45 +309,47 @@
 	<!--
 		Converts an HTML node to raw string.
 	-->
-	<xsl:template name="fl_encode">
+	<func:function name="fl:to-string">
 		<xsl:param name="node"/>
 
-		<xsl:choose>
-			<!-- Special case for text-only node -->
-			<xsl:when test="count(exsl:node-set($node)/*) = 0">
-				<xsl:value-of select="$node"/>
-			</xsl:when>
+		<func:result>
+			<xsl:choose>
+				<!-- Special case for text-only node -->
+				<xsl:when test="count(exsl:node-set($node)/*) = 0">
+					<xsl:value-of select="$node"/>
+				</xsl:when>
 
-			<!-- Process the node -->
-			<xsl:otherwise>
-				<xsl:apply-templates select="exsl:node-set($node)/*" mode="fl_encode"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
+				<!-- Process the node -->
+				<xsl:otherwise>
+					<xsl:apply-templates select="exsl:node-set($node)/*" mode="fl_to-string"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</func:result>
+	</func:function>
 
-	<xsl:template match="*" mode="fl_encode">
+	<xsl:template match="*" mode="fl_to-string">
 		<!-- start tag : open -->
 		<xsl:text>&lt;</xsl:text>
 		<xsl:value-of select="name()"/>
 
 		<!-- attributes -->
-		<xsl:apply-templates select="@*" mode="fl_encode"/>
+		<xsl:apply-templates select="@*" mode="fl_to-string"/>
 
 		<!-- start tag : close -->
-		<xsl:text>></xsl:text>
+		<xsl:text>&gt;</xsl:text>
 
 		<!-- content -->
-		<xsl:apply-templates select="* | text()" mode="fl_encode"/>
+		<xsl:apply-templates select="* | text()" mode="fl_to-string"/>
 
 		<!-- close tag -->
-		<xsl:value-of select="concat('&lt;/',name(),'>')"/>
+		<xsl:value-of select="concat('&lt;/',name(),'&gt;')"/>
 	</xsl:template>
 
-	<xsl:template match="@*" mode="fl_encode">
+	<xsl:template match="@*" mode="fl_to-string">
 		<xsl:value-of select="concat(' ',name(),'=&#34;',.,'&#34;')"/>
 	</xsl:template>
 
-	
-	
-	
+
+
+
 </xsl:stylesheet>

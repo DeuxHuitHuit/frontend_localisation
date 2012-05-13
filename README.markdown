@@ -3,16 +3,14 @@ Frontend Localisation
 
 Offers an integrated solution to localise the Frontend of your site.
 
-* Version: 1.3.2
-* Build Date: 2012-01-18
+* Version: 1.4
+* Build Date: 2012-05-11
 * Authors:
 	- [Xander Group](http://www.xanderadvertising.com)
 	- Vlad Ghita
 * Requirements:
-	- Symphony 2.2 or above
-	- At least one frontend language driver. @see **3 Installation**
-
-Thank you all other Symphony & Extensions developers for your inspirational work.
+	- Symphony 2.3
+	- At least one FLang detection extension. @see **3 Installation**
 
 
 
@@ -29,13 +27,10 @@ Thank you all other Symphony & Extensions developers for your inspirational work
 
 ## 1 Synopsis ##
 
-Frontend localisation in Symphony (and other systems) implies coverage of two problems:<br />
-1. Frontend language detection and (optional) redirect mechanism.<br />
-2. Translation mechanism of static text, whether it's a few words long or a few paragraphs.
+This extension deals with 2 major requests regarding multilingual sites:
 
-For problem 1, there are a few extensions that provide this functionality, but there is a lack of unified approach. This extension is decoupled from any of these drivers and provides a mechanism to associate it with them. More details in **5.1 Frontend Language** section.<br />
-For problem 2, this extension offers a translation mechanism for creating and editing Translation strings. More details in **5.2 Translation Manager** section.
-
+1. Frontend language management. More details in **5.1 Frontend Language** section.<br />
+2. Scalable translation mechanism of static text, whether it's a few words long or a few paragraphs. More details in **5.2 Translation Manager** section.
 
 
 
@@ -44,17 +39,17 @@ For problem 2, this extension offers a translation mechanism for creating and ed
 ## 2 Features ##
 For site builders:
 
-* Admin UI for Translations management (usable by Authors as well)
-* changeble `Language Driver`
-* changeble `Reference Language`
-* Translations consolidation on uninstall
+* Frontend Languages management.
+* backend UI for Translations management (usable by Authors as well)
+* Translations consolidation on uninstall (keeps files for removed languages)
 * one button update of all language Translations referencing `Reference Language`
-* offers one Datasource with strings from all Translations attached to current page and one Datasource with current languages from Language Driver.
+* one Datasource with Frontend Languages information
+* one Datasource with strings from all Translations attached to current page
 
 For PHP developers:
 
-* unifies Frontend language drivers in one access point.
-
+* easy access to Frontend Language information
+* UI assets to build the language tabs
 
 
 
@@ -62,7 +57,7 @@ For PHP developers:
 
 ## 3 Installation ##
 
-1. Make sure you have at least one language driver installed (= install that extension). Currently supported language drivers are: [Language Redirect](https://github.com/klaftertief/language_redirect).
+1. Make sure you have at least one FLang detection driver installed (= install that extension). For example, use [FLang detection gTLDs](https://github.com/vlad-ghita/flang_detection_gtlds).
 1. Upload the `frontend_localisation` folder found in this archive to your Symphony `extensions` folder.    
 2. Enable it by selecting `Frontend Localisation` under `System -> Extensions`, choose Enable from the with-selected menu, then click Apply.
 
@@ -70,12 +65,9 @@ For PHP developers:
 
 
 
-
 ## 4 Upgrading ##
 
-If you're upgrading from > 0.2beta to 1.0 or later, uncomment [these lines](https://github.com/vlad-ghita/frontend_localisation/blob/master/extension.driver.php#L363-365), go to Preferences page and push the `Convert Translations to 1.0` button. Comment the lines back and you're good to go.
-
-
+Keep your fingers crossed and push za button!
 
 
 
@@ -88,23 +80,18 @@ If you're upgrading from > 0.2beta to 1.0 or later, uncomment [these lines](http
 
 #### 5.1.1 @ Site builders ####
 
-On Preferences page you can select:
+On Preferences page you can:
 
-- `Language Driver` you want to use from supported and integrated ones. The Language Driver provides Frontend language information for the system.
-- `Reference Language` should be the main language of your site frontend.
+- `Language codes`: insert multiple language codes for desired Frontend Languages
+- `Main language`: chose the main language of the site
 
 
 
 #### 5.1.2 @ PHP developers ####
 
-This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.
+This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.<br/>
+If you want to create a FLang detection driver, make sure that your driver adds the `fl-language` & `fl-region` params to the URL query string with appropriate values.
 
-<b>Adding a Language Driver</b>
-
-1. In [$supported_drivers](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php#L22) array add the driver. @see property description.
-2. Create a new class named `FLDriver<driver_name>` that extends `FLDriver` class. Save it in file `/frontend_localisation/lib/class.FLDriver<driver_name>.php`.
-3. Done. You can now select this new driver on Preferences page.
-4. Don't forget to send a pull request if you want to share the change.
 
 
 <br />
@@ -112,16 +99,18 @@ This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_l
 
 #### 5.2.1 Preferences page ####
 
-- `Default storage format` is used as default when creating new Translations.
-- `Consolidate Translations` is set default to `checked`. When this is checked, on uninstall, translation folders will **not** be deleted.
-- pushing `Update Translations` button will update all languages Translations with reference to `Reference Language`.
+- `Reference language`: the reference point for Translations synchronisation
+- `Default storage format`: is used as default when creating new Translations
+- `Consolidate translations` is set default to `checked`. When this is checked, on uninstall, translation folders will **not** be deleted
+- pushing `Update Translations` button will update all languages Translations with reference to `Reference Language`
 
 #### 5.2.2 Managing Translations ####
 
 1. Add new translations through Admin interface.
-2. Add new translation strings. @see **6 Examples**. I hope in future the Admin interface will supply the <b>create new item</b> functionality.
-3. Add `FL: Translations` datasource to your pages. (visit `?debug` -> `/data/fl-translations`)
-4. Add `fl_utilities.xsl` to your stylesheets. See the [utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) for usage.
+2. Add new translation strings. @see **6 Examples**. I hope in future the Admin interface will supply <b>CRUD</b> functionality for items.
+3. Add `FL: Languages` datasource to your pages. (visit `?debug` -> `/data/fl-languages`)
+4. Add `FL: Translations` datasource to your pages. (visit `?debug` -> `/data/fl-translations`)
+5. Add `fl_utilities.xsl` to your stylesheets. See the [utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) for usage.
 
 
 
@@ -137,8 +126,8 @@ On pressing the `Create Translation` button, in every language folder from `work
 Supported storage formats are:
 
     xml => XML
-    po => GNU PO
-    i18n => JAVA properties
+    (@todo) po => GNU PO
+    (@todo) i18n => JAVA properties
 
 `DATA file` contains business information. This will be edited.<br />
 `META file` contains various info about the Translation (not of interest).
@@ -156,7 +145,7 @@ On visiting in Admin the edit page of a Translation, the `DATA file` in all lang
 
 `Translation synchronisation` = From reference translation to target translation, copy all items from reference while preserving only corresponding items from target (extra items in target are lost).
 
-So, if your `Reference language` is `English` and you're creating items for `French`, on visiting translation page you **will** lose all content from French translation (English translation doesn't contain anything = copy `empty` to everywhere).
+So, if your `Reference language` is `English` and you're creating items for `French`, on visiting translation page you **will** lose all content from French translation that doesn't exist in English translation (English translation doesn't contain anything => copy `empty` to everywhere).
 
 
 <br />
@@ -188,8 +177,8 @@ Here's an example from my `master.data.xml`:
             <item handle="message-p2"><![CDATA[Copies of any kind obtained without prior permission are prohibited.]]></item>
         </copyright>
         <page-not-found>
-            <item handle="title"><![CDATA[Page not found]]></item>
-            <item handle="message"><![CDATA[Return to main page in order to continue.]]></item>
+            <item handle="title">Page not found</item>
+            <item handle="message"><![CDATA[<p>Requested page was not found. Return %1$s to continue.</p>]]></item>
         </page-not-found>
     </data>
 
@@ -220,3 +209,8 @@ Created files will be:
 Here's an example from my `master.data.i18n`:
 
     To be continued ...
+
+
+### 6.4 XSL FLang utilities ###
+
+Read the docs from the [XSLT utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) for usage examples.

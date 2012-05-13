@@ -1,9 +1,10 @@
 <?php
 
-	require_once(TOOLKIT . '/class.datasource.php');
-	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
+	require_once(TOOLKIT.'/class.datasource.php');
+	require_once(EXTENSIONS.'/frontend_localisation/lib/class.FLang.php');
 
-	Class datasourcefl_languages extends Datasource{
+	Class datasourcefl_languages extends Datasource
+	{
 
 		public function about(){
 			return array(
@@ -23,33 +24,33 @@
 			return false;
 		}
 
-		public function grab(&$param_pool=NULL){
+		public function grab(&$param_pool = NULL){
 			$result = new XMLElement('fl-languages');
 
-			$reference_language = FLang::instance()->referenceLanguage();
-			$current_language_code = FLang::instance()->ld()->languageCode();
-			$all_languages = FLang::instance()->ld()->allLanguages();
-			$supported_language_codes = FLang::instance()->ld()->languageCodes();
-			
-			$current_language_xml = new XMLElement('current-language', $all_languages[$current_language_code] ? $all_languages[$current_language_code] : $current_language_code);
-			$current_language_xml->setAttribute('handle', $current_language_code);
+			$main_lang = FLang::instance()->getMainLang();
+			$lang_code = FLang::instance()->getLangCode();
+			$all_languages = FLang::instance()->getAllLangs();
+			$langs = FLang::instance()->getLangs();
+
+			$current_language_xml = new XMLElement('current-language', $all_languages[$lang_code] ? $all_languages[$lang_code] : $lang_code);
+			$current_language_xml->setAttribute('handle', $lang_code);
 			$result->appendChild($current_language_xml);
-			
+
 			$supported_languages_xml = new XMLElement('supported-languages');
 
-			foreach($supported_language_codes as $language) {
-				$language_code = new XMLElement('item', $all_languages[$language] ? $all_languages[$language] : $language);
-				$language_code->setAttribute('handle', $language);
+			foreach( $langs as $lc ){
+				$lang_xml = new XMLElement('item', $all_languages[$lc] ? $all_languages[$lc] : $lc);
+				$lang_xml->setAttribute('handle', $lc);
 
-				if( $language === $reference_language ){
-					$language_code->setAttribute('reference', 'yes');
+				if( $lc === $main_lang ){
+					$lang_xml->setAttribute('main', 'yes');
 				}
 
-				$supported_languages_xml->appendChild($language_code);
+				$supported_languages_xml->appendChild($lang_xml);
 			}
 
 			$result->appendChild($supported_languages_xml);
-			
+
 			return $result;
 		}
 	}

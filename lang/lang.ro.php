@@ -4,10 +4,10 @@
 		'name' => 'Romana',
 		'author' => array(
 			'name' => 'Vlad Ghita',
-			'email' => 'vlad.ghita@xandergroup.ro',
+			'email' => 'vlad_micutul@yahoo.com',
 			'website' => 'http://www.xanderadvertising.com'
 		),
-		'release-date' => '2011-12-29'
+		'release-date' => '2012-05-11'
 	);
 
 	/**
@@ -18,8 +18,8 @@
 		'%1$s %2$s at %3$s. <a href="%4$s" accesskey="c">Create another?</a> <a href="%5$s" accesskey="a">%6$s</a>' => 
 		'%1$s %2$s la %3$s. <a href="%4$s" accesskey="c">Creaţi alta?</a> <a href="%5$s" accesskey="a">%6$s</a>',
 
-		'<code>%1$s</code>: Column `translation` for `tbl_pages` already exists. Uninstall extension and re-install it after.' => 
-		'<code>%1$s</code>: Coloana `translation` din `tbl_pages` există deja. Dezinstalaţi extensia şi reinstalaţi.',
+		'<code>%1$s</code>: Column `translations` for `tbl_pages` already exists. Uninstall extension and re-install it after.' => 
+		'<code>%1$s</code>: Coloana `translations` din `tbl_pages` există deja. Dezinstalaţi extensia şi reinstalaţi.',
 
 		'<code>%1$s</code>: Failed to remove <code>%2$s</code> folder.' => 
 		'<code>%1$s</code>: Ştergerea directorului <code>%2$s</code> nu a reuşit.',
@@ -30,17 +30,14 @@
 		'Check this to preserve Translations for languages being removed by <code>Language driver</code>.' => 
 		'Bifaţi aceasta pentru a păstra traducerile limbilor care vor fi înlăturate de către <code>Driverul pentru limbă</code>',
 
+		'Comma separated list of supported language codes.' => 
+		'Codurile limbilor separate prin virgula.',
+
 		'Consolidate translations' => 
 		'Consolideză traducerile',
 
 		'Context: ' => 
 		'Context: ',
-
-		'Convert Translations to 1.0' => 
-		'Conversie Traduceri la 1.0',
-
-		'Convert XML to Translations' => 
-		'Converteşte XML la traduceri',
 
 		'Create Translation' => 
 		'Crează traducere',
@@ -63,20 +60,20 @@
 		'In FLPageManager it died trying to get a list of Pages from Database. Poor fellow.' => 
 		'A murit în FLPageManager încercând sa aducă o listă de Pagini din Baza de date. Sărăcuţul.',
 
-		'Invalid XML.' => 
-		'XML invalid.',
+		'Language codes' => 
+		'Codurile de limba',
 
-		'Language driver' => 
-		'Driverul pentru limbă',
-
-		'Language translations that will be used as reference when updating other languages translations.' => 
-		'Traducerile acestei limbi vor fi folosite ca referinţă la actualizarea traducerilor celorlalte limbi.',
+		'Main language' => 
+		'Limba principala',
 
 		'No Pages Found' => 
 		'Lipsă Pagini',
 
-		'Offers a frontend localisation mechanism using XML, GNU PO or JAVA Style formats.' => 
-		'Furnizează un mecanism pentru traducerea frontendului folosind formate XML, GNU PO sau stil JAVA.',
+		'Normal' => 
+		'Normal',
+
+		'Page' => 
+		'Pagină',
 
 		'Reference language' => 
 		'Limba de referinţă',
@@ -87,11 +84,17 @@
 		'Save changes' => 
 		'Salvează modificările',
 
+		'Select the main language of the site.' => 
+		'Selectati limba principala a siteului',
+
+		'Set type of Translation. <b>%1$s</b> for Symphony Pages, <b>%2$s</b> otherwise.' => 
+		'Selectare tip Traducere. <b>%1$s</b> pentru Paginile Symphony, altfel <b>%2$s</b>.',
+
+		'Storage format' => 
+		'Metoda de stocare',
+
 		'Storage format to use for translations.' => 
 		'Metoda de stocare folosită pentru traduceri.',
-
-		'The Symphony extension that drives your frontend language management.' => 
-		'Extensia Symphony care coordonează limba de frontend.',
 
 		'The translation file you requested to edit does not exist.' => 
 		'Traducerea pe care aţi cerut-o nu există.',
@@ -129,19 +132,25 @@
 		'updated' => 
 		'actualizată',
 
-		'<code>%1$s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.' => 
-		'<code>%1$s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.',
+		'<code>%1$s</code>: No languages have been set on Preferences page. Please <a href="%2$s">review them</a>.' =>
+		'<code>%1$s</code>: Nu au fost setate limbi pe pagina de Preferinte. <a href="%2$s">Verificati-le</a>.',
 
-		'Storage format' => 
-		'Metoda de stocare',
+		'Please fill at least one valid language code.' => 
+		'Introduceti cel putin un cod valid.',
 
-		'Normal' => 
-		'Normal',
+		'An error occurred while processing this form. <a href="#error">See below for details.</a>' => 
+		'O eroare a intervenit la procesarea formularului. <a href="#error">Vedeti mai jos pentru detalii.</a>',
 
-		'Page' => 
-		'Pagină',
+		'<code>%1$s</code>: Translation folders not found.' => 
+		'<code>%1$s</code>: Folderele cu traduceri lipsesc..',
 
-		'Set type of Translation. <b>%1$s</b> for Symphony Pages, <b>%2$s</b> otherwise.' => 
-		'Selectare tip Traducere. <b>%1$s</b> pentru Paginile Symphony, altfel <b>%2$s</b>.',
+		'No translations found. <a href="%s">Create new?</a>' => 
+		'Lipsa traduceri. <a href="%s">Creati una?</a>',
+
+		'Are you sure you want to delete the selected translations?' => 
+		'Sigur doriti stergerea traducerilor selectate?',
+
+		'review settings' => 
+		'verificati setarile',
 
 	);
