@@ -311,11 +311,11 @@
 			// if language code
 			if( strpos($language, '-') !== false ){
 				$lang_code = $language;
-				list($language, $region) = self::extractLanguageBits($lang_code);
+				list($language, $region) = self::extractLanguageBits(strtolower($lang_code));
 			}
 			// if language
 			else{
-				$lang_code = self::buildLanguageCode($language, $region);
+				$lang_code = self::buildLanguageCode(strtolower($language), strtolower($region));
 			}
 
 			// make sure language code exists in current setup
@@ -429,6 +429,7 @@
 		 */
 		public static function cleanLanguageCodes($langs){
 			$clean = array_map('trim', $langs);
+			$clean = array_map('strtolower', $clean);
 			$clean = array_filter($clean);
 
 			return $clean;
