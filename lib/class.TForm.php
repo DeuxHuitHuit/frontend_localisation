@@ -61,7 +61,7 @@
 		private function _appendStorageFormat(XMLElement &$wrapper, $fields, $disabled){
 			$options = array();
 
-			foreach( TManager::instance()->getSupportedStorageFormats() as $storage_format => $info ){
+			foreach( TManager::getSupportedStorageFormats() as $storage_format => $info ){
 				$options[] = array(
 					$storage_format, $fields['storage_format'] === $storage_format, $info['description']
 				);
@@ -106,8 +106,8 @@
 			if( is_array($fields['translations']) ){
 				$attributes = $disabled ? array('disabled' => 'yes') : array();
 
-				$all_langs = FLang::instance()->getAllLangs();
-				$ref_lang = TManager::instance()->getRefLang();
+				$all_langs = FLang::getAllLangs();
+				$ref_lang = TManager::getRefLang();
 
 				$content_wrapper = new XMLElement('div');
 				$content_wrapper->setAttribute('class', 'field-multilingual');

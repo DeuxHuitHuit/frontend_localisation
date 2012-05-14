@@ -47,9 +47,9 @@
 		/**
 		 * Creates a new Translation holding meta information and business data.
 		 *
-		 * @param TFolder $parent - parent TFolder
-		 * @param string $handle  - handle of the file
-		 * @param mixed $meta     - meta information
+		 * @param TFolder $t_folder - parent TFolder
+		 * @param string  $handle   - handle of the file
+		 * @param mixed   $meta     - meta information
 		 *		 - TFileMeta object
 		 *		 - Array = an array with meta information
 		 *
@@ -126,7 +126,7 @@
 			}
 
 			// set new data
-			$this->parent->getManager()->loadStorageClass($this->tf_meta->get('storage_format'), 'TFileData');
+			TManager::loadStorageClass($this->tf_meta->get('storage_format'), 'TFileData');
 
 			$data_class_name = strtoupper($this->tf_meta->get('storage_format')).'_TFileData';
 			$this->tf_data = new $data_class_name($this);
@@ -190,7 +190,7 @@
 		 * @return TParser
 		 */
 		public function getParser(){
-			return $this->parent->getManager()->getParser($this->tf_meta->get('storage_format'));
+			return TManager::getParser($this->tf_meta->get('storage_format'));
 		}
 
 

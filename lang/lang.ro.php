@@ -7,7 +7,7 @@
 			'email' => 'vlad_micutul@yahoo.com',
 			'website' => 'http://www.xanderadvertising.com'
 		),
-		'release-date' => '2012-05-11'
+		'release-date' => '2012-05-14'
 	);
 
 	/**
@@ -27,8 +27,17 @@
 		'<code>%1$s</code>: MySQL error %d occured when adding column `translation` to `tbl_pages`. Installation aborted.' => 
 		'<code>%1$s</code>: Eroarea MySQL %d a apărut la adăugarea coloanei `translation` la tabelul `tbl_pages`. Instalare anulată.',
 
-		'Check this to preserve Translations for languages being removed by <code>Language driver</code>.' => 
-		'Bifaţi aceasta pentru a păstra traducerile limbilor care vor fi înlăturate de către <code>Driverul pentru limbă</code>',
+		'<code>%1$s</code>: No languages have been set on Preferences page. Please <a href="%2$s">review them</a>.' => 
+		'<code>%1$s</code>: Nu au fost setate limbi pe pagina de Preferinte. <a href="%2$s">Verificati-le</a>.',
+
+		'<code>%1$s</code>: Translation folders not found.' => 
+		'<code>%1$s</code>: Folderele cu traduceri lipsesc..',
+
+		'An error occurred while processing this form. <a href="#error">See below for details.</a>' => 
+		'O eroare a intervenit la procesarea formularului. <a href="#error">Vedeti mai jos pentru detalii.</a>',
+
+		'Are you sure you want to delete the selected translations?' => 
+		'Sigur doriti stergerea traducerilor selectate?',
 
 		'Comma separated list of supported language codes.' => 
 		'Codurile limbilor separate prin virgula.',
@@ -69,11 +78,17 @@
 		'No Pages Found' => 
 		'Lipsă Pagini',
 
+		'No translations found. <a href="%s">Create new?</a>' => 
+		'Lipsa traduceri. <a href="%s">Creati una?</a>',
+
 		'Normal' => 
 		'Normal',
 
 		'Page' => 
 		'Pagină',
+
+		'Please fill at least one valid language code.' => 
+		'Introduceti cel putin un cod valid.',
 
 		'Reference language' => 
 		'Limba de referinţă',
@@ -132,25 +147,31 @@
 		'updated' => 
 		'actualizată',
 
-		'<code>%1$s</code>: No languages have been set on Preferences page. Please <a href="%2$s">review them</a>.' =>
-		'<code>%1$s</code>: Nu au fost setate limbi pe pagina de Preferinte. <a href="%2$s">Verificati-le</a>.',
+		'<code>%1$s</code>: Failed to remove `translation` column from `tbl_pages`. Perhaps it didn\'t existed at all.' =>
+		'<code>%1$s</code>: Eroare la inlaturarea coloanei `translations` din `tbl_pages`. Posibil nici sa nu fi existat.',
 
-		'Please fill at least one valid language code.' => 
-		'Introduceti cel putin un cod valid.',
+		'<code>%1$s</code>: Reference language code <code>%2$s</code> is not supported.' => 
+		'<code>%1$s</code>: Limba de referinta <code>%2$s</code> nu este suportata.',
 
-		'An error occurred while processing this form. <a href="#error">See below for details.</a>' => 
-		'O eroare a intervenit la procesarea formularului. <a href="#error">Vedeti mai jos pentru detalii.</a>',
+		'Please review settings' => 
+		'Verificati setarile',
 
-		'<code>%1$s</code>: Translation folders not found.' => 
-		'<code>%1$s</code>: Folderele cu traduceri lipsesc..',
+		'<code>%1$s</code>: Translation folder couldn\'t be created at <code>%2$s</code>.' => 
+		'<code>%1$s</code>: Eroare la crearea folderului cu traduceri la <code>%2$s</code>.',
 
-		'No translations found. <a href="%s">Create new?</a>' => 
-		'Lipsa traduceri. <a href="%s">Creati una?</a>',
+		'<code>%1$s</code>: Storage directory <code>%2$s</code> for <code>%3$s</code> storage format doesn\'t exist.' => 
+		'<code>%1$s</code>: Biblioteca <code>%2$s</code> pentru formatul <code>%3$s</code> nu exista.',
 
-		'Are you sure you want to delete the selected translations?' => 
-		'Sigur doriti stergerea traducerilor selectate?',
+		'Language translations that will be used as reference when updating other languages\' translations.' => 
+		'Traducerile care vor fi folosite ca referinta la sincronizarea celorlalte traduceri.',
 
-		'review settings' => 
-		'verificati setarile',
+		'Check this to preserve Translations for removed languages.' => 
+		'Bifaţi aceasta pentru a păstra traducerile limbilor înlăturate.',
+
+		'Invalid language code.' => 
+		'Cod de limba invalid.',
+
+		'Invalid storage format.' => 
+		'Format de stocare invalid.',
 
 	);

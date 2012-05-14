@@ -11,7 +11,6 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#Translation utilities
 
-		version:  1.1
 		author:   Vlad Ghita
 		email:    vlad_micutul@yahoo.com
 

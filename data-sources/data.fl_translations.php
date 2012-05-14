@@ -40,7 +40,7 @@
 				if( !empty($handles) ){
 					$result_value = '';
 
-					$t_folder = TManager::instance()->getFolder(FLang::instance()->getLangCode());
+					$t_folder = TManager::getFolder(FLang::getLangCode());
 
 					if( $t_folder instanceof TFolder ){
 						foreach( $handles as $handle ){
@@ -58,7 +58,7 @@
 								// else convert to XML
 								else{
 									$translations = $translation->getParser()->asTArray($translation);
-									$xml = TManager::instance()->getParser('xml')->TArray2string($translations);
+									$xml = TManager::getParser('xml')->TArray2string($translations);
 								}
 
 								// process XML

@@ -20,8 +20,6 @@
 		 */
 		private $t_form = null;
 
-		private $driver = null;
-
 
 
 		public function __construct(){
@@ -39,26 +37,22 @@
 		 * @see AdministrationPage::view()
 		 */
 		public function view(){
-			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.css', 'screen', null, false);
-			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs_init.js', null, false);
-
-			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.js', 203, false);
-			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.css', "screen");
-
-			$this->setPageType('form');
-
 			// If we're editing, make sure the item exists
 
 			if( $this->_context[0] ){
-				$translations = TManager::instance()->getFolder(FLang::instance()->getMainLang())->getTranslations();
-
 				if( !$handle = $this->_context[0] ) redirect(SYMPHONY_URL.'/extension/frontend_localisaion');
 
-				if( !array_key_exists($handle, $translations) || empty($translations[$handle]) || !($translations[$handle] instanceof Translation) ){
-					$this->_Parent->customError(
+				$valid = true;
+
+				$t_folder = TManager::getFolder( TManager::getRefLang() );
+
+				if( is_null($t_folder) ) $valid = false;
+
+				if( !$valid || is_null($t_folder->getTranslation($handle)) ){
+					Administration::instance()->customError(
 						__('Translation not found'),
 						__('The translation file you requested to edit does not exist.'),
-						'error',
+						'generic',
 						array(
 							'header' => 'HTTP/1.0 404 Not Found'
 						)
@@ -69,11 +63,8 @@
 
 			// sync file across languages. On fail, abort edit.
 
-			if( !TManager::instance()->syncTranslation($handle) ){
-				$this->pageAlert(
-					__('Translations synchronisation failed. Please contact site administrator.'),
-					Alert::NOTICE
-				);
+			if( !TManager::syncTranslation($handle) ){
+				$this->pageAlert(__('Translations synchronisation failed. Please contact site administrator.'), Alert::NOTICE);
 				return;
 			}
 
@@ -87,7 +78,7 @@
 						'%1$s %2$s at %3$s. <a href="%4$s" accesskey="c">Create another?</a> <a href="%5$s" accesskey="a">%6$s</a>',
 						array(
 							__('Translation'),
-							($this->_context[1] == 'saved' ? __('updated') : __('created')),
+							$this->_context[1] == 'saved' ? __('updated') : __('created'),
 							Widget::Time('', __SYM_TIME_FORMAT__)->generate(),
 							SYMPHONY_URL.'/extension/'.FL_GROUP.'/new/',
 							SYMPHONY_URL.'/extension/'.FL_GROUP.'/',
@@ -101,7 +92,7 @@
 
 			// Find values
 
-			$reference_language = FLang::instance()->getMainLang();
+			$ref_lang = TManager::getRefLang();
 
 			$fields = array();
 
@@ -120,11 +111,10 @@
 					$fields['pages'][] = $page_id;
 				}
 
-				foreach( TManager::instance()->getFolders() as $lc => $t_folder ){
-					/* @var $t_folder TFolder */
+				foreach( TManager::getFolders() as $lc => $t_folder ){
 					$translation = $t_folder->getTranslation($handle);
 
-					if( $lc == $reference_language ){
+					if( $lc === $ref_lang ){
 						$fields['storage_format'] = $translation->meta()->get('storage_format');
 						$fields['type'] = $translation->meta()->get('type');
 					}
@@ -137,22 +127,27 @@
 
 			// Start building the page
 
+			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.css', 'screen', null, false);
+			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs_init.js', null, false);
+
+			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.js', 203, false);
+			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.css', "screen");
+
+			$this->setPageType('form');
+
 			$this->setTitle(__(
-				($fields['name'] ? '%1$s &ndash; %2$s &ndash; %3$s' : '%1$s &ndash; %2$s'),
-				array(
-					__('Symphony'),
-					__('Translations'),
-					$fields['name'][$reference_language]
-				)
+				$fields['name'] ? '%1$s &ndash; %2$s &ndash; %3$s' : '%1$s &ndash; %2$s',
+				array(__('Symphony'), __('Translations'), $fields['name'][$ref_lang])
 			));
-			$this->appendSubheading(($fields['name'][$reference_language] ? $fields['name'][$reference_language] : __('Untitled')));
+
+			$this->appendSubheading(($fields['name'][$ref_lang] ? $fields['name'][$ref_lang] : __('Untitled')));
 
 			$this->insertBreadcrumbs(array(
 				Widget::Anchor(__('Translations'), SYMPHONY_URL.'/extension/'.FL_GROUP.'/'),
 			));
 
 
-			// Append form elements
+			// Form elements
 
 			$this->Form->setAttribute('class', 'two columns');
 
@@ -162,12 +157,7 @@
 			// Form actions
 
 			$div = new XMLElement('div', null, array('class' => 'actions'));
-			$div->appendChild(Widget::Input(
-					'action[save]',
-					__('Save changes'),
-					'submit',
-					array('accesskey' => 's'))
-			);
+			$div->appendChild(Widget::Input('action[save]', __('Save changes'), 'submit', array('accesskey' => 's')));
 
 			if( $this->_context[0] && Administration::instance()->Author->isDeveloper() ){
 				$button = new XMLElement('button', __('Delete'));
@@ -194,19 +184,19 @@
 
 				// if there are any translations at all
 				if( is_array($fields['translations']) ){
-					$reference_language = FLang::instance()->getMainLang();
+					$ref_lang = TManager::getRefLang();
 
 					foreach( $fields['translations'] as $lc => $translations ){
 						foreach( $translations as $context => $items ){
 
 							foreach( $items as $old_handle => $item ){
-								if( empty($item['handle']) && ($lc == $reference_language) && Administration::instance()->Author->isDeveloper() ){
+								if( empty($item['handle']) && ($lc === $ref_lang) && Administration::instance()->Author->isDeveloper() ){
 									$this->_errors['translations'][$lc][$context][$old_handle]['handle'] = __('Handle is a required field.');
 								}
 
 								// mark for storage
 								$file_translations[$lc][$context][$old_handle] = array(
-									'handle' => $fields['translations'][$reference_language][$context][$old_handle]['handle'],
+									'handle' => $fields['translations'][$ref_lang][$context][$old_handle]['handle'],
 									'value' => $item['value']
 								);
 							}
@@ -215,7 +205,7 @@
 				}
 				// default to empty translations data
 				else{
-					foreach( FLang::instance()->getLangs() as $lc ){
+					foreach( FLang::getLangs() as $lc ){
 						$file_translations[$lc] = array();
 					}
 				}
@@ -225,7 +215,7 @@
 
 					// if handle changed
 					if( $fields['old_handle'] != $fields['handle'] ){
-						TManager::instance()->changeTranslationHandle($fields['old_handle'], $fields['handle']);
+						TManager::changeTranslationHandle($fields['old_handle'], $fields['handle']);
 					}
 
 					// update linked pages
@@ -247,12 +237,12 @@
 
 					// set translations
 					foreach( $file_translations as $lc => $translations ){
-						$t_folder = TManager::instance()->getFolder($lc);
+						$t_folder = TManager::getFolder($lc);
 
-						if( !empty($t_folder) ){
+						if( !is_null($t_folder) ){
 							$translation = $t_folder->getTranslation($fields['handle']);
 
-							if( !empty($translation) ){
+							if( !is_null($translation) ){
 								// if storage_format changed
 								if( $fields['old_storage_format'] != $fields['storage_format'] ){
 									$translation->meta()->set('storage_format', $fields['storage_format']);
@@ -280,12 +270,12 @@
 						}
 					}
 
-					redirect(URL."/symphony/extension/".FL_GROUP."/edit/{$fields['handle']}/saved/");
+					redirect(SYMPHONY_URL."/extension/".FL_GROUP."/edit/{$fields['handle']}/saved/");
 				}
 			}
 
 			elseif( array_key_exists('delete', $_POST['action']) ){
-				$t_folders = TManager::instance()->getFolders();
+				$t_folders = TManager::getFolders();
 				$pages = FLPageManager::instance()->listAll(array('translations'));
 
 				// remove translation files
@@ -302,7 +292,7 @@
 					}
 				}
 
-				redirect(URL."/symphony/extension/".FL_GROUP);
+				redirect(SYMPHONY_URL."/extension/".FL_GROUP);
 			}
 
 			if( is_array($this->_errors) && !empty($this->_errors) ){

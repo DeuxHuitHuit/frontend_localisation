@@ -3,8 +3,8 @@ Frontend Localisation
 
 Offers an integrated solution to localise the Frontend of your site.
 
-* Version: 1.4
-* Build Date: 2012-05-11
+* Version: 1.5
+* Build Date: 2012-05-14
 * Authors:
 	- [Xander Group](http://www.xanderadvertising.com)
 	- Vlad Ghita
@@ -89,8 +89,8 @@ On Preferences page you can:
 
 #### 5.1.2 @ PHP developers ####
 
-This extension provides a [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php) implementing [Singleton interface](https://github.com/symphonycms/symphony-2/blob/master/symphony/lib/core/interface.singleton.php) for easy access to Frontend language information.<br/>
-If you want to create a FLang detection driver, make sure that your driver adds the `fl-language` & `fl-region` params to the URL query string with appropriate values.
+This extension provides a static [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.FLang.php) for easy access to Frontend language information.<br/>
+If you want to create a third-party FLang detection driver, make sure that your driver adds the `fl-language` & `fl-region` params to the URL query string with appropriate values.
 
 
 

@@ -6,8 +6,10 @@
 
 	/**
 	 * Provides Frontend language information
+	 *
+	 * @static
 	 */
-	final class FLang implements Singleton
+	final class FLang
 	{
 
 		/*------------------------------------------------------------------------------------------------*/
@@ -15,44 +17,37 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		/**
-		 * Singleton instance
-		 *
-		 * @var FLang
-		 */
-		private static $_instance;
-
-		/**
 		 * Current language
 		 *
 		 * @var string
 		 */
-		private $_lang = '';
+		private static $_lang = '';
 
 		/**
 		 * Current region
 		 *
 		 * @var string
 		 */
-		private $_reg = '';
+		private static $_reg = '';
 
 		/**
 		 * Main language
 		 *
 		 * @var string
 		 */
-		private $_main_lang = '';
+		private static $_main_lang = '';
 
 		/**
 		 * Stored language codes
 		 *
 		 * @var array
 		 */
-		private $_langs = array();
+		private static $_langs = array();
 
 		// I don't know those languages, so if You know for sure that browser uses different code,
 		// or that native name should be different, please let me know about that :).
 		// It would also be great, if whole string could be in native form, including name of country.
-		private $_all_langs = array( // [English name]
+		private static $_all_langs = array( // [English name]
 			'ab' => 'аҧсуа бызшәа', // Abkhazian
 			'af' => 'Afrikaans', // Afrikaans
 			'sq' => 'shqip', // Albanian
@@ -233,56 +228,6 @@
 			'zu' => 'isiZulu', // Zulu
 		);
 
-		/**
-		 * Switch to write config or not
-		 *
-		 * @var bool
-		 */
-		private $_write_config = false;
-
-
-
-		/*------------------------------------------------------------------------------------------------*/
-		/*  Initialisation  */
-		/*------------------------------------------------------------------------------------------------*/
-
-		private function __construct(){
-			// initialize Language codes
-			$langs = Symphony::Configuration()->get('langs', FL_GROUP);
-			$this->setLangs(is_null($langs) ? '' : $langs, false);
-
-			// initialize Main language
-			$main_lang = Symphony::Configuration()->get('main_lang', FL_GROUP);
-			$this->setMainLang(is_null($main_lang) ? '' : $main_lang, false);
-
-			// read current language
-			$language = General::sanitize((string)$_REQUEST['fl-language']);
-			$region = General::sanitize((string)$_REQUEST['fl-region']);
-
-			// set language code
-			if( false === $this->setLangCode($language, $region) ){
-
-				// language code is not supported, fallback to main lang
-				if( false === $this->setLangCode($this->_main_lang) ){
-					// do something usefull here if no lang is set ...
-				}
-			}
-		}
-
-		public function __destruct(){
-			if( $this->_write_config === true ){
-				Symphony::Configuration()->write();
-			}
-		}
-
-		public static function instance(){
-			if( !self::$_instance instanceof FLang ){
-				self::$_instance = new self();
-			}
-
-			return self::$_instance;
-		}
-
 
 
 		/*------------------------------------------------------------------------------------------------*/
@@ -294,8 +239,8 @@
 		 *
 		 * @return string
 		 */
-		public function getLangCode(){
-			return $this->buildLanguageCode($this->_lang, $this->_reg);
+		public static function getLangCode(){
+			return self::buildLanguageCode(self::$_lang, self::$_reg);
 		}
 
 		/**
@@ -303,8 +248,8 @@
 		 *
 		 * @return string
 		 */
-		public function getLang(){
-			return $this->_lang;
+		public static function getLang(){
+			return self::$_lang;
 		}
 
 		/**
@@ -312,8 +257,8 @@
 		 *
 		 * @return string
 		 */
-		public function getReg(){
-			return $this->_reg;
+		public static function getReg(){
+			return self::$_reg;
 		}
 
 		/**
@@ -321,8 +266,8 @@
 		 *
 		 * @return string
 		 */
-		public function getMainLang(){
-			return $this->_main_lang;
+		public static function getMainLang(){
+			return self::$_main_lang;
 		}
 
 		/**
@@ -330,8 +275,8 @@
 		 *
 		 * @return array
 		 */
-		public function getLangs(){
-			return $this->_langs;
+		public static function getLangs(){
+			return self::$_langs;
 		}
 
 		/**
@@ -339,8 +284,8 @@
 		 *
 		 * @return array
 		 */
-		public function getAllLangs(){
-			return $this->_all_langs;
+		public static function getAllLangs(){
+			return self::$_all_langs;
 		}
 
 
@@ -357,7 +302,7 @@
 		 *
 		 * @return boolean - true if success, false otherwise
 		 */
-		public function setLangCode($language, $region = ''){
+		public static function setLangCode($language, $region = ''){
 			General::ensureType(array(
 				'language' => array('var' => $language, 'type' => 'string'),
 				'region' => array('var' => $region, 'type' => 'string')
@@ -366,17 +311,17 @@
 			// if language code
 			if( strpos($language, '-') !== false ){
 				$lang_code = $language;
-				list($language, $region) = $this->extractLanguageBits($lang_code);
+				list($language, $region) = self::extractLanguageBits($lang_code);
 			}
 			// if language
 			else{
-				$lang_code = $this->buildLanguageCode($language, $region);
+				$lang_code = self::buildLanguageCode($language, $region);
 			}
 
 			// make sure language code exists in current setup
-			if( in_array($lang_code, $this->_langs) ){
-				$this->setLang($language);
-				$this->setReg($region);
+			if( in_array($lang_code, self::$_langs) ){
+				self::setLang($language);
+				self::setReg($region);
 
 				return true;
 			}
@@ -389,8 +334,8 @@
 		 *
 		 * @param $language
 		 */
-		private function setLang($language){
-			$this->_lang = $language;
+		private static function setLang($language){
+			self::$_lang = $language;
 		}
 
 		/**
@@ -398,38 +343,21 @@
 		 *
 		 * @param $region
 		 */
-		private function setReg($region){
-			$this->_reg = $region;
+		private static function setReg($region){
+			self::$_reg = $region;
 		}
 
 		/**
 		 * Set main language code
 		 *
 		 * @param $lang_code
-		 * @param boolean $write
 		 *
 		 * @return boolean
 		 */
-		public function setMainLang($lang_code, $write = true){
+		public static function setMainLang($lang_code){
+			if( !self::validateLangCode($lang_code) ) return false;
 
-			// make sure it exists in language codes
-			if( in_array($lang_code, $this->_langs) ){
-				$this->_main_lang = $lang_code;
-			}
-
-			// defaults to first language
-			elseif( isset($this->_langs[0]) ){
-				$this->_main_lang = $this->_langs[0];
-			}
-
-			else{
-				return false;
-			}
-
-			if( $write === true ){
-				Symphony::Configuration()->set('main_lang', $this->_main_lang, FL_GROUP);
-				$this->_write_config = true;
-			}
+			self::$_main_lang = $lang_code;
 
 			return true;
 		}
@@ -438,11 +366,10 @@
 		 * Set language codes
 		 *
 		 * @param $langs
-		 * @param boolean $write
 		 *
 		 * @return boolean
 		 */
-		public function setLangs($langs, $write = true){
+		public static function setLangs($langs){
 			$langs = explode(',', General::sanitize($langs));
 
 			// if no language codes, return false
@@ -450,7 +377,7 @@
 				return false;
 			}
 
-			$langs = $this->cleanLanguageCodes($langs);
+			$langs = self::cleanLanguageCodes($langs);
 
 			if( count($langs) === 0 ){
 				return false;
@@ -460,7 +387,7 @@
 
 			// only valid language codes are preserved
 			foreach( $langs as $lc ){
-				if( array_key_exists($lc, $this->_all_langs) ){
+				if( array_key_exists($lc, self::$_all_langs) ){
 					$new_codes[] = $lc;
 				}
 			}
@@ -471,12 +398,7 @@
 			}
 
 			// store the new language codes
-			$this->_langs = $new_codes;
-
-			if( $write === true ){
-				Symphony::Configuration()->set('langs', implode(',', $this->_langs), FL_GROUP);
-				$this->_write_config = true;
-			}
+			self::$_langs = $new_codes;
 
 			return true;
 		}
@@ -494,8 +416,8 @@
 		 *
 		 * @return boolean true if language code is valid, false otherwise
 		 */
-		public function validateLangCode($lang_code){
-			return in_array($lang_code, $this->_langs);
+		public static function validateLangCode($lang_code){
+			return in_array($lang_code, self::$_langs);
 		}
 
 		/**
@@ -505,7 +427,7 @@
 		 *
 		 * @return array
 		 */
-		public function cleanLanguageCodes($langs){
+		public static function cleanLanguageCodes($langs){
 			$clean = array_map('trim', $langs);
 			$clean = array_filter($clean);
 
@@ -520,7 +442,7 @@
 		 *
 		 * @return string - the language code
 		 */
-		public function buildLanguageCode($language, $region = ''){
+		public static function buildLanguageCode($language, $region = ''){
 			return $language.(($region !== '') ? '-'.$region : '');
 		}
 
@@ -531,7 +453,7 @@
 		 *
 		 * @return array - array(0 => string, 1 => string)
 		 */
-		public function extractLanguageBits($lang_code){
+		public static function extractLanguageBits($lang_code){
 			$bits = explode('-', $lang_code);
 
 			if( empty($bits[0]) )
@@ -539,69 +461,5 @@
 
 			return array($bits[0], isset($bits[1]) ? $bits[1] : '');
 		}
-
-
-
-		/**
-		 * Deprecated API. Use new API instead
-		 *
-		 * @deprecated
-		 */
-
-		/**
-		 * Deprecated. Use @see instance()
-		 *
-		 * @deprecated
-		 *
-		 * @return FLang
-		 */
-		public function ld(){
-			return $this;
-		}
-
-		/**
-		 * Deprecated. Use @see getMainLang() instead
-		 *
-		 * @deprecated
-		 *
-		 * @return string
-		 */
-		public function referenceLanguage(){
-			return $this->getMainLang();
-		}
-
-		/**
-		 * Deprecated. Use @see getAllLangs() instead
-		 *
-		 * @deprecated
-		 *
-		 * @return string
-		 */
-		public function allLanguages(){
-			return $this->getAllLangs();
-		}
-
-		/**
-		 * Deprecated. Use @see getLangCode() instead
-		 *
-		 * @deprecated
-		 *
-		 * @return string
-		 */
-		public function languageCode(){
-			return $this->getLangCode();
-		}
-
-		/**
-		 * Deprecated. Use @see getLangs() instead
-		 *
-		 * @deprecated
-		 *
-		 * @return string
-		 */
-		public function languageCodes(){
-			return $this->getLangs();
-		}
-
 
 	}

@@ -28,13 +28,6 @@
 		private $lang_code = '';
 
 		/**
-		 * TManager to which this folder belongs.
-		 *
-		 * @var TManager
-		 */
-		private $parent = null;
-
-		/**
 		 * Translations in this folder
 		 *
 		 * @var Translation[]
@@ -46,11 +39,9 @@
 		/**
 		 * Creates a new Translation folder, discovering existing Translations.
 		 *
-		 * @param string $path      - path to folder
-		 * @param string $lang_code - responsible for this language
+		 * @param string $lang_code
 		 */
-		public function __construct(TManager $t_manager, $lang_code){
-			$this->parent = $t_manager;
+		public function __construct($lang_code){
 			$this->lang_code = $lang_code;
 
 			$this->_discoverTranslations();
@@ -86,7 +77,6 @@
 		 */
 		public function __destruct(){
 			foreach( $this->translations as $translation ){
-				/* @var $translation Translation */
 				$translation->meta()->saveSettings();
 			}
 		}
@@ -94,12 +84,12 @@
 
 
 		/**
-		 * Get the language code this folder manages.
+		 * Get the language code
 		 *
 		 * @return string
 		 */
 		public function getLangCode(){
-			return (string)$this->lang_code;
+			return (string) $this->lang_code;
 		}
 
 		/**
@@ -108,16 +98,7 @@
 		 * @return string
 		 */
 		public function getPath(){
-			return (string)$this->parent->getPath().'/'.$this->lang_code;
-		}
-
-		/**
-		 * Getter for Translation Manager parent.
-		 *
-		 * @return TManager
-		 */
-		public function getManager(){
-			return $this->parent;
+			return (string) TManager::getPath().'/'.$this->lang_code;
 		}
 
 		/**
@@ -126,7 +107,7 @@
 		 * @return array
 		 */
 		public function getTranslations(){
-			return $this->translations;
+			return (array) $this->translations;
 		}
 
 		/**
@@ -134,9 +115,13 @@
 		 *
 		 * @param string $handle
 		 *
-		 * @return Translation
+		 * @return Translation|null
 		 */
 		public function getTranslation($handle){
+			General::ensureType(array(
+				'handle' => array('var' => $handle, 'type' => 'string')
+			));
+
 			if( !isset($this->translations[$handle]) ) return null;
 
 			if( !$this->translations[$handle] instanceof Translation ) return null;
@@ -150,6 +135,8 @@
 		 * Deletes a Translation.
 		 *
 		 * @param string $handle
+		 *
+		 * @return boolean
 		 */
 		public function deleteTranslation($handle){
 			if( !empty($this->translations[$handle]) ){
@@ -175,10 +162,10 @@
 					$handle = $page['handle'].'_'.$handle;
 				}
 
-				$handle = Symphony::Configuration()->get('page_name_prefix', FL_GROUP).$handle;
+				$handle = TManager::getPagePrefix().$handle;
 
-				if( empty($this->translations[$handle]) ){
-					$translation = $this->addTranslation($handle, array('type' => 'page'));
+				if( is_null($this->getTranslation($handle)) ){
+					$this->addTranslation($handle, array('type' => 'page'));
 				}
 
 				$this->translations[$handle]->setName($handle);
@@ -186,7 +173,7 @@
 		}
 
 		/**
-		 * Update Translations againts reference language Translations.
+		 * Update Translations against reference language Translations.
 		 *
 		 * @param array $ref_files - array of Translations representing reference_languages' files.
 		 */
@@ -207,24 +194,25 @@
 		 * @param string $handle - Handle of the file
 		 * @param mixed $meta    (optional) - supplies meta info about Translation
 		 *		 - TFileMeta - an object containing the information
+		 *          OR
 		 *		 - Array(
 		 *			 [storage_format] => '' (optional)
 		 *			 [type] => '' (optional)
 		 *		 )
 		 *
-		 * @return Translation
-		 *
 		 * @throws Exception
+		 *
+		 * @return Translation
 		 */
 		public function addTranslation($handle, $meta = array()){
-			if( empty($this->translations[$handle]) ){
+			if( is_null($this->getTranslation($handle)) ){
 
 				// if Array, ensure some settings
 				if( is_array($meta) ){
-					// make sure $storage_format is supported. Fallback to default otherwise.
-					$meta['storage_format'] = array_key_exists($meta['storage_format'], $this->parent->getSupportedStorageFormats()) ? $meta['storage_format'] : $this->parent->getStorageFormat();
+					if( !TManager::validateStorageFormat($meta['storage_format']) ){
+						$meta['storage_format'] = TManager::getStorageFormat();
+					}
 
-					// type of translation
 					$meta['type'] = ($meta['type'] == 'page') ? $meta['type'] : '';
 
 					$type = $meta['type'];
@@ -236,7 +224,7 @@
 					throw new Exception('Meta information not valid. Supply an array or a TFileMeta object.');
 				}
 
-				$this->parent->loadTranslationClass($type);
+				TManager::loadTranslationClass($type);
 				$class_name = 'Translation'.ucfirst($type);
 
 				$this->translations[$handle] = new $class_name($this, $handle, $meta);

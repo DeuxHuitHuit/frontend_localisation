@@ -110,16 +110,17 @@
 							}
 						}
 
-						$t_folders = TManager::instance()->getFolders();
+						$t_folders = TManager::getFolders();
 
 						if( is_array($t_folders) && !empty($t_folders) ){
 							foreach( $t_folders as /* @var $t_folder TFolder */
 							         $t_folder ){
 
 								// create Translation
-								$translation = $t_folder->addTranslation($fields['handle'], array('storage_format' => $fields['storage_format']));
+								$t_folder->addTranslation($fields['handle'], array('storage_format' => $fields['storage_format']));
+								$translation = $t_folder->getTranslation($fields['handle']);
 
-								// set Name
+									// set Name
 								$translation->setName($fields['handle']);
 
 								// set default Content

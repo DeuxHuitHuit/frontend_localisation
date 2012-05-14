@@ -65,7 +65,7 @@
 			Symphony::Configuration()->set('translation_path', '/translations', FL_GROUP);
 			Symphony::Configuration()->set('page_name_prefix', 'p_', FL_GROUP);
 			Symphony::Configuration()->set('storage_format', 'xml', FL_GROUP);
-			Symphony::Configuration()->set('consolidate_translations', self::CHECKBOX_YES, FL_GROUP);
+			Symphony::Configuration()->set('consolidate', self::CHECKBOX_YES, FL_GROUP);
 
 			Symphony::Configuration()->write();
 
@@ -73,7 +73,7 @@
 			General::realiseDirectory(WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP));
 
 			/* Update existing translations */
-			TManager::instance()->updateFolders();
+			TManager::updateFolders();
 
 			return true;
 		}
@@ -87,12 +87,15 @@
 
 				$ref_lang = Symphony::Configuration()->get('reference_language', FL_GROUP);
 				Symphony::Configuration()->set('ref_lang', $ref_lang, FL_GROUP);
+
+				$consolidate = Symphony::Configuration()->get('consolidate_translations', FL_GROUP);
+				Symphony::Configuration()->set('consolidate', $consolidate, FL_GROUP);
 			}
 		}
 
 		public function uninstall(){
 			/* Translations */
-			if( Symphony::Configuration()->get('consolidate_translations', FL_GROUP) != self::CHECKBOX_YES ){
+			if( Symphony::Configuration()->get('consolidate', FL_GROUP) != self::CHECKBOX_YES ){
 				General::deleteDirectory(WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP));
 			}
 
@@ -233,16 +236,113 @@
 		 * Frontend
 		 */
 		public function dFrontendInitialised(){
-			FLang::instance();
-			TManager::instance();
+			$fronend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
+
+			if( $fronend_localisation[0] = EXTENSION_ENABLED ){
+				$this->_initFLang();
+				$this->_initTManager();
+			}
 		}
 
 		/**
 		 * Backend
 		 */
 		public function dInitialiseAdminPageHead(){
-			FLang::instance();
-			TManager::instance();
+			$fronend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
+
+			if( $fronend_localisation[0] = EXTENSION_ENABLED ){
+				$this->_initFLang();
+				$this->_initTManager();
+			}
+		}
+
+		private function _initFLang(){
+			// initialize Language codes
+			$langs = Symphony::Configuration()->get('langs', FL_GROUP);
+			FLang::setLangs($langs);
+
+			// initialize Main language
+			$main_lang = Symphony::Configuration()->get('main_lang', FL_GROUP);
+			if( !FLang::setMainLang($main_lang) ){
+				$langs = FLang::getLangs();
+
+				if( isset($langs[0]) && !FLang::setLangCode($langs[0]) ){
+					// do something usefull here if no lang is set ...
+				}
+			}
+
+			// read current language
+			$language = General::sanitize((string)$_REQUEST['fl-language']);
+			$region = General::sanitize((string)$_REQUEST['fl-region']);
+
+			// set language code
+			if( false === FLang::setLangCode($language, $region) ){
+
+				// language code is not supported, fallback to main lang
+				if( false === FLang::setLangCode(FLang::getMainLang()) ){
+					// do something usefull here if no lang is set ...
+				}
+			}
+		}
+
+		private function _initTManager(){
+			try{
+				// initialize Reference language
+				$ref_lang = Symphony::Configuration()->get('ref_lang', FL_GROUP);
+				if( !TManager::setRefLang($ref_lang) ){
+					$langs = FLang::getLangs();
+					if( !empty($langs) )
+						throw new Exception(
+							__('<code>%1$s</code>: Reference language code <code>%2$s</code> is not supported.', array(FL_NAME, $ref_lang))
+								.'<a href="'.SYMPHONY_URL.'/system/preferences/#'.FL_GROUP.'_translation_path">'.__('Please review settings').'</a>'
+						);
+				}
+
+
+				// initialize Translation path
+				$path = WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP);
+				if( !TManager::setPath($path) ){
+					throw new Exception(
+						__('<code>%1$s</code>: Translation folder couldn\'t be created at <code>%2$s</code>.', array(FL_NAME, $path))
+							.__('Please review settings')
+					);
+				}
+
+
+				// initialize Page prefix
+				$page_prefix = WORKSPACE.Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
+				TManager::setPagePrefix($page_prefix);
+
+
+				// initialize Storage format
+				$storage_format = Symphony::Configuration()->get('storage_format', FL_GROUP);
+				if( !TManager::setStorageFormat($storage_format) ){
+					throw new Exception(
+						__(
+							'<code>%1$s</code>: Storage directory <code>%2$s</code> for <code>%3$s</code> storage format doesn\'t exist.',
+							array(FL_NAME, EXTENSIONS.'/'.FL_GROUP.'/lib/'.$storage_format, $storage_format)
+						)
+							.'<a href="'.SYMPHONY_URL.'/system/preferences/#'.FL_GROUP.'_translation_path">'.__('Please review settings').'</a>'
+					);
+				}
+			}
+			catch( Exception $e ){
+				$message = $e->getMessage();
+
+				Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
+				Symphony::Log()->pushToLog($message, E_NOTICE, true);
+
+				return false;
+			}
+
+
+			// discover Translation Folders
+			$t_path = TManager::getPath();
+
+			foreach( FLang::getLangs() as $lc )
+				if( is_dir($t_path.'/'.$lc) ){
+					TManager::addFolder($lc);
+				}
 		}
 
 
@@ -252,7 +352,7 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function dAppendPageAlert(){
-			$langs = FLang::instance()->getLangs();
+			$langs = FLang::getLangs();
 
 			if( empty($langs) ){
 				Administration::instance()->Page->pageAlert(
@@ -292,7 +392,7 @@
 
 			$options = array();
 
-			$t_folder = TManager::instance()->getFolder( TManager::instance()->getRefLang() );
+			$t_folder = TManager::getFolder(TManager::getRefLang());
 
 			if( !is_null($t_folder) ){
 				$translations = $t_folder->getTranslations();
@@ -335,7 +435,7 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePostCreate(array $context){
-			TManager::instance()->createTranslation(
+			TManager::createTranslation(
 				array(
 					'id' => $context['page_id'],
 					'handle' => $context['fields']['handle'],
@@ -357,7 +457,7 @@
 
 			// update translation filenames if needed
 			if( ($context['fields']['handle'] != $current_page['handle']) || ($context['fields']['parent'] != $current_page['parent']) ){
-				$this->changed_handles = TManager::instance()->editTranslation(array(
+				$this->changed_handles = TManager::editTranslation(array(
 					'id' => $context['page_id'],
 					'old_handle' => $current_page['handle'],
 					'new_handle' => $context['fields']['handle'],
@@ -376,7 +476,7 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePostEdit($context){
-			foreach( TManager::instance()->getFolders() as $t_folder ){
+			foreach( TManager::getFolders() as $t_folder ){
 				/* @var $t_folder TFolder */
 				/* @var $translation Translation*/
 
@@ -388,7 +488,7 @@
 					}
 				}
 				else{
-					$translation = $t_folder->getTranslation(TManager::instance()->getPageHandle($context['page_id']));
+					$translation = $t_folder->getTranslation(TManager::getPageHandle($context['page_id']));
 					if( !is_null($translation) ) $translation->setName();
 				}
 			}
@@ -400,7 +500,7 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreDelete(array $context){
-			TManager::instance()->deleteTranslation($context['page_ids']);
+			TManager::deleteTranslation($context['page_ids']);
 		}
 
 
@@ -419,10 +519,16 @@
 			$group->setAttribute('class', 'settings');
 			$group->appendChild(new XMLElement('legend', __(FL_NAME)));
 
-			$this->_appendLangs($group, $context);
-			$this->_appendMainLang($group);
-			$this->_appendRefLang($group);
-			$this->_appendStorageFormat($group);
+			$div = new XMLElement('div', null, array('class' => 'two columns'));
+			$this->_appendLangs($div, $context);
+			$this->_appendMainLang($div, $context);
+			$group->appendChild($div);
+
+			$div = new XMLElement('div', null, array('class' => 'two columns'));
+			$this->_appendStorageFormat($div, $context);
+			$this->_appendRefLang($div, $context);
+			$group->appendChild($div);
+
 			$this->_appendConsolidate($group);
 			$this->_appendUpdate($group);
 
@@ -432,75 +538,89 @@
 		/**
 		 * Convenience method; builds language codes input
 		 *
-		 * @param XMLElement (reference) $group
-		 * @param array $context
+		 * @param XMLElement &$wrapper
+		 * @param array      $context
 		 */
-		private function _appendLangs(&$group, $context){
-			$label = Widget::Label(__('Language codes'), null, null, FL_GROUP.'_langs');
-			$label->appendChild(Widget::Input('settings['.FL_GROUP.'][langs]', implode(',', FLang::instance()->getLangs())));
+		private function _appendLangs(&$wrapper, $context){
+			$label = Widget::Label(__('Language codes'), null, 'column', FL_GROUP.'_langs');
+			$label->appendChild(Widget::Input('settings['.FL_GROUP.'][langs]', implode(',', FLang::getLangs())));
+			$label->appendChild(new XMLElement('p', __('Comma separated list of supported language codes.'), array('class' => 'help')));
 
 			if( isset($context['errors'][FL_GROUP]['langs']) ){
-				$group->appendChild(Widget::Error($label, $context['errors'][FL_GROUP]['langs']));
+				$wrapper->appendChild(Widget::Error($label, $context['errors'][FL_GROUP]['langs']));
 			}
 			else{
-				$group->appendChild($label);
+				$wrapper->appendChild($label);
 			}
-
-			$group->appendChild(new XMLElement('p', __('Comma separated list of supported language codes.'), array('class' => 'help')));
 		}
 
 		/**
 		 * Convenience method; builds main language select
 		 *
-		 * @param XMLElement (reference) $group
+		 * @param XMLElement &$wrapper
+		 * @param array      $context
 		 */
-		private function _appendMainLang(&$group){
-			$label = Widget::Label(__('Main language'), null, null, FL_GROUP.'_main_lang');
-			$main_lang = FLang::instance()->getMainLang();
-			$all_languages = FLang::instance()->getAllLangs();
+		private function _appendMainLang(&$wrapper, $context){
+			$label = Widget::Label(__('Main language'), null, 'column', FL_GROUP.'_main_lang');
+			$main_lang = FLang::getMainLang();
+			$all_languages = FLang::getAllLangs();
 
 			$options = array();
-			foreach( FLang::instance()->getLangs() as $lang_code ){
+			foreach( FLang::getLangs() as $lang_code ){
 				$options[] = array($lang_code, ($lang_code == $main_lang), $all_languages[$lang_code]);
 			}
 
 			$label->appendChild(Widget::Select('settings['.FL_GROUP.'][main_lang]', $options));
-			$group->appendChild($label);
-			$group->appendChild(new XMLElement('p', __('Select the main language of the site.'), array('class' => 'help')));
+			$label->appendChild(new XMLElement('p', __('Select the main language of the site.'), array('class' => 'help')));
+
+			if( isset($context['errors'][FL_GROUP]['main_lang']) ){
+				$wrapper->appendChild(Widget::Error($label, $context['errors'][FL_GROUP]['main_lang']));
+			}
+			else{
+				$wrapper->appendChild($label);
+			}
 		}
 
 		/**
 		 * Convenience method; builds reference language select
 		 *
-		 * @param XMLElement (reference) $group
+		 * @param XMLElement &$wrapper
+		 * @param array      $context
 		 */
-		private function _appendRefLang(&$group){
-			$label = Widget::Label(__('Reference language'), null, null, FL_GROUP.'_ref_lang');
-			$ref_lang = TManager::instance()->getRefLang();
-			$all_langs = FLang::instance()->getAllLangs();
+		private function _appendRefLang(&$wrapper, $context){
+			$label = Widget::Label(__('Reference language'), null, 'column', FL_GROUP.'_ref_lang');
+			$ref_lang = TManager::getRefLang();
+			$all_langs = FLang::getAllLangs();
 
 			$options = array();
-			foreach( FLang::instance()->getLangs() as $lang ){
+			foreach( FLang::getLangs() as $lang ){
 				$options[] = array($lang, ($lang == $ref_lang), $all_langs[$lang]);
 			}
 
 			$label->appendChild(Widget::Select('settings['.FL_GROUP.'][ref_lang]', $options));
-			$group->appendChild($label);
-			$group->appendChild(new XMLElement('p', __('Language translations that will be used as reference when updating other languages\' translations.'), array('class' => 'help')));
+			$label->appendChild(new XMLElement('p', __('Language translations that will be used as reference when updating other languages\' translations.'), array('class' => 'help')));
+
+			if( isset($context['errors'][FL_GROUP]['ref_lang']) ){
+				$wrapper->appendChild(Widget::Error($label, $context['errors'][FL_GROUP]['ref_lang']));
+			}
+			else{
+				$wrapper->appendChild($label);
+			}
 		}
 
 		/**
 		 * Convenience method; builds storage format select
 		 *
-		 * @param XMLElement (reference) $group
+		 * @param XMLElement &$wrapper
+		 * @param array      $context
 		 */
-		private function _appendStorageFormat(&$group){
-			$label = Widget::Label(__('Default storage format'));
+		private function _appendStorageFormat(&$wrapper, $context){
+			$label = Widget::Label(__('Default storage format'), null, 'column');
 
 			$current_storage_format = Symphony::Configuration()->get('storage_format', FL_GROUP);
 
 			$options = array();
-			foreach( TManager::instance()->getSupportedStorageFormats() as $storage_format => $info ){
+			foreach( TManager::getSupportedStorageFormats() as $storage_format => $info ){
 				$options[] = array(
 					$storage_format,
 					($storage_format == $current_storage_format),
@@ -509,33 +629,40 @@
 			}
 
 			$label->appendChild(Widget::Select('settings['.FL_GROUP.'][storage_format]', $options));
-			$group->appendChild($label);
-			$group->appendChild(new XMLElement('p', __('Storage format to use for translations.'), array('class' => 'help')));
+			$label->appendChild(new XMLElement('p', __('Storage format to use for translations.'), array('class' => 'help')));
+
+			if( isset($context['errors'][FL_GROUP]['storage_format']) ){
+				$wrapper->appendChild(Widget::Error($label, $context['errors'][FL_GROUP]['storage_format']));
+			}
+			else{
+				$wrapper->appendChild($label);
+			}
 		}
 
 		/**
 		 * Convenience method; builds consolidate translations checkbox
 		 *
-		 * @param XMLElement (reference) $group
+		 * @param XMLElement (reference) $wrapper
 		 */
-		private function _appendConsolidate(&$group){
-			$checkbox = Widget::Input('settings['.FL_GROUP.'][consolidate_translations]', self::CHECKBOX_YES, 'checkbox');
-			if( Symphony::Configuration()->get('consolidate_translations', FL_GROUP) == self::CHECKBOX_YES ){
+		private function _appendConsolidate(&$wrapper){
+			$checkbox = Widget::Input('settings['.FL_GROUP.'][consolidate]', self::CHECKBOX_YES, 'checkbox');
+			if( Symphony::Configuration()->get('consolidate', FL_GROUP) == self::CHECKBOX_YES ){
 				$checkbox->setAttribute('checked', 'checked');
 			}
-			$group->appendChild(Widget::Label($checkbox->generate().' '.__('Consolidate translations')));
-			$group->appendChild(new XMLElement('p', __('Check this to preserve Translations for languages being removed by <code>Language driver</code>.'), array('class' => 'help')));
+			$label = Widget::Label($checkbox->generate().' '.__('Consolidate translations'));
+			$label->appendChild(new XMLElement('p', __('Check this to preserve Translations for removed languages.'), array('class' => 'help')));
+			$wrapper->appendChild($label);
 		}
 
 		/**
 		 * Convenience method; builds update folders button
 		 *
-		 * @param XMLElement (reference) $group
+		 * @param XMLElement (reference) $wrapper
 		 */
-		private function _appendUpdate(&$group){
+		private function _appendUpdate(&$wrapper){
 			$button = new XMLElement('span', NULL, array('class' => 'frame'));
 			$button->appendChild(new XMLElement('button', __('Update Translations'), array('name' => 'action['.FL_GROUP.'][update_translations]', 'type' => 'submit')));
-			$group->appendChild($button);
+			$wrapper->appendChild($button);
 		}
 
 		/**
@@ -543,7 +670,7 @@
 		 */
 		public function dCustomActions(){
 			if( isset($_POST['action'][FL_GROUP]['update_translations']) ){
-				TManager::instance()->updateFolders();
+				TManager::updateFolders();
 			}
 		}
 
@@ -556,15 +683,18 @@
 		 */
 		public function dSave(array $context){
 
+			$valid = true;
+
 			/* Language codes */
 
-			$old_langs = FLang::instance()->getLangs();
-			if( false === FLang::instance()->setLangs($context['settings'][FL_GROUP]['langs']) ){
+			$old_langs = FLang::getLangs();
+			if( !FLang::setLangs($context['settings'][FL_GROUP]['langs']) ){
 				$context['errors'][FL_GROUP]['langs'] = __('Please fill at least one valid language code.');
-				return false;
+				$valid = false;
 			}
+			$new_langs = FLang::getLangs();
 			unset($context['settings'][FL_GROUP]['langs']);
-			$new_langs = FLang::instance()->getLangs();
+			Symphony::Configuration()->set('langs', implode(',', $new_langs), FL_GROUP);
 
 
 			/**
@@ -573,10 +703,10 @@
 			 * @delegate FLSavePreferences
 			 * @since    1.4
 			 *
-			 * @param string $context  - '/extensions/frontend_localisation/'
-			 * @param array $context - the original context from @delegate Save
-			 * @param array $old_langs - old language codes
-			 * @param array $new_langs - new language codes
+			 * @param string $context   - '/extensions/frontend_localisation/'
+			 * @param array  $context   - the original context from @delegate Save
+			 * @param array  $old_langs - old language codes
+			 * @param array  $new_langs - new language codes
 			 */
 			Symphony::ExtensionManager()->notifyMembers('FLSavePreferences', '/extensions/frontend_localisation/', array(
 				'context' => $context,
@@ -587,29 +717,55 @@
 
 			/* Main language */
 
-			FLang::instance()->setMainLang($context['settings'][FL_GROUP]['main_lang']);
+			if( !FLang::setMainLang($context['settings'][FL_GROUP]['main_lang']) ){
+
+				if( !empty($old_langs) || !(isset($new_langs[0]) && FLang::setMainLang($new_langs[0])) ){
+					$context['errors'][FL_GROUP]['main_lang'] = __('Invalid language code.');
+					$valid = false;
+				}
+			}
+			$main_lang = FLang::getMainLang();
 			unset($context['settings'][FL_GROUP]['main_lang']);
+			Symphony::Configuration()->set('main_lang', $main_lang, FL_GROUP);
 
 
 			/* Reference language */
 
-			TManager::instance()->setRefLang($context['settings'][FL_GROUP]['ref_lang']);
+			if( !TManager::setRefLang($context['settings'][FL_GROUP]['ref_lang']) ){
+
+				if( !empty($old_langs) || !TManager::setRefLang($main_lang) ){
+					$context['errors'][FL_GROUP]['main_lang'] = __('Invalid language code.');
+					$valid = false;
+				}
+			}
 			unset($context['settings'][FL_GROUP]['ref_lang']);
+			Symphony::Configuration()->set('ref_lang', TManager::getRefLang(), FL_GROUP);
 
 
 			/* Storage format */
 
-			TManager::instance()->setStorageFormat($context['settings'][FL_GROUP]['storage_format']);
+			if( !TManager::setStorageFormat($context['settings'][FL_GROUP]['storage_format']) ){
+
+				// make sure existing storage format is valid
+				if( !TManager::validateStorageFormat( TManager::getStorageFormat() ) ){
+					TManager::setStorageFormat('xml');
+				}
+
+				$context['errors'][FL_GROUP]['storage_format'] = __('Invalid storage format.');
+				$valid = false;
+			}
 			unset($context['settings'][FL_GROUP]['storage_format']);
+			Symphony::Configuration()->set('storage_format', TManager::getStorageFormat(), FL_GROUP);
 
 
 			/* Consolidate */
 
-			$old_consolidate = Symphony::Configuration()->get('consolidate_translations', FL_GROUP);
-			$new_consolidate = $context['settings'][FL_GROUP]['consolidate_translations'];
+			$old_consolidate = Symphony::Configuration()->get('consolidate', FL_GROUP);
+			$new_consolidate = $context['settings'][FL_GROUP]['consolidate'];
 
 			if( $old_consolidate != $new_consolidate ){
-				Symphony::Configuration()->set('consolidate_translations', $new_consolidate, FL_GROUP);
+				unset($context['settings'][FL_GROUP]['consolidate']);
+				Symphony::Configuration()->set('consolidate', $new_consolidate, FL_GROUP);
 			}
 
 
@@ -618,17 +774,19 @@
 			// update translation folders for new languages
 			$added_languages = array_diff($new_langs, $old_langs);
 			if( !empty($added_languages) ){
-				TManager::instance()->updateFolders($added_languages);
+				TManager::updateFolders($added_languages);
 			}
 
 			// delete translation folders for deleted languages
 			$deleted_languages = array_diff($old_langs, $new_langs);
 			if( !empty($deleted_languages) && ($new_consolidate != self::CHECKBOX_YES) ){
-				TManager::instance()->deleteFolders($deleted_languages);
+				TManager::deleteFolders($deleted_languages);
 			}
 
 
-			return true;
+			Symphony::Configuration()->write();
+
+			return $valid;
 		}
 
 	}

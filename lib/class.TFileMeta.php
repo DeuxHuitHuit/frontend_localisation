@@ -147,7 +147,7 @@
 			}
 
 			if( !isset($this->meta['language']) ){
-				$all_langs = FLang::instance()->getAllLangs();
+				$all_langs = FLang::getAllLangs();
 				$lang_code = $this->parent->getFolder()->getLangCode();
 
 				$this->set('language', array(
@@ -158,7 +158,7 @@
 			}
 
 			if( !isset($this->meta['storage_format']) ){
-				$this->set('storage_format', $this->parent->getFolder()->getManager()->getStorageFormat());
+				$this->set('storage_format', TManager::getStorageFormat());
 			}
 
 			if( !isset($this->meta['type']) ){

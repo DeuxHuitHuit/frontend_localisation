@@ -14,10 +14,11 @@
 	 *
 	 * @package Frontend Localisation
 	 *
-	 * @author  Vlad Ghita
+	 * @static
 	 *
+	 * @author  Vlad Ghita
 	 */
-	final class TManager implements Singleton
+	final class TManager
 	{
 
 		/*------------------------------------------------------------------------------------------------*/
@@ -25,30 +26,32 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		/**
-		 * @var TManager
-		 */
-		private static $instance;
-
-		/**
 		 * Translation path
 		 *
 		 * @var string
 		 */
-		private $path = '';
+		private static $path = '';
+
+		/**
+		 * Page prefix
+		 *
+		 * @var string
+		 */
+		private static $page_prefix = '';
 
 		/**
 		 * Reference language
 		 *
 		 * @var string
 		 */
-		private $ref_lang = '';
+		private static $ref_lang = '';
 
 		/**
 		 * Storage format
 		 *
 		 * @var string
 		 */
-		private $storage_format = '';
+		private static $storage_format = '';
 
 		/**
 		 * Supported storage formats
@@ -62,7 +65,7 @@
 		 *		 )
 		 * )
 		 */
-		private $supported_storage_formats = array(
+		private static $supported_storage_formats = array(
 			'xml' => array(
 				'description' => 'XML',
 			),
@@ -83,131 +86,14 @@
 		 *
 		 * @var TFolder[]
 		 */
-		private $t_folders = array();
+		private static $t_folders = array();
 
 		/**
 		 * Translation Parsers. Caches them for easy access.
 		 *
 		 * @var TParser[]
 		 */
-		private $t_parsers = array();
-
-		/**
-		 * Switch to write config or not
-		 *
-		 * @var bool
-		 */
-		private $write_config = false;
-
-
-
-		/*------------------------------------------------------------------------------------------------*/
-		/*  Initialization  */
-		/*------------------------------------------------------------------------------------------------*/
-
-		private function __construct(){
-			try{
-				$this->_initRefLang();
-				$this->_initPath();
-				$this->_initStorageFormat();
-				$this->_discoverFolders();
-			}
-			catch( Exception $e ){
-				$message = $e->getMessage();
-
-				Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
-				Symphony::Log()->pushToLog($message, E_NOTICE, true);
-			}
-		}
-
-		public function __destruct(){
-			if( $this->write_config === true ){
-				Symphony::Configuration()->write();
-			}
-		}
-
-		/**
-		 * Initializes translation path
-		 *
-		 * @throws Exception
-		 */
-		private function _initPath(){
-			$path = WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP);
-
-			if( false === $this->setPath($path, false) ){
-				throw new Exception(__('
-					<code>%1$s</code>: Translation folder couldn\'t be created a <code>%2$s</code>. Please %3$s.',
-					array(
-						FL_NAME,
-						$path,
-						__('review settings')
-					)
-				));
-			}
-		}
-
-		/**
-		 * Initializes reference language
-		 *
-		 * @throws Exception
-		 */
-		private function _initRefLang(){
-			$ref_lang = Symphony::Configuration()->get('ref_lang', FL_GROUP);
-
-			if( false === $this->setRefLang($ref_lang, false) ){
-				$langs = FLang::instance()->getLangs();
-
-				if( !empty($langs) )
-					throw new Exception(__('
-					<code>%1$s</code>: Reference language code <code>%2$s</code> is not supported. Please %3$s.',
-						array(
-							FL_NAME,
-							$ref_lang,
-							'<a href="'.SYMPHONY_URL.'/system/preferences/#'.FL_GROUP.'_translation_path">'.__('review settings').'</a>'
-						)
-					));
-			}
-		}
-
-		/**
-		 * Initializes storage format
-		 *
-		 * @throws Exception
-		 */
-		private function _initStorageFormat(){
-			$storage_format = Symphony::Configuration()->get('storage_format', FL_GROUP);
-
-			if( fales === $this->setStorageFormat($storage_format, false) ){
-				throw new Exception(__('
-					<code>%1$s</code>: Storage directory <code>%2$s</code> for <code>%3$s</code> storage format doesn\'t exist. Please %4$s.',
-					array(
-						FL_NAME,
-						$dir_storage,
-						$this->storage_format,
-						'<a href="'.SYMPHONY_URL.'/system/preferences/#'.FL_GROUP.'_translation_path">'.__('review settings').'</a>'
-					)
-				));
-			}
-		}
-
-		/**
-		 * Discover existing folders in translation folder
-		 */
-		private function _discoverFolders(){
-			foreach( FLang::instance()->getLangs() as $lc ){
-				if( is_dir($this->path.'/'.$lc) ){
-					$this->addFolder($lc);
-				}
-			}
-		}
-
-		public static function instance(){
-			if( !self::$instance instanceof TManager ){
-				self::$instance = new TManager();
-			}
-
-			return self::$instance;
-		}
+		private static $t_parsers = array();
 
 
 
@@ -220,8 +106,17 @@
 		 *
 		 * @return string
 		 */
-		public function getPath(){
-			return (string)$this->path;
+		public static function getPath(){
+			return (string)self::$path;
+		}
+
+		/**
+		 * Get page prefix
+		 *
+		 * @return string
+		 */
+		public static function getPagePrefix(){
+			return (string) self::$page_prefix;
 		}
 
 		/**
@@ -229,8 +124,8 @@
 		 *
 		 * @return string
 		 */
-		public function getRefLang(){
-			return (string)$this->ref_lang;
+		public static function getRefLang(){
+			return (string)self::$ref_lang;
 		}
 
 		/**
@@ -238,40 +133,36 @@
 		 *
 		 * @return string
 		 */
-		public function getStorageFormat(){
-			return (string)$this->storage_format;
+		public static function getStorageFormat(){
+			return (string)self::$storage_format;
 		}
 
 		/**
 		 * Get all Translation folders
 		 *
-		 * @return array
+		 * @return TFolder[]
 		 */
-		public function getFolders(){
-			return (array)$this->t_folders;
+		public static function getFolders(){
+			return (array)self::$t_folders;
 		}
 
 		/**
 		 * Get Translation folder identified by `$lang_code`
 		 *
-		 * @param string $lang_code (optional)
+		 * @param string $lang_code
 		 *
 		 * @return TFolder|null
 		 */
-		public function getFolder($lang_code = null){
+		public static function getFolder($lang_code){
 			General::ensureType(array(
-				'lang_code' => array('var' => $lang_code, 'type' => 'string', 'optional' => true)
+				'lang_code' => array('var' => $lang_code, 'type' => 'string')
 			));
 
-			if( is_null($lang_code) ){
-				$lang_code = $this->getRefLang();
-			}
+			if( !isset(self::$t_folders[$lang_code]) ) return null;
 
-			if( array_key_exists($lang_code, $this->t_folders) && $this->t_folders[$lang_code] instanceof TFolder ){
-				return $this->t_folders[$lang_code];
-			}
+			if( !self::$t_folders[$lang_code] instanceof TFolder ) return null;
 
-			return null;
+			return self::$t_folders[$lang_code];
 		}
 
 		/**
@@ -279,8 +170,8 @@
 		 *
 		 * @return array
 		 */
-		public function getSupportedStorageFormats(){
-			return (array)$this->supported_storage_formats;
+		public static function getSupportedStorageFormats(){
+			return (array)self::$supported_storage_formats;
 		}
 
 		/**
@@ -290,27 +181,27 @@
 		 *
 		 * @return TParser - Appropriate TParser for $storage_format
 		 */
-		public function getParser($storage_format = null){
+		public static function getParser($storage_format = null){
 			General::ensureType(array(
 				'storage_format' => array('var' => $storage_format, 'type' => 'string', 'optional' => true)
 			));
 
-			if( is_null($storage_format) ){
-				$storage_format = $this->getStorageFormat();
+			if( !self::validateStorageFormat($storage_format) ){
+				$storage_format = self::getStorageFormat();
 			}
 
-			if( !array_key_exists($storage_format, $this->supported_storage_formats) )
+			if( !self::validateStorageFormat($storage_format) )
 				return null;
 
-			if( !($this->t_parsers[$storage_format] instanceof TParser) ){
-				$this->loadStorageClass($storage_format, 'TParser');
+			if( !(self::$t_parsers[$storage_format] instanceof TParser) ){
+				self::loadStorageClass($storage_format, 'TParser');
 
 				$class_name = strtoupper($storage_format).'_TParser';
 
-				$this->t_parsers[$storage_format] = new $class_name();
+				self::$t_parsers[$storage_format] = new $class_name();
 			}
 
-			return $this->t_parsers[$storage_format];
+			return self::$t_parsers[$storage_format];
 		}
 
 
@@ -323,23 +214,30 @@
 		 * Set translation path
 		 *
 		 * @param string $path
-		 * @param boolean $write
 		 *
 		 * @return boolean
 		 */
-		public function setPath($path, $write = true){
+		public static function setPath($path){
+			if( !General::realiseDirectory($path) ) return false;
 
-			// safe cheks
-			if( !General::realiseDirectory($path) ){
-				return false;
-			}
+			self::$path = $path;
 
-			$this->path = $path;
+			return true;
+		}
 
-			if( $write === true ){
-				Symphony::Configuration()->set('translation_path', $this->path, FL_GROUP);
-				$this->write_config = true;
-			}
+		/**
+		 * Set page prefix
+		 *
+		 * @param string $page_prefix
+		 *
+		 * @return boolean
+		 */
+		public static function setPagePrefix($page_prefix){
+			General::ensureType(array(
+				'page_prefix' => array('var' => $page_prefix, 'type' => 'string')
+			));
+
+			self::$page_prefix = $page_prefix;
 
 			return true;
 		}
@@ -348,32 +246,13 @@
 		 * Set reference language
 		 *
 		 * @param string $lang_code
-		 * @param boolean $write
 		 *
 		 * @return boolean
 		 */
-		public function setRefLang($lang_code, $write = true){
+		public static function setRefLang($lang_code){
+			if( !FLang::validateLangCode($lang_code) )return false;
 
-			if( FLang::instance()->validateLangCode($lang_code) ){
-				$this->ref_lang = $lang_code;
-			}
-
-			// defaults to main language
-			else{
-				$main_lang = FLang::instance()->getMainLang();
-
-				if( !empty($main_lang) ){
-					$this->ref_lang = $main_lang;
-				}
-				else{
-					return false;
-				}
-			}
-
-			if( $write === true ){
-				Symphony::Configuration()->set('ref_lang', $this->ref_lang, FL_GROUP);
-				$this->write_config = true;
-			}
+			self::$ref_lang = $lang_code;
 
 			return true;
 		}
@@ -382,28 +261,15 @@
 		 * Set storage format
 		 *
 		 * @param string $storage_format
-		 * @param boolean $write
 		 *
 		 * @return boolean
 		 */
-		public function setStorageFormat($storage_format, $write = true){
-			// make sure default storage format is supported
-			if( !array_key_exists($storage_format, $this->supported_storage_formats) )
-				$storage_format = 'xml';
+		public static function setStorageFormat($storage_format){
+			if( !self::validateStorageFormat($storage_format) ) return false;
 
-			$dir_storage = EXTENSIONS.'/'.FL_GROUP.'/lib/'.$storage_format.'/';
+			if( !is_dir(EXTENSIONS.'/'.FL_GROUP.'/lib/'.$storage_format.'/') ) return false;
 
-			// if necessary storage files are missing, abort
-			if( !is_dir($dir_storage) ){
-				return false;
-			}
-
-			$this->storage_format = $storage_format;
-
-			if( $write === true ){
-				Symphony::Configuration()->set('storage_format', $this->storage_format, FL_GROUP);
-				$this->write_config = true;
-			}
+			self::$storage_format = $storage_format;
 
 			return true;
 		}
@@ -419,17 +285,17 @@
 		 *
 		 * @param array $current_page - page info. Must include id, handle and parent.
 		 */
-		public function createTranslation(array $current_page){
+		public static function createTranslation(array $current_page){
 			// if it has a parent, build entire ascending line
 			if( !empty($current_page['parent']) ){
-				$handle = $this->_createAncestorFilename($current_page['parent'], FLPageManager::instance()->listAll());
+				$handle = self::_createAncestorFilename($current_page['parent'], FLPageManager::instance()->listAll());
 			}
 
-			$handle = Symphony::Configuration()->get('page_name_prefix', FL_GROUP).$handle.$current_page['handle'];
+			$handle = self::$page_prefix.$handle.$current_page['handle'];
 
-			foreach( $this->t_folders as $t_folder ){
-				/* @var $t_folder TFolder */
-				$translation = $t_folder->addTranslation($handle, array('type' => 'page'));
+			foreach( self::$t_folders as $t_folder ){
+				$t_folder->addTranslation($handle, array('type' => 'page'));
+				$translation = $t_folder->getTranslation($handle);
 				$translation->setName($handle);
 			}
 		}
@@ -441,7 +307,7 @@
 		 *
 		 * @return array - changed handles
 		 */
-		public function editTranslation(array $current_page){
+		public static function editTranslation(array $current_page){
 			$pages = FLPageManager::instance()->listAll();
 
 			// get ancestor handle part
@@ -449,32 +315,31 @@
 			$new_ancestor_handle = '';
 
 			if( !empty($current_page['old_parent']) ){
-				$old_ancestor_handle = $this->_createAncestorFilename($current_page['old_parent'], $pages);
+				$old_ancestor_handle = self::_createAncestorFilename($current_page['old_parent'], $pages);
 			}
 
 			if( !empty($current_page['new_parent']) ){
-				$new_ancestor_handle = $this->_createAncestorFilename($current_page['new_parent'], $pages);
+				$new_ancestor_handle = self::_createAncestorFilename($current_page['new_parent'], $pages);
 			}
 
 			// get children of this page, including self
 			$descendant_handles = array();
-			$this->_createDescendantFilenames($current_page['id'], $pages, '', $descendant_handles);
+			self::_createDescendantFilenames($current_page['id'], $pages, '', $descendant_handles);
 
-			$page_prefix = Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
 			$handles = array();
 
 			foreach( $descendant_handles as $desc_handle ){
 				$desc_handle = trim($desc_handle, '_');
 
-				$old_handle = $page_prefix.$old_ancestor_handle.$desc_handle;
-				$new_handle = $page_prefix.$new_ancestor_handle.preg_replace("/{$current_page['old_handle']}/", $current_page['new_handle'], $desc_handle, 1);
+				$old_handle = self::$page_prefix.$old_ancestor_handle.$desc_handle;
+				$new_handle = self::$page_prefix.$new_ancestor_handle.preg_replace("/{$current_page['old_handle']}/", $current_page['new_handle'], $desc_handle, 1);
 
 				$handles[$old_handle] = $new_handle;
 			}
 
 			// update Translations whichs' name depend on this page
 			foreach( $handles as $old_handle => $new_handle ){
-				$this->changeTranslationHandle($old_handle, $new_handle);
+				self::changeTranslationHandle($old_handle, $new_handle);
 			}
 
 			return $handles;
@@ -485,7 +350,7 @@
 		 *
 		 * @param array $page_ids
 		 */
-		public function deleteTranslation(array $page_ids){
+		public static function deleteTranslation(array $page_ids){
 			$handles = array();
 			$pages = FLPageManager::instance()->listAll();
 
@@ -495,12 +360,12 @@
 
 				$handle = '';
 				if( !empty($pages[$page_id]['parent']) ){
-					$handle = $this->_createAncestorFilename($pages[$page_id]['parent'], $pages);
+					$handle = self::_createAncestorFilename($pages[$page_id]['parent'], $pages);
 				}
-				$handles[] = Symphony::Configuration()->get('page_name_prefix', FL_GROUP).$handle.$pages[$page_id]['handle'];
+				$handles[] = self::$page_prefix.$handle.$pages[$page_id]['handle'];
 			}
 
-			foreach( $this->t_folders as $t_folder ){
+			foreach( self::$t_folders as $t_folder ){
 				foreach( $handles as $handle ){
 					$t_folder->deleteTranslation($handle);
 				}
@@ -513,32 +378,32 @@
 		 *
 		 * @param string $handle - reference handle translation.
 		 */
-		public function syncTranslation($handle){
+		public static function syncTranslation($handle){
 			if( !is_string($handle) || empty($handle) ) return false;
 
-			$ref_lang = TManager::instance()->getRefLang();
+			$ref_lang = TManager::getRefLang();
 
 			// make sure reference folder exists
-			if( !$this->addFolder($ref_lang) ) return false;
+			if( !self::addFolder($ref_lang) ) return false;
 
-			$ref_translation = $this->t_folders[$ref_lang]->getTranslation($handle);
+			$ref_translation = self::$t_folders[$ref_lang]->getTranslation($handle);
 
 			// make sure ref_file exists
 			if( is_null($ref_translation) ) return false;
 
 			$valid = true;
 
-			foreach( FLang::instance()->getLangs() as $lc ){
+			foreach( FLang::getLangs() as $lc ){
 
 				if( $lc === $ref_lang ) continue;
 
-				if( !$this->addFolder($lc) ){
+				if( !self::addFolder($lc) ){
 					$valid = false;
 					continue;
 				}
 
-				$this->t_folders[$lc]->addTranslation($handle);
-				$translation = $this->t_folders[$lc]->getTranslation($handle);
+				self::$t_folders[$lc]->addTranslation($handle);
+				$translation = self::$t_folders[$lc]->getTranslation($handle);
 
 				if( is_null($translation) ){
 					$valid = false;
@@ -560,15 +425,14 @@
 		 *
 		 * return boolean - true if success, false otherwise
 		 */
-		public function changeTranslationHandle($old_handle, $new_handle){
+		public static function changeTranslationHandle($old_handle, $new_handle){
 			$valid = true;
 
 			// keeps track of altered Translations
 			$changed = array();
 
 			// try to rename files
-			foreach( $this->t_folders as $t_folder ){
-				/* @var $t_folder TFolder */
+			foreach( self::$t_folders as $t_folder ){
 				$valid = $t_folder->changeTranslationHandle($old_handle, $new_handle);
 
 				$changed[] = $t_folder->getTranslation($new_handle);
@@ -621,29 +485,31 @@
 		 *
 		 * @param array $langs - desired languages to update
 		 */
-		public function updateFolders($langs = null){
+		public static function updateFolders($langs = null){
 			// if no languages desired, update all folders
 			if( empty($langs) ){
-				$langs = FLang::instance()->getLangs();
+				$langs = FLang::getLangs();
 			}
 
 			if( !empty($langs) ){
 
 				// update folder for reference language
-				$ref_lang = TManager::instance()->getRefLang();
+				$ref_lang = TManager::getRefLang();
 
 				if( !empty($ref_lang) ){
-					$this->addFolder($ref_lang);
+					self::addFolder($ref_lang);
+					$ref_folder = self::getFOlder($ref_lang);
 
-					$this->t_folders[$ref_lang]->updateTranslationsForPages();
+					if( is_null($ref_folder) ) return false;
 
+					$ref_folder->updateTranslationsForPages();
 
 					// update remaining folders
 					foreach( $langs as $lc ){
 						if( $lc === $ref_lang ) continue;
 
-						$t_folder = $this->addFolder($lc);
-						$t_folder->updateTranslations($this->t_folders[$ref_lang]->getTranslations());
+						self::addFolder($lc);
+						self::getFolder($lc)->updateTranslations( $ref_folder->getTranslations() );
 					}
 				}
 			}
@@ -654,15 +520,15 @@
 		 *
 		 * @param array $langs
 		 */
-		public function deleteFolders(array $langs){
+		public static function deleteFolders(array $langs){
 			// if no languages desired, delete all folders
 			if( empty($langs) ){
-				$langs = FLang::instance()->getLangs();
+				$langs = FLang::getLangs();
 			}
 
 			foreach( $langs as $lc ){
-				if( General::deleteDirectory($this->path.'/'.$lc) ){
-					unset($this->t_folders[$lc]);
+				if( General::deleteDirectory(self::$path.'/'.$lc) ){
+					unset(self::$t_folders[$lc]);
 				}
 				else{
 					Administration::instance()->Page->pageAlert(
@@ -681,22 +547,22 @@
 		 *
 		 * @param string $lang_code
 		 *
-		 * @return TFolder
+		 * @return boolean
 		 */
-		public function addFolder($lang_code){
+		public static function addFolder($lang_code){
 			General::ensureType(array(
 				'lang_code' => array('var' => $lang_code, 'type' => 'string')
 			));
 
-			if( !FLang::instance()->validateLangCode($lang_code) ) return false;
+			if( !FLang::validateLangCode($lang_code) ) return false;
 
-			if( empty($this->t_folders[$lang_code]) ){
-				if( !General::realiseDirectory($this->path.'/'.$lang_code) ) return false;
+			if( is_null(self::getFolder($lang_code)) ){
+				if( !General::realiseDirectory(self::$path.'/'.$lang_code) ) return false;
 
-				$this->t_folders[$lang_code] = new TFolder($this, $lang_code);
+				self::$t_folders[$lang_code] = new TFolder($lang_code);
 			}
 
-			return $this->t_folders[$lang_code];
+			return true;
 		}
 
 
@@ -704,6 +570,17 @@
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Public Utilities  */
 		/*------------------------------------------------------------------------------------------------*/
+
+		/**
+		 * Validate given storage_format.
+		 *
+		 * @param $storage_format
+		 *
+		 * @return bool
+		 */
+		public static function validateStorageFormat($storage_format){
+			return array_key_exists($storage_format, self::$supported_storage_formats);
+		}
 
 		/**
 		 * Loads a Translation resource identified by `$class` abstract class name.
@@ -719,15 +596,14 @@
 		 *
 		 * @return bool
 		 */
-		public function loadStorageClass($storage_format, $class){
-			if( !array_key_exists($storage_format, $this->supported_storage_formats) ){
+		public static function loadStorageClass($storage_format, $class){
+			if( !self::validateStorageFormat($storage_format) )
 				throw new Exception("Storage format `{$storage_format}` is not supported.`");
-			}
 
 			$filename = EXTENSIONS.'/'.FL_GROUP.'/lib/'.$storage_format.'/class.'.$class.'.php';
 			$class_name = strtoupper($storage_format).'_'.$class;
 
-			return (boolean)$this->_loadClass($filename, $class_name);
+			return (boolean)self::_loadClass($filename, $class_name);
 		}
 
 		/**
@@ -739,13 +615,13 @@
 		 *
 		 * @return bool
 		 */
-		public function loadTranslationClass($type){
+		public static function loadTranslationClass($type){
 			$type = ($type == 'page') ? ucfirst($type) : '';
 
 			$filename = EXTENSIONS.'/'.FL_GROUP.'/lib/class.Translation'.$type.'.php';
 			$class_name = 'Translation'.$type;
 
-			return (boolean)$this->_loadClass($filename, $class_name);
+			return (boolean)self::_loadClass($filename, $class_name);
 		}
 
 		/**
@@ -755,13 +631,12 @@
 		 *
 		 * @return string - Page handle
 		 */
-		public function getPageHandle($page_id){
+		public static function getPageHandle($page_id){
 			$pages = FLPageManager::instance()->listAll();
 
-			$parent_handle = $this->_createAncestorFilename($page_id, $pages);
-			$prefix = Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
+			$parent_handle = self::_createAncestorFilename($page_id, $pages);
 
-			return (string)$prefix.trim($parent_handle, '_');
+			return (string) self::page_prefix.trim($parent_handle, '_');
 		}
 
 
@@ -780,7 +655,7 @@
 		 *
 		 * @return boolean - true if success
 		 */
-		private function _loadClass($filename, $class_name){
+		private static function _loadClass($filename, $class_name){
 			// $class file must exist
 			if( !is_file($filename) ){
 				throw new Exception("File '`{$filename}`' doesn't exist.`");
@@ -804,7 +679,7 @@
 		 *
 		 * @return string - handle
 		 */
-		private function _createAncestorFilename($page_id, $pages = null){
+		private static function _createAncestorFilename($page_id, $pages = null){
 			if( empty($pages) ) $pages = FLPageManager::instance()->listAll();
 
 			$page = $pages[$page_id];
@@ -826,13 +701,13 @@
 		 * @param string $handle   - internal used to store current handle
 		 * @param array $handles   (pointer) - resulting array
 		 */
-		private function _createDescendantFilenames($page_id, $pages, $handle, &$handles){
+		private static function _createDescendantFilenames($page_id, $pages, $handle, &$handles){
 			$handle .= '_'.$pages[$page_id]['handle'];
 			$handles[] = $handle;
 
 			foreach( $pages as $page ){
 				if( $page['parent'] == $page_id ){
-					$this->_createDescendantFilenames($page['id'], $pages, $handle, $handles);
+					self::_createDescendantFilenames($page['id'], $pages, $handle, $handles);
 				}
 			}
 		}

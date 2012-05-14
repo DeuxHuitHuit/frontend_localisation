@@ -27,10 +27,10 @@
 		public function grab(&$param_pool = NULL){
 			$result = new XMLElement('fl-languages');
 
-			$main_lang = FLang::instance()->getMainLang();
-			$lang_code = FLang::instance()->getLangCode();
-			$all_languages = FLang::instance()->getAllLangs();
-			$langs = FLang::instance()->getLangs();
+			$main_lang = FLang::getMainLang();
+			$lang_code = FLang::getLangCode();
+			$all_languages = FLang::getAllLangs();
+			$langs = FLang::getLangs();
 
 			$current_language_xml = new XMLElement('current-language', $all_languages[$lang_code] ? $all_languages[$lang_code] : $lang_code);
 			$current_language_xml->setAttribute('handle', $lang_code);

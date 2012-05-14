@@ -30,6 +30,12 @@
 	</dependencies>
 
 	<releases>
+		<release version="1.5" date="2012-05-14" min="2.3"><![CDATA[
+			* FLang and TManager classes are now static to align with Symphony 2.3 style.
+			* Implemented error feedback for Preferences page settings.
+			* Fixed minor bugs regarding Reference language & Translations logic.
+		]]></release>
+
 		<release version="1.4" date="2012-05-11" min="2.3"><![CDATA[
 			* Symphony 2.3 update
 			* Integrates Frontend Languages management. Dropped support for FLang drivers. Requires a third-party FLang detection driver to be installed.

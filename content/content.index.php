@@ -49,7 +49,7 @@
 
 			$tbody = array();
 
-			$t_folder = TManager::instance()->getFolder(TManager::instance()->getRefLang());
+			$t_folder = TManager::getFolder(TManager::getRefLang());
 			if( is_null($t_folder) ){
 				$this->Form->appendChild($t_folder);
 				Administration::instance()->Page->pageAlert(__('<code>%1$s</code>: Translation folders not found.', array(FL_NAME)), Alert::NOTICE);
@@ -126,7 +126,7 @@
 
 					case 'delete':
 
-						$t_folders = TManager::instance()->getFolders();
+						$t_folders = TManager::getFolders();
 						$t_linker = new TLinker();
 
 						$pages = FLPageManager::instance()->listAll(array('translations'));
