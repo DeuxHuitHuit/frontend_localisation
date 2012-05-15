@@ -3,18 +3,6 @@ Frontend Localisation
 
 Offers an integrated solution to localise the Frontend of your site.
 
-* Version: 1.5
-* Build Date: 2012-05-14
-* Authors:
-	- [Xander Group](http://www.xanderadvertising.com)
-	- Vlad Ghita
-* Requirements:
-	- Symphony 2.3
-	- At least one FLang detection extension. @see **3 Installation**
-
-
-
-
 
 ## 0 @todo list ##
 

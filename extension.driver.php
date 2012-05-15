@@ -14,7 +14,7 @@
 
 
 
-	final class extension_frontend_localisation extends Extension
+	final class Extension_Frontend_Localisation extends Extension
 	{
 
 		const CHECKBOX_YES = 'yes';
@@ -25,6 +25,8 @@
 		 * @var array
 		 */
 		private $changed_handles = array();
+
+		private static $assets_loaded = false;
 
 
 
@@ -477,9 +479,6 @@
 		 */
 		public function dPagePostEdit($context){
 			foreach( TManager::getFolders() as $t_folder ){
-				/* @var $t_folder TFolder */
-				/* @var $translation Translation*/
-
 				// change all
 				if( !empty($this->changed_handles) ){
 					foreach( $this->changed_handles as $new_handle ){
@@ -787,6 +786,27 @@
 			Symphony::Configuration()->write();
 
 			return $valid;
+		}
+
+
+
+		/*------------------------------------------------------------------------------------------------*/
+		/*  Public utilities  */
+		/*------------------------------------------------------------------------------------------------*/
+
+		public static function appendAssets(){
+			if( self::$assets_loaded === false
+				&& class_exists('Administration')
+				&& Administration::instance() instanceof Administration
+				&& Administration::instance()->Page instanceof HTMLPage ){
+
+				self::$assets_loaded = true;
+
+				$page = Administration::instance()->Page;
+
+				$page->addStylesheetToHead(URL.'/extensions/'.FL_GROUP.'/assets/'.FL_GROUP.'.multilingual_tabs.css', 'screen', null, false);
+				$page->addScriptToHead(URL.'/extensions/'.FL_GROUP.'/assets/'.FL_GROUP.'.multilingual_tabs.js', null, false);
+			}
 		}
 
 	}

@@ -1,52 +1,37 @@
-(function($, Symphony, window, undefined){
+(function($, undefined){
 
-	function MultilingualTabs(field){
-		this.field = field;
-		this.init();
-	}
+	$(document).ready(function(){
+		var $m_fields = $('.field-multilingual');
+		if( $m_fields.length === 0 ) return;
 
-	MultilingualTabs.prototype = {
-		init: function(){
-			var self = this,
-				activeTab = this.field.find('ul.tabs li.active');
+		var $m_ul = $m_fields.find('ul.tabs');
+		if( $m_ul.length === 0 ) return;
 
-			// Fallback to first tab if no tab is set as active by default
-			if( activeTab.length === 0 ){
-				activeTab = this.field.find('ul.tabs li:eq(0)');
-			}
+		var $m_tabs = $m_ul.find('li');
+		if( $m_tabs.length === 0 ) return;
 
-			// bind tab events
-			this.field.find('ul.tabs li').bind('click', function(e){
-				e.preventDefault();
-				self.setActiveTab($(this).attr('class').split(' ')[0]);
-			});
+		var $m_panels = $m_fields.find('.tab-element, .tab-panel');
+		if( $m_panels.length === 0 ) return;
 
-			// Show the active tab
-			this.setActiveTab(activeTab.attr('class').split(' ')[0]);
-		},
+		$m_ul.on('click', 'li', function(){
+			var lang_code = $(this).data('lang_code');
 
-		setActiveTab: function(tab_name){
-			// hide all tab panels
-			this.field.find('.tab-panel').hide();
+			$m_tabs
+				.each(function(){
+					$(this).removeClass('active');
+				})
+				.filter('.'+lang_code).each(function(){
+					$(this).addClass('active');
+				});
 
-			// find the desired tab and activate the tab and its panel
-			this.field.find('ul.tabs li').each(function(){
-				var tab = $(this);
+			$m_panels.hide().filter('.tab-'+lang_code).show();
+		});
 
-				if( tab.hasClass(tab_name) ){
-					tab.addClass('active');
+		$m_tabs
+			.each(function(){
+				$(this).data('lang_code', $(this).attr('class'));
+			})
+			.eq(0).click();
+	});
 
-					var panel = tab.parent().parent().find('.tab-'+tab_name);
-					panel.show();
-
-				}else{
-					tab.removeClass('active');
-				}
-			});
-		}
-	};
-
-	// export Constructor
-	window.MultilingualTabs = MultilingualTabs;
-
-}(this.jQuery, this.Symphony, this));
+}(this.jQuery));

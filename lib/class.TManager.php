@@ -636,7 +636,7 @@
 
 			$parent_handle = self::_createAncestorFilename($page_id, $pages);
 
-			return (string) self::page_prefix.trim($parent_handle, '_');
+			return (string) self::$page_prefix.trim($parent_handle, '_');
 		}
 
 
