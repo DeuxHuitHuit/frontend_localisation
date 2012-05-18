@@ -33,6 +33,7 @@ For site builders:
 * one button update of all language Translations referencing `Reference Language`
 * one Datasource with Frontend Languages information
 * one Datasource with strings from all Translations attached to current page
+* one nice and handy [utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) tu rule them all. Read more in **6.4 XSL FLang utilities** section.
 
 For PHP developers:
 
@@ -200,5 +201,10 @@ Here's an example from my `master.data.i18n`:
 
 
 ### 6.4 XSL FLang utilities ###
+
+These utilities offer an easy way to access the translations provided by `FL: Translations` datasource:
+
+- easy acccess to translation items using xPath like selectors
+- placeholders replacement just like `sprintf()` in PHP. (`%1$s`, `%2$s` etc)
 
 Read the docs from the [XSLT utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) for usage examples.
