@@ -34,6 +34,8 @@
 
 			$current_language_xml = new XMLElement('current-language', $all_languages[$lang_code] ? $all_languages[$lang_code] : $lang_code);
 			$current_language_xml->setAttribute('handle', $lang_code);
+			$current_language_xml->setAttribute('language', FLang::getLang());
+			$current_language_xml->setAttribute('region', FLang::getReg());
 			$result->appendChild($current_language_xml);
 
 			$supported_languages_xml = new XMLElement('supported-languages');
