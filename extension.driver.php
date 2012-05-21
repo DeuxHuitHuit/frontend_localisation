@@ -163,6 +163,14 @@
 
 
 				array(
+					'page' => '/frontend/',
+					'delegate' => 'FrontendParamsPostResolve',
+					'callback' => 'dFrontendParamsPostResolve'
+				),
+
+
+
+				array(
 					'page' => '/backend/',
 					'delegate' => 'AppendPageAlert',
 					'callback' => 'dAppendPageAlert'
@@ -244,6 +252,14 @@
 				$this->_initFLang();
 				$this->_initTManager();
 			}
+		}
+
+		public function dFrontendParamsPostResolve($context){
+			if( isset($context['params']['url-fl-language']) )
+				unset($context['params']['url-fl-language']);
+
+			if( isset($context['params']['url-fl-region']) )
+				unset($context['params']['url-fl-region']);
 		}
 
 		/**

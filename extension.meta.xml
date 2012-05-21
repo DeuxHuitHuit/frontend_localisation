@@ -30,6 +30,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="1.6.3" date="2012-05-18" min="2.3"><![CDATA[
+			* Added language information to param pool.
+		]]></release>
+
 		<release version="1.6" date="2012-05-15" min="2.3"><![CDATA[
 			* Fixed a (stupid) critical bug in TManager class.
 			* Improves support for multilingual extensions.
