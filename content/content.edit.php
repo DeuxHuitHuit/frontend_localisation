@@ -128,7 +128,7 @@
 			// Start building the page
 
 			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.css', 'screen', null, false);
-			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs_init.js', null, false);
+			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.js', null, false);
 
 			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.js', 203, false);
 			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.css', "screen");

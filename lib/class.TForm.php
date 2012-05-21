@@ -25,17 +25,17 @@
 
 			/* Primary */
 			$fieldset = new XMLElement('fieldset', null, array('class' => 'primary column'));
-				$this->_appendHandle($fieldset, $fields, $disabled);
-				$wrapper_meta = new XMLElement('div', null, array('class' => 'two columns'));
-					$this->_appendStorageFormat($wrapper_meta, $fields, $disabled);
-					$this->_appendType($wrapper_meta, $fields, $disabled);
-				$fieldset->appendChild($wrapper_meta);
-				$this->_appendContent($fieldset, $fields, $errors, $disabled);
+			$this->_appendHandle($fieldset, $fields, $disabled);
+			$wrapper_meta = new XMLElement('div', null, array('class' => 'two columns'));
+			$this->_appendStorageFormat($wrapper_meta, $fields, $disabled);
+			$this->_appendType($wrapper_meta, $fields, $disabled);
+			$fieldset->appendChild($wrapper_meta);
+			$this->_appendContent($fieldset, $fields, $errors, $disabled);
 			$wrapper->appendChild($fieldset);
 
 			/* Sidebar */
 			$fieldset = new XMLElement('fieldset', null, array('class' => 'secondary column'));
-				$this->_appendPages($fieldset, $fields, $errors, $disabled);
+			$this->_appendPages($fieldset, $fields, $errors, $disabled);
 			$wrapper->appendChild($fieldset);
 
 			return $wrapper;
@@ -122,11 +122,7 @@
 
 					/* Tabs */
 
-					$li = new XMLElement(
-						'li',
-						$all_langs[$lc] ? $all_langs[$lc] : __('Unknown Lang').' : '.$lc,
-						array('class' => $lc.($lc == $ref_lang ? ' active' : ''))
-					);
+					$li = new XMLElement('li', $all_langs[$lc], array('class' => $lc));
 
 
 					// Name - text input
