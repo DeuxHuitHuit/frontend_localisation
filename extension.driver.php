@@ -312,7 +312,7 @@
 
 
 				// initialize Page prefix
-				$page_prefix = WORKSPACE.Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
+				$page_prefix = Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
 				TManager::setPagePrefix($page_prefix);
 
 

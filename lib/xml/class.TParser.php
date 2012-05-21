@@ -134,8 +134,13 @@
 				$query .= '/'.$node_name;
 
 				if( $xPath->query($query)->length == 0 ){
+					$clean_node_name = $node_name;
+
+					if( $pos = strpos($node_name, '[') )
+						$clean_node_name = substr($node_name, 0, $pos);
+
 					$iterator->appendChild(
-						$doc->createElement($node_name)
+						$doc->createElement($clean_node_name)
 					);
 				}
 
