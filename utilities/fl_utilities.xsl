@@ -79,7 +79,7 @@
 					<xsl:with-param name="context" select="'p_news/view-all'"/>
 					<xsl:with-param name="reps">
 						<rep><xsl:value-of select="fl:__('p_news/news-link')"/></rep>
-						<rep><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
+						<rep loc="__PLACEHOLDER__"><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
 					</xsl:with-param>
 				</xsl:call-template>
 
