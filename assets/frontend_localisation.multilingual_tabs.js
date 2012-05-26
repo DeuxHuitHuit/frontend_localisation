@@ -7,8 +7,7 @@
 
 	$.fn.symphonyMultilingualTabs = function(){
 
-		return $(this)
-			.filter(function(){
+		return $(this).filter(function(){
 				return $(this).hasClass('multilingual-initialised') !== true;
 			})
 			.each(function(){
