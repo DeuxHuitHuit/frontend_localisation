@@ -196,7 +196,7 @@
 
 				<data>
 					<p_news>
-						<item handle="view-all"><![CDATA[View %1$s or head back to %2$s.]]></item>
+						<item handle="view-all"><![CDATA[View %1$s or head back to __PLACEHOLDER__.]]></item>
 						<item handle="news-link"><![CDATA[all news]]></item>
 						<item handle="home-link"><![CDATA[our spify home page]]></item>
 					</p_news>
@@ -207,8 +207,8 @@
 				<xsl:call-template name="fl__">
 					<xsl:with-param name="context" select="'p_news/view-all'"/>
 					<xsl:with-param name="reps">
-						<rep loc="%1$s"><xsl:value-of select="fl:__('p_news/news-link')"/></rep>
-						<rep><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
+						<rep><xsl:value-of select="fl:__('p_news/news-link')"/></rep>
+						<rep loc="__PLACEHOLDER__"><xsl:value-of select="fl:__('p_news/home-link')"/></rep>
 					</xsl:with-param>
 				</xsl:call-template>
 
@@ -225,7 +225,7 @@
 								</span>
 							</a>
 						</rep>
-						<rep>
+						<rep loc="__PLACEHOLDER__">
 							<a href="{/data/params/root}">
 								<xsl:value-of select="fl:__('p_news/home-link')"/>
 							</a>
