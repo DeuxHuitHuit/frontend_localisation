@@ -822,6 +822,7 @@
 
 				$page->addStylesheetToHead(URL.'/extensions/'.FL_GROUP.'/assets/'.FL_GROUP.'.multilingual_tabs.css', 'screen', null, false);
 				$page->addScriptToHead(URL.'/extensions/'.FL_GROUP.'/assets/'.FL_GROUP.'.multilingual_tabs.js', null, false);
+				$page->addScriptToHead(URL.'/extensions/'.FL_GROUP.'/assets/'.FL_GROUP.'.multilingual_tabs_init.js', null, false);
 			}
 		}
 
