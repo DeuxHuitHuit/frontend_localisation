@@ -30,6 +30,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="1.6.4" date="2012-05-26" min="2.3"><![CDATA[
+			* Javascript scales better now. The new symphonyMultilingualTabs jQuery plugin can be used to instantiate tabs on-the-fly.
+		]]></release>
+
 		<release version="1.6.3" date="2012-05-18" min="2.3"><![CDATA[
 			* Added language information to param pool.
 		]]></release>
