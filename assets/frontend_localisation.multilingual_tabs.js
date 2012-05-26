@@ -1,18 +1,16 @@
 (function($, undefined){
 
 	var collection = {
+		$m_fields: $(),
 		$m_tabs: $(),
 		$m_panels: $()
 	};
 
 	$.fn.symphonyMultilingualTabs = function(){
 
-		return $(this).filter(function(){
-				return $(this).hasClass('multilingual-initialised') !== true;
-			})
-			.each(function(){
+		return $(this).not(collection.$m_fields).each(function(){
 
-				var $this = $(this).addClass('multilingual-initialised');
+				var $this = $(this);
 
 				// safe checks
 				var $m_ul = $this.find('ul.tabs');
@@ -39,7 +37,8 @@
 					$current_tab = collection.$m_tabs.filter('.active:eq(0)');
 				}
 
-				// store new elements
+				// store element
+				collection.$m_fields = collection.$m_fields.add($this);
 				collection.$m_tabs = collection.$m_tabs.add($m_tabs);
 				collection.$m_panels = collection.$m_panels.add($m_panels);
 
