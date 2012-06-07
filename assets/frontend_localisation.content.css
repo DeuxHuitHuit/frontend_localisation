@@ -7,3 +7,8 @@
 .context .column {
 	margin-bottom: 0;
 }
+
+#contents th:first-child,
+#contents td:first-child{
+	width: 30%;
+}

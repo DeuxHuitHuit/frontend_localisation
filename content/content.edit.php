@@ -5,6 +5,7 @@
 
 
 	require_once(TOOLKIT.'/class.administrationpage.php');
+	require_once(EXTENSIONS.'/frontend_localisation/extension.driver.php');
 	require_once(EXTENSIONS.'/frontend_localisation/lib/class.FLPageManager.php');
 	require_once(EXTENSIONS.'/frontend_localisation/lib/class.TForm.php');
 
@@ -127,8 +128,7 @@
 
 			// Start building the page
 
-			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.css', 'screen', null, false);
-			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.multilingual_tabs.js', null, false);
+			Extension_Frontend_Localisation::appendAssets();
 
 			$this->addScriptToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.js', 203, false);
 			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.css', "screen");

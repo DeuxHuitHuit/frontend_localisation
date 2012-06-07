@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<extension id="frontend_localisation" status="released"
-		xmlns="http://symphony-cms.com/schemas/extension/1.0">
+<extension id="frontend_localisation" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 
 	<name>Frontend Localisation</name>
 
@@ -30,6 +29,12 @@
 	</dependencies>
 
 	<releases>
+		<release version="1.6.5" date="2012-06-07" min="2.3"><![CDATA[
+			* Fixed bug on content pages with Multilingual Tabs.
+			* Proper space usage on Translations index page.
+			* Deactivated Translation name setting with localised page values.
+		]]></release>
+
 		<release version="1.6.4" date="2012-05-26" min="2.3"><![CDATA[
 			* Javascript scales better now. The new symphonyMultilingualTabs jQuery plugin can be used to instantiate tabs on-the-fly.
 		]]></release>

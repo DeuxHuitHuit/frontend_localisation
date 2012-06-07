@@ -22,6 +22,8 @@
 
 			/* Start building the page */
 
+			$this->addStylesheetToHead(URL.'/extensions/frontend_localisation/assets/frontend_localisation.content.css', "screen");
+
 			$this->setPageType('table');
 			$this->setTitle(__('%1$s &ndash; %2$s', array(__('Symphony'), __('Translations'))));
 

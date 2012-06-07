@@ -23,10 +23,10 @@
 			$title_field = 'title';
 
 			// support for Page LHandles
-			$page_lhandles = ExtensionManager::fetchStatus(array('handle' => 'page_lhandles'));
-			if( $page_lhandles[0] === EXTENSION_ENABLED ){
-				$title_field = 'plh_t-'.$this->getFolder()->getLangCode();
-			}
+//			$page_lhandles = ExtensionManager::fetchStatus(array('handle' => 'page_lhandles'));
+//			if( $page_lhandles[0] === EXTENSION_ENABLED ){
+//				$title_field = 'plh_t-'.$this->getFolder()->getLangCode();
+//			}
 
 			$pages = FLPageManager::instance()->listAll(array($title_field));
 
