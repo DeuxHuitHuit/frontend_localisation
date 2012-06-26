@@ -102,7 +102,7 @@ If you want to create a third-party FLang detection driver, make sure that your 
 <br />
 ### 5.3 Going PRO ###
 
-You have a delegate in Translations Datasource (`/data-sources/data.fl_translations.php`) called `FLdsTranslationsPreRun`:
+You have a delegate in [Translations Datasource](https://github.com/vlad-ghita/frontend_localisation/blob/master/data-sources/data.fl_translations.php) called `FLdsTranslationsPreExecute`:
 
 - Create an extension that listens to this delegate and includes various Translations for emails sent with ETM.
 - Dynamically change the source of translations in your `workspace` folder (or any folder) based on a theme system that you created.

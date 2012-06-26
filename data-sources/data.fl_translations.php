@@ -29,32 +29,35 @@
 		public function grab(&$param_pool = NULL){
 			$result = new XMLElement('fl-translations');
 
-			$page_id = $this->_env['param']['current-page-id'];
 			$translation_path = TManager::getPath();
 			$original_path = $translation_path;
 
 			$pages = FLPageManager::instance()->listAll(array('translations'));
+			$page_id = $this->_env['param']['current-page-id'];
 			$translation_files = array_filter(explode(',', $pages[$page_id]['translations']));
+
+			$lc = FLang::getLangCode();
 
 			/**
 			 * Before executing the Translations DS, allow custom settings.
 			 *
-			 * @delegate FLdsTranslationsPreRun
-			 * @since    1.6.5
+			 * @delegate FLdsTranslationsPreExecute
+			 * @context  '/extensions/frontend_localisation/'
+			 * @since    1.7
 			 *
-			 * @param string $context  - '/extensions/frontend_localisation/'
-			 * @param array  $path     - path to translation folders
-			 * @param array  $files    - translations which should be grabbed
+			 * @param string $path       - path to translation folders
+			 * @param string $files      - translations which should be grabbed
+			 * @param string $lang_code  - desired language code
 			 */
-			Symphony::ExtensionManager()->notifyMembers('FLdsTranslationsPreRun', '/extensions/frontend_localisation/', array(
+			Symphony::ExtensionManager()->notifyMembers('FLdsTranslationsPreExecute', '/extensions/frontend_localisation/', array(
 				'path' => &$translation_path,
-				'files' => &$translation_files
+				'files' => &$translation_files,
+				'lang_code' => &$lc
 			));
 
 			if( empty($translation_path) ) return;
 			if( !is_array($translation_files) || empty($translation_files) ) return;
-
-			$lc = FLang::getLangCode();
+			if( !FLang::validateLangCode($lc) ) return;
 
 			// try to get from custom location
 			if( $original_path !== $translation_path ){
