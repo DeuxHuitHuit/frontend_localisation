@@ -185,7 +185,7 @@
 		}
 
 		/**
-		 * Access an Appropriate TParser for this type of Translation.
+		 * Access an appropriate TParser for this type of Translation.
 		 *
 		 * @return TParser
 		 */

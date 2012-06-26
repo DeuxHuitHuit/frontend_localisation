@@ -65,16 +65,12 @@ Keep your fingers crossed and push za button!
 
 ### 5.1 Frontend Language ###
 
-
-
 #### 5.1.1 @ Site builders ####
 
 On Preferences page you can:
 
 - `Language codes`: insert multiple language codes for desired Frontend Languages
 - `Main language`: chose the main language of the site
-
-
 
 #### 5.1.2 @ PHP developers ####
 
@@ -100,6 +96,16 @@ If you want to create a third-party FLang detection driver, make sure that your 
 3. Add `FL: Languages` datasource to your pages. (visit `?debug` -> `/data/fl-languages`)
 4. Add `FL: Translations` datasource to your pages. (visit `?debug` -> `/data/fl-translations`)
 5. Add `fl_utilities.xsl` to your stylesheets. See the [utility](https://github.com/vlad-ghita/frontend_localisation/blob/master/utilities/fl_utilities.xsl) for usage.
+
+
+
+<br />
+### 5.3 Going PRO ###
+
+You have a delegate in Translations Datasource (`/data-sources/data.fl_translations.php`) called `FLdsTranslationsPreRun`:
+
+- Create an extension that listens to this delegate and includes various Translations for emails sent with ETM.
+- Dynamically change the source of translations in your `workspace` folder (or any folder) based on a theme system that you created.
 
 
 

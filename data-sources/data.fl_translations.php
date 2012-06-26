@@ -30,46 +30,70 @@
 			$result = new XMLElement('fl-translations');
 
 			$page_id = $this->_env['param']['current-page-id'];
-			$translation_path = Symphony::Configuration()->get('translation_path', FL_GROUP);
+			$translation_path = TManager::getPath();
+			$original_path = $translation_path;
 
 			$pages = FLPageManager::instance()->listAll(array('translations'));
+			$translation_files = array_filter(explode(',', $pages[$page_id]['translations']));
 
-			if( !empty($translation_path) ){
-				$handles = array_filter(explode(',', $pages[$page_id]['translations']));
+			/**
+			 * Before executing the Translations DS, allow custom settings.
+			 *
+			 * @delegate FLdsTranslationsPreRun
+			 * @since    1.6.5
+			 *
+			 * @param string $context  - '/extensions/frontend_localisation/'
+			 * @param array  $path     - path to translation folders
+			 * @param array  $files    - translations which should be grabbed
+			 */
+			Symphony::ExtensionManager()->notifyMembers('FLdsTranslationsPreRun', '/extensions/frontend_localisation/', array(
+				'path' => &$translation_path,
+				'files' => &$translation_files
+			));
 
-				if( !empty($handles) ){
-					$result_value = '';
+			if( empty($translation_path) ) return;
+			if( !is_array($translation_files) || empty($translation_files) ) return;
 
-					$t_folder = TManager::getFolder(FLang::getLangCode());
+			$lc = FLang::getLangCode();
 
-					if( $t_folder instanceof TFolder ){
-						foreach( $handles as $handle ){
-
-							$handle = trim($handle);
-
-							$translation = $t_folder->getTranslation($handle);
-
-							if( $translation instanceof Translation ){
-								// if XML, fetch as normal
-								if( $translation->meta()->get('storage_format') == 'xml' ){
-									$xml = $translation->data()->getContent();
-								}
-
-								// else convert to XML
-								else{
-									$translations = $translation->getParser()->asTArray($translation);
-									$xml = TManager::getParser('xml')->TArray2string($translations);
-								}
-
-								// process XML
-								$result_value .= $this->_addFile($xml);
-							}
-						}
-					}
-
-					$result->setValue($this->_formatXmlString($result_value));
+			// try to get from custom location
+			if( $original_path !== $translation_path ){
+				try{
+					TManager::setPath($translation_path);
+					TManager::addFolder($lc, true);
+				}
+				catch( Exception $e ){
+					// dunno what do to with this information, yet
 				}
 			}
+
+			$t_folder = TManager::getFolder($lc);
+
+			if( is_null($t_folder) ) return;
+
+			$result_value = '';
+
+			foreach( $translation_files as $translation_file ){
+				$translation = $t_folder->getTranslation(trim($translation_file));
+
+				if( is_null($translation) ) continue;
+
+				// if XML, fetch as normal
+				if( $translation->meta()->get('storage_format') === 'xml' ){
+					$xml = $translation->data()->getContent();
+				}
+
+				// else convert to XML
+				else{
+					$items = $translation->getParser()->asTArray($translation);
+					$xml = TManager::getParser('xml')->TArray2string($items);
+				}
+
+				// process XML
+				$result_value .= $this->_addFile($xml);
+			}
+
+			$result->setValue($this->_formatXmlString($result_value));
 
 			return $result;
 		}
@@ -159,6 +183,10 @@
 
 		/**
 		 * Courtesy of <a href="http://forums.devnetwork.net/viewtopic.php?p=213989">TJ at devnet</a>
+		 *
+		 * @param $xml - input string
+		 *
+		 * @return string - formatted string
 		 */
 		private function _formatXmlString($xml){
 

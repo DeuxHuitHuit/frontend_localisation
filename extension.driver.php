@@ -246,9 +246,9 @@
 		 * Frontend
 		 */
 		public function dFrontendInitialised(){
-			$fronend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
+			$frontend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
 
-			if( $fronend_localisation[0] = EXTENSION_ENABLED ){
+			if( $frontend_localisation[0] = EXTENSION_ENABLED ){
 				$this->_initFLang();
 				$this->_initTManager();
 			}
@@ -266,9 +266,9 @@
 		 * Backend
 		 */
 		public function dInitialiseAdminPageHead(){
-			$fronend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
+			$frontend_localisation = ExtensionManager::fetchStatus(array('handle' => FL_GROUP));
 
-			if( $fronend_localisation[0] = EXTENSION_ENABLED ){
+			if( $frontend_localisation[0] = EXTENSION_ENABLED ){
 				$this->_initFLang();
 				$this->_initTManager();
 			}

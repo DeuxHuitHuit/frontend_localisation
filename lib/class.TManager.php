@@ -546,17 +546,18 @@
 		 * Translation Folder generator
 		 *
 		 * @param string $lang_code
+		 * @param boolean $replace - force replace existing TFolder
 		 *
 		 * @return boolean
 		 */
-		public static function addFolder($lang_code){
+		public static function addFolder($lang_code, $replace = false){
 			General::ensureType(array(
 				'lang_code' => array('var' => $lang_code, 'type' => 'string')
 			));
 
 			if( !FLang::validateLangCode($lang_code) ) return false;
 
-			if( is_null(self::getFolder($lang_code)) ){
+			if( is_null(self::getFolder($lang_code)) || $replace === true ){
 				if( !General::realiseDirectory(self::$path.'/'.$lang_code) ) return false;
 
 				self::$t_folders[$lang_code] = new TFolder($lang_code);
