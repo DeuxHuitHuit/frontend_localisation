@@ -133,18 +133,18 @@ Now you must add your translation strings in `DATA file`.
 <br />
 ### !!! **!!! Very important !!!** !!! ###
 
-Let's say your `Reference language` from `System -> Preferences` is `English`. Edit the `<<handle>>.data.<<storage_format>>` file from `workspace/translations/en`.<br />
+Let's say your `Main language` from `System -> Preferences` is `English`. Edit the `<<handle>>.data.<<storage_format>>` file from `workspace/translations/en`.<br />
 If it's `French`, edit the `workspace/translations/fr` files. Always!
 
-On visiting in Admin the edit page of a Translation, the `DATA file` in all languages will be synchronised from the `Reference language`'s `DATA file`.
+On visiting in Admin the edit page of a Translation, the `DATA file` in all languages will be synchronised from the `Main language`'s `DATA file`.
 
 `Translation synchronisation` = From reference translation to target translation, copy all items from reference while preserving only corresponding items from target (extra items in target are lost).
 
-So, if your `Reference language` is `English` and you're creating items for `French`, on visiting translation page you **will** lose all content from French translation that doesn't exist in English translation (English translation doesn't contain anything => copy `empty` to everywhere).
+So, if your `Main language` is `English` and you're creating items for `French`, on visiting translation page you **will** lose all content from French translation that doesn't exist in English translation (English translation doesn't contain anything => copy `empty` to everywhere).
 
 
 <br />
-After adding the translation strings in proper file (from `Reference language`), visit the edit page for Translation and use the interface to translate the strings in all languages.
+After adding the translation strings in proper file (from `Main language`), visit the edit page for Translation and use the interface to translate the strings in all languages.
 
 
 ### 6.1 `Storage format` is XML ###
