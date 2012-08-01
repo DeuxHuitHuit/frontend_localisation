@@ -347,7 +347,11 @@
 			catch( Exception $e ){
 				$message = $e->getMessage();
 
-				Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
+				// show a Page alert in Backend
+				if( Symphony::engine() instanceof Administration )
+					Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
+				
+				// log the error for refference
 				Symphony::Log()->pushToLog($message, E_NOTICE, true);
 
 				return false;
