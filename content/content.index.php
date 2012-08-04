@@ -66,7 +66,7 @@
 
 				$tbody = array(Widget::TableRow(array(
 					Widget::TableData(
-						__('No translations found. <a href="%s">Create new?</a>', array(SYMPHONY_URL.'/'.FL_GROUP.'/frontend_localisation/new/')),
+						__('No translations found. <a href="%s">Create new?</a>', array(SYMPHONY_URL.'/'.FL_GROUP.'/new/')),
 						'inactive', null, count($thead)
 					)
 				), 'odd'));
