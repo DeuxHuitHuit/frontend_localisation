@@ -53,7 +53,6 @@
 
 			$t_folder = TManager::getFolder(TManager::getRefLang());
 			if( is_null($t_folder) ){
-				$this->Form->appendChild($t_folder);
 				Administration::instance()->Page->pageAlert(__('<code>%1$s</code>: Translation folders not found.', array(FL_NAME)), Alert::NOTICE);
 				return;
 			}
