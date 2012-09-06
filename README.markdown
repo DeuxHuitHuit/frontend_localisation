@@ -6,8 +6,16 @@ Offers an integrated solution to localise the Frontend of your site.
 
 ## 0 @todo list ##
 
-- add support for GNU PO and JAVA properties.
-- implement `Add new item` | `Delete item` | `Item reordering (subgrouping)` features for the UI.
+Refactor code to allow the following structure:
+
+    /translation_handle
+        /language-code-#1
+            data.xml
+            meta.xml
+        /language-code-#2
+            data.xml
+            meta.xml
+
 
 
 

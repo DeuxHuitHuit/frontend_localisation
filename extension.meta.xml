@@ -29,6 +29,12 @@
 	</dependencies>
 
 	<releases>
+		<release version="1.7.1" date="2012-06-26" min="2.3"><![CDATA[
+			* Added a new delegate to modify settings at initialization.
+			* Fixed error when creating new translation if no languages are set.
+			* On Translations index a proper message appears if no languages are set.
+		]]></release>
+
 		<release version="1.7" date="2012-06-26" min="2.3"><![CDATA[
 			* Added a new delegate to Translations DS for customized execution.
 			* Pumped up `TManager::addFolder()` with an option to replace existing folder.
