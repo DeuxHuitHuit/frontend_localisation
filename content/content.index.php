@@ -32,7 +32,10 @@
 
 			$create_new = null;
 
-			if( Administration::instance()->Author->isDeveloper() ){
+			$langs = FLang::getLangs();
+
+			// if no languages, remove create button
+			if( Administration::instance()->Author->isDeveloper() && $langs ){
 				$create_new = Widget::Anchor(
 					__('Create New'), SYMPHONY_URL.'/extension/'.FL_GROUP.'/new/',
 					__('Create a new translation file'), 'create button'
@@ -52,8 +55,17 @@
 			$tbody = array();
 
 			$t_folder = TManager::getFolder(TManager::getRefLang());
+
+			// no languages set. Display message
 			if( is_null($t_folder) ){
-				Administration::instance()->Page->pageAlert(__('<code>%1$s</code>: Translation folders not found.', array(FL_NAME)), Alert::NOTICE);
+				$this->Form->appendChild(new XMLElement(
+					'p',
+					__(
+						'<code>%1$s</code>: No languages have been set on Preferences page. Please <a href="%2$s">review them</a>.',
+						array(FL_NAME, SYMPHONY_URL.'/system/preferences/#'.FL_GROUP.'_langs')
+					),
+					array('style' => 'margin: 10px 0 0 18px;')
+				));
 				return;
 			}
 
@@ -65,7 +77,7 @@
 
 				$tbody = array(Widget::TableRow(array(
 					Widget::TableData(
-						__('No translations found. <a href="%s">Create new?</a>', array(SYMPHONY_URL.'/'.FL_GROUP.'/new/')),
+						__('No translations found. <a href="%s">Create new?</a>', array(SYMPHONY_URL.'/'.FL_GROUP.'/frontend_localisation/new/')),
 						'inactive', null, count($thead)
 					)
 				), 'odd'));

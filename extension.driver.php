@@ -127,7 +127,7 @@
 		public function fetchNavigation(){
 			return array(
 				array(
-					'name' => __('Translations'),
+					'name' => __("Translations"),
 					'type' => 'content',
 					'children' => array(
 						array(
@@ -304,9 +304,23 @@
 		}
 
 		private function _initTManager(){
+			$ref_lang = Symphony::Configuration()->get('ref_lang', FL_GROUP);
+			$path = WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP);
+			$page_prefix = Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
+			$storage_format = Symphony::Configuration()->get('storage_format', FL_GROUP);
+
+			/**
+			 * Allow config to be changed.
+			 */
+			Symphony::ExtensionManager()->notifyMembers('frontend_localisation_TManagerInitialization', '/extensions/frontend_localisation/', array(
+				'ref_lang' => &$ref_lang,
+				'path' => &$path,
+				'page_prefix' => &$page_prefix,
+				'storage_format' => &$storage_format
+			));
+
 			try{
 				// initialize Reference language
-				$ref_lang = Symphony::Configuration()->get('ref_lang', FL_GROUP);
 				if( !TManager::setRefLang($ref_lang) ){
 					$langs = FLang::getLangs();
 					if( !empty($langs) )
@@ -318,7 +332,6 @@
 
 
 				// initialize Translation path
-				$path = WORKSPACE.Symphony::Configuration()->get('translation_path', FL_GROUP);
 				if( !TManager::setPath($path) ){
 					throw new Exception(
 						__('<code>%1$s</code>: Translation folder couldn\'t be created at <code>%2$s</code>.', array(FL_NAME, $path))
@@ -328,12 +341,10 @@
 
 
 				// initialize Page prefix
-				$page_prefix = Symphony::Configuration()->get('page_name_prefix', FL_GROUP);
 				TManager::setPagePrefix($page_prefix);
 
 
 				// initialize Storage format
-				$storage_format = Symphony::Configuration()->get('storage_format', FL_GROUP);
 				if( !TManager::setStorageFormat($storage_format) ){
 					throw new Exception(
 						__(
@@ -347,11 +358,7 @@
 			catch( Exception $e ){
 				$message = $e->getMessage();
 
-				// show a Page alert in Backend
-				if( Symphony::engine() instanceof Administration )
-					Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
-				
-				// log the error for refference
+				Administration::instance()->Page->pageAlert($message, Alert::NOTICE);
 				Symphony::Log()->pushToLog($message, E_NOTICE, true);
 
 				return false;
@@ -519,7 +526,7 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreDelete(array $context){
-			TManager::deleteTranslation($context['page_ids']);
+			TManager::deleteTranslation((array) $context['page_ids']);
 		}
 
 

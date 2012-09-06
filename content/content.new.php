@@ -130,7 +130,7 @@
 							redirect(URL."/symphony/extension/".FL_GROUP."/edit/{$fields['handle']}/created/");
 						}
 
-						$this->_Parent->customError(
+						Symphony::engine()->customError(
 							__('Translation could not be created.'),
 							__('You asked to create a Translation but there are not languages set by your Language Driver.'),
 							'error',
