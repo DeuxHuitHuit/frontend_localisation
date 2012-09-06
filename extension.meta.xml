@@ -24,10 +24,6 @@
 		</author>
 	</authors>
 
-	<dependencies>
-		<dependency version="1.02">language_redirect</dependency>
-	</dependencies>
-
 	<releases>
 		<release version="1.7.1" date="2012-06-26" min="2.3"><![CDATA[
 			* Added a new delegate to modify settings at initialization.
