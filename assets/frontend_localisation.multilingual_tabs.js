@@ -29,9 +29,15 @@
 
 			// current tab which will be clicked
 			var $current_tab = '';
+			
+			//current language defined by symphony in the html header with lang attr
+			var currentlanguage = jQuery('html').attr('lang');
 
 			if( collection.$m_tabs.length === 0 ){
 				$current_tab = $m_tabs.eq(0);
+			}
+			else if (currentlanguage.length > 0){
+				$current_tab = collection.$m_tabs.filter('.'+currentlanguage+'');
 			}
 			else{
 				$current_tab = collection.$m_tabs.filter('.active:eq(0)');
