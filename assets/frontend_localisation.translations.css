@@ -1,0 +1,11 @@
+table.translations input {
+	margin-right: 0px;
+}
+
+p.translation-help {
+	padding: 20px;
+}
+
+table.translations tr.template {
+	display: none;
+}

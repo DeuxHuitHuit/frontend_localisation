@@ -49,7 +49,8 @@
 
 			$thead = array(
 				array(__('Title'), 'col'),
-				array(__('Pages'), 'col')
+				array(__('Pages'), 'col'),
+				array(__('Actions'), 'col')
 			);
 
 			$tbody = array();
@@ -95,7 +96,10 @@
 
 					$col_pages = Widget::TableData($this->_createPageList($translation));
 
-					$tbody[] = Widget::TableRow(array($col_title, $col_pages), ($bOdd ? 'odd' : NULL));
+					$col_actions = Widget::TableData(Widget::Anchor(__('Edit translations'),
+						SYMPHONY_URL.'/extension/'.FL_GROUP.'/translations/'.$handle.'/', __('Edit translations')));
+
+					$tbody[] = Widget::TableRow(array($col_title, $col_pages, $col_actions), ($bOdd ? 'odd' : NULL));
 
 					$bOdd = !$bOdd;
 				}
