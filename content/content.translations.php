@@ -112,6 +112,7 @@
 			foreach($languages as $code) {
 				$tableData[] = Widget::TableData(Widget::Input('translations['.$code.'][__HANDLE__]', '', 'text'));
 			}
+			$tableData[] = Widget::TableData(Widget::Anchor(__('Delete'), '#', __('Delete'), 'delete'));
 			$tableBody[] = Widget::TableRow($tableData, 'template');
 
 			// Build the table:

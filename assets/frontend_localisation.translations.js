@@ -5,6 +5,12 @@ jQuery(function($){
     $('table.translations a.delete').click(function(e){
         e.preventDefault();
         $(this).parent().parent().remove(); // simple as that!
+        fl_bind_tab();
+        // When not a single translation is set, start with a blank entry:
+        if($('table.translations tr.data').length == 0)
+        {
+            fl_clone_template();
+        }
     });
     // When not a single translation is set, start with a blank entry:
     if($('table.translations tr.data').length == 0)
