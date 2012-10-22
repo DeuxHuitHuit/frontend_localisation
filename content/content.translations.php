@@ -103,6 +103,8 @@
 				$xml[$code]    = simplexml_load_file($xmlFile);
 			}
 
+			$tableHeader[] = array(__('Actions'), 'col');
+
 			$tableBody = array();
 
 			// Create a template:
@@ -129,6 +131,11 @@
 						)
 					);
 				}
+
+				$tableData[] = Widget::TableData(
+					Widget::Anchor(__('Delete'), '#', __('Delete'), 'delete')
+				);
+
 				$tableBody[] = Widget::TableRow($tableData, 'data');
 			}
 

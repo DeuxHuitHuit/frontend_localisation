@@ -1,6 +1,11 @@
 jQuery(function($){
     fl_bind_tab();
     fl_bind_handle();
+    // Bind delete:
+    $('table.translations a.delete').click(function(e){
+        e.preventDefault();
+        $(this).parent().parent().remove(); // simple as that!
+    });
     // When not a single translation is set, start with a blank entry:
     if($('table.translations tr.data').length == 0)
     {
@@ -26,7 +31,7 @@ function fl_clone_template()
 {
     var $ = jQuery;
     // Clone the template:
-    $row = $('table.translations tr.template').clone();
+    $row = $('table.translations tr.template').clone(true);
     $row.removeClass('template').addClass('data');
     $('input[type=text]', $row).each(function(){
         this.name = this.name.replace('__HANDLE__', '');

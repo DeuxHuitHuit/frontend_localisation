@@ -9,3 +9,11 @@ p.translation-help {
 table.translations tr.template {
 	display: none;
 }
+
+table.translations td {
+	vertical-align: middle;
+}
+
+table.translations a.delete {
+	padding: 0;
+}
