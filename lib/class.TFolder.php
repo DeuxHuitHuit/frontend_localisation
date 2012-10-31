@@ -244,6 +244,11 @@
 		public function changeTranslationHandle($old_handle, $new_handle){
 			$translation = $this->translations[$old_handle];
 
+			if(!is_object($translation))
+			{
+				return false;
+			}
+
 			if( !$translation->setHandle($new_handle) ){
 				return false;
 			}
