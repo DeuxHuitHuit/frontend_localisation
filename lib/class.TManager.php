@@ -462,9 +462,12 @@
 			else{
 				foreach( $changed as $translation ){
 					/* @var $translation Translation */
-					$translation->delete();
-					$translation->setHandle($old_handle);
-					$translation->setName($old_handle);
+					if(is_object($translation))
+					{
+						$translation->delete();
+						$translation->setHandle($old_handle);
+						$translation->setName($old_handle);
+					}
 				}
 			}
 
