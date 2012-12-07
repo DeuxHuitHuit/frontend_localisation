@@ -159,8 +159,8 @@
 			'or' => 'ଓଡ଼ିଆ', // Oriya
 			'ps' => 'پښتو', // Pashto
 			'pl' => 'polski', // Polish
-			'pt-br' => 'português brasileiro', // Portuguese (Brasil)
-			'pt' => 'português', // Portuguese
+			'pt-br' => 'Português (Brasil)', // Portuguese (Brasil)
+			'pt' => 'Português', // Portuguese
 			'pa' => 'پنجابی/ਪੰਜਾਬੀ', // Punjabi
 			'qu' => 'Runa Simi/Kichwa', // Quechua
 			'rm' => 'Romansch', // Rhaeto-Romanic
