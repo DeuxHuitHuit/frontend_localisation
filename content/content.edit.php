@@ -175,6 +175,7 @@
 		 */
 		public function action(){
 			$fields = $_POST['fields'];
+            $contexts = $_POST['contexts'];
 			$t_linker = new TLinker();
 
 			if( @array_key_exists('save', $_POST['action']) ){
@@ -187,16 +188,21 @@
 					$ref_lang = TManager::getRefLang();
 
 					foreach( $fields['translations'] as $lc => $translations ){
-						foreach( $translations as $context => $items ){
-
+						foreach( $translations as $old_context => $items ){
+                            
+                            //context is the context in the context field
+                            $context = $old_context;
+                            if($old_context != '/'.$contexts['translations'][$ref_lang][$old_context]){
+                                $context='/'.$contexts['translations'][$ref_lang][$old_context];
+                            }
 							foreach( $items as $old_handle => $item ){
 								if( empty($item['handle']) && ($lc === $ref_lang) && Administration::instance()->Author->isDeveloper() ){
-									$this->_errors['translations'][$lc][$context][$old_handle]['handle'] = __('Handle is a required field.');
+									$this->_errors['translations'][$lc][$old_context][$old_handle]['handle'] = __('Handle is a required field.');
 								}
 
 								// mark for storage
 								$file_translations[$lc][$context][$old_handle] = array(
-									'handle' => $fields['translations'][$ref_lang][$context][$old_handle]['handle'],
+									'handle' => $fields['translations'][$ref_lang][$old_context][$old_handle]['handle'],
 									'value' => $item['value']
 								);
 							}

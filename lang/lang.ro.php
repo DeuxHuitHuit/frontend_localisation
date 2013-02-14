@@ -48,6 +48,18 @@
 		'Context: ' => 
 		'Context: ',
 
+        'Delete' =>
+        'șterge',
+        
+        'Add a translation' =>
+        'Adăugați o traducere',
+        
+        'Add a context' =>
+        'Adauga un context',
+        
+        'Delete a context'=>
+        'Sterge un context',
+        
 		'Create Translation' => 
 		'Crează traducere',
 

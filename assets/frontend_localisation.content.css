@@ -12,3 +12,34 @@
 #contents td:first-child{
 	width: 30%;
 }
+
+.controler{
+    width : 100%;
+    margin : 10px;
+    height : 10px;
+}
+.controler>button{
+    float: right;
+}
+
+.Tadd{
+
+}
+.Tdel{
+    float: right;
+    margin: 0px;
+    margin-bottom: -15px;
+    position: relative;
+    width: 100%;
+    top: -16px;
+}
+.Tdel>button{
+    float: right;
+    position: relative;
+    right: 0px;
+    background: #dd4422;
+    color: #FFF;
+}
+.Tdel>button:hover{
+    background: #dd2211;
+}
