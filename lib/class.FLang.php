@@ -132,8 +132,8 @@
 			'hu' => 'Magyar', // Hungarian
 			'is' => 'Íslenska', // Icelandic
 			'id' => 'Bahasa Indonesia', // Indonesian
-			'it-ch' => 'italiano (Switzerland)', // Italian
-			'it' => 'italiano', // Italian
+			'it-ch' => 'Italiano (Switzerland)', // Italian
+			'it' => 'Italiano', // Italian
 			'ja' => '日本語', // Japanese
 			'kn' => 'ಕನ್ನಡ', // Kannada
 			'kk' => 'Қазақ', // Kazakh
