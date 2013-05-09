@@ -251,6 +251,8 @@
 			if( $frontend_localisation[0] = EXTENSION_ENABLED ){
 				$this->_initFLang();
 				$this->_initTManager();
+				
+				Lang::set( FLang::getLangCode() );
 			}
 		}
 
