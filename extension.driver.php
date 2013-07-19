@@ -68,6 +68,7 @@
 			Symphony::Configuration()->set('page_name_prefix', 'p_', FL_GROUP);
 			Symphony::Configuration()->set('storage_format', 'xml', FL_GROUP);
 			Symphony::Configuration()->set('consolidate', self::CHECKBOX_YES, FL_GROUP);
+			Symphony::Configuration()->set('translations_enabled', 'yes', FL_GROUP);
 
 			Symphony::Configuration()->write();
 
@@ -81,6 +82,9 @@
 		}
 
 		public function update($previousVersion = false){
+			if( version_compare($previousVersion, '1.7.2', '<') ){
+				Symphony::Configuration()->set('translations_enabled', 'yes', FL_GROUP);
+			}
 			if( version_compare($previousVersion, '1.4', '<') ){
 				Symphony::Configuration()->remove('fl_driver', FL_GROUP);
 
@@ -125,18 +129,19 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function fetchNavigation(){
-			return array(
-				array(
-					'name' => __("Translations"),
-					'type' => 'content',
-					'children' => array(
-						array(
-							'name' => __('Translations'),
-							'link' => '/'
-						)
-					),
-				)
-			);
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes')
+				return array(
+					array(
+						'name' => __("Translations"),
+						'type' => 'content',
+						'children' => array(
+							array(
+								'name' => __('Translations'),
+								'link' => '/'
+							)
+						),
+					)
+				);
 		}
 
 
@@ -250,7 +255,11 @@
 
 			if( $frontend_localisation[0] = EXTENSION_ENABLED ){
 				$this->_initFLang();
-				$this->_initTManager();
+				Symphony::Profiler()->sample('FLang Initialised');
+				if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+					$this->_initTManager();
+					Symphony::Profiler()->sample('Translation Manager Initialized');
+				}
 			}
 		}
 
@@ -270,7 +279,8 @@
 
 			if( $frontend_localisation[0] = EXTENSION_ENABLED ){
 				$this->_initFLang();
-				$this->_initTManager();
+				if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes')
+					$this->_initTManager();
 			}
 		}
 
@@ -404,6 +414,9 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dAppendPageContent(array $context){
+			//if translations disabled do not append
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='no') return;
+
 			// prepare translations array
 			if( is_string($context['fields']['translations']) ){
 				$context['fields']['translations'] = preg_split('/,/i', $context['fields']['translations'], -1, PREG_SPLIT_NO_EMPTY);
@@ -454,8 +467,10 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreCreate(array $context){
-			// prepare translations data for DB insert
-			$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : NULL;
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+				// prepare translations data for DB insert
+				$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : NULL;
+			}
 		}
 
 		/**
@@ -464,13 +479,15 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePostCreate(array $context){
-			TManager::createTranslation(
-				array(
-					'id' => $context['page_id'],
-					'handle' => $context['fields']['handle'],
-					'parent' => $context['fields']['parent']
-				)
-			);
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+				TManager::createTranslation(
+					array(
+						'id' => $context['page_id'],
+						'handle' => $context['fields']['handle'],
+						'parent' => $context['fields']['parent']
+					)
+				);
+			}
 		}
 
 		/**
@@ -480,22 +497,24 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreEdit(array $context){
-			$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : '';
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+				$context['fields']['translations'] = is_array($context['fields']['translations']) ? implode(',', $context['fields']['translations']) : '';
 
-			$current_page = Symphony::Database()->fetchRow(0, "SELECT `handle`, `parent` FROM `tbl_pages` WHERE id = '{$context['page_id']}' LIMIT 1");
+				$current_page = Symphony::Database()->fetchRow(0, "SELECT `handle`, `parent` FROM `tbl_pages` WHERE id = '{$context['page_id']}' LIMIT 1");
 
-			// update translation filenames if needed
-			if( ($context['fields']['handle'] != $current_page['handle']) || ($context['fields']['parent'] != $current_page['parent']) ){
-				$this->changed_handles = TManager::editTranslation(array(
-					'id' => $context['page_id'],
-					'old_handle' => $current_page['handle'],
-					'new_handle' => $context['fields']['handle'],
-					'old_parent' => $current_page['parent'],
-					'new_parent' => $context['fields']['parent']
-				));
+				// update translation filenames if needed
+				if( ($context['fields']['handle'] != $current_page['handle']) || ($context['fields']['parent'] != $current_page['parent']) ){
+					$this->changed_handles = TManager::editTranslation(array(
+						'id' => $context['page_id'],
+						'old_handle' => $current_page['handle'],
+						'new_handle' => $context['fields']['handle'],
+						'old_parent' => $current_page['parent'],
+						'new_parent' => $context['fields']['parent']
+					));
 
-				// FL takes care of Translations
-				unset($context['fields']['translations']);
+					// FL takes care of Translations
+					unset($context['fields']['translations']);
+				}
 			}
 		}
 
@@ -505,17 +524,19 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePostEdit($context){
-			foreach( TManager::getFolders() as $t_folder ){
-				// change all
-				if( !empty($this->changed_handles) ){
-					foreach( $this->changed_handles as $new_handle ){
-						$translation = $t_folder->getTranslation($new_handle);
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+				foreach( TManager::getFolders() as $t_folder ){
+					// change all
+					if( !empty($this->changed_handles) ){
+						foreach( $this->changed_handles as $new_handle ){
+							$translation = $t_folder->getTranslation($new_handle);
+							if( !is_null($translation) ) $translation->setName();
+						}
+					}
+					else{
+						$translation = $t_folder->getTranslation(TManager::getPageHandle($context['page_id']));
 						if( !is_null($translation) ) $translation->setName();
 					}
-				}
-				else{
-					$translation = $t_folder->getTranslation(TManager::getPageHandle($context['page_id']));
-					if( !is_null($translation) ) $translation->setName();
 				}
 			}
 		}
@@ -526,7 +547,9 @@
 		 * @param array $context - see delegate description
 		 */
 		public function dPagePreDelete(array $context){
-			TManager::deleteTranslation((array) $context['page_ids']);
+			if (Symphony::Configuration()->get('translations_enabled', FL_GROUP)=='yes'){
+				TManager::deleteTranslation((array) $context['page_ids']);
+			}
 		}
 
 
@@ -557,6 +580,8 @@
 
 			$this->_appendConsolidate($group);
 			$this->_appendUpdate($group);
+
+			$this->_appendTranslations($group);
 
 			$context['wrapper']->appendChild($group);
 		}
@@ -681,6 +706,21 @@
 		}
 
 		/**
+		 * Convenience method; builds enable translations checkbox
+		 *
+		 * @param XMLElement (reference) $wrapper
+		 */
+		private function _appendTranslations(&$wrapper){
+			$checkbox = Widget::Input('settings['.FL_GROUP.'][translations_enabled]', self::CHECKBOX_YES, 'checkbox');
+			if( Symphony::Configuration()->get('translations_enabled', FL_GROUP) == self::CHECKBOX_YES ){
+				$checkbox->setAttribute('checked', 'checked');
+			}
+			$label = Widget::Label($checkbox->generate().' '.__('Enable Translations'));
+			$label->appendChild(new XMLElement('p', __('Check this to enable translations.'), array('class' => 'help')));
+			$wrapper->appendChild($label);
+		}
+
+		/**
 		 * Convenience method; builds update folders button
 		 *
 		 * @param XMLElement (reference) $wrapper
@@ -794,6 +834,8 @@
 				Symphony::Configuration()->set('consolidate', $new_consolidate, FL_GROUP);
 			}
 
+
+			Symphony::Configuration()->set('translations_enabled', $context['settings'][FL_GROUP]['translations_enabled'], FL_GROUP);
 
 			/* Manage Translation folders */
 
