@@ -75,6 +75,7 @@
 			'eu' => 'euskera', // Basque
 			'be' => 'Беларуская', // Belarusian
 			'bn' => 'বাংলা', // Bengali
+			'br' => 'Breizh', // Breton
 			'bg' => 'Български', // Bulgarian
 			'ca' => 'Català', // Catalan
 			'zh-cn' => '简体中文 (China)', // Chinese simplified script
