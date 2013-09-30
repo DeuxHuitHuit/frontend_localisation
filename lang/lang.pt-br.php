@@ -48,6 +48,18 @@
 		'Context: ' => 
 		'Contexto: ',
 
+        'Delete' =>
+        'Excluir',
+        
+        'Add a translation' =>
+        'Adicionar uma tradução',
+        
+        'Add a context' =>
+        'Adicionar um contexto',
+        
+        'Delete a context'=>
+        'Excluir um contexto',
+        
 		'Create Translation' => 
 		'Criar Tradução',
 

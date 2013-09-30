@@ -145,9 +145,19 @@
 
 					foreach( $translations as $context => $items ){
 						$context_xml = new XMLElement('div', null, array('class' => 'context'));
-
-						$context_xml->appendChild(new XMLElement('h2', __('Context: ').trim($context, '/')));
-
+                        
+                        /* Context */
+                        $context_input = Widget::Label(
+                            '<h2>Context</h2>',
+                            Widget::Input(
+                                "contexts[translations][{$lc}][{$context}]",
+                                empty($context) ? '' : trim($context, '/'),
+                                'text',
+                                $ref_lang != $lc ? array('disabled' => 'disabled') : $attributes
+                            )
+                        );
+                        $context_xml->appendChild($context_input);
+                        
 						foreach( $items as $handle => $item ){
 
 							$item_xml = new XMLElement('div', null, array('class' => 'two columns'));
@@ -195,16 +205,43 @@
 								__('Value'),
 								Widget::Textarea("fields[translations][{$lc}][{$context}][{$handle}][value]", 2, 50, $item['value'])
 							);
+                            
 							if( isset($errors['translations'][$lc][$context][$handle]['value']) ){
 								$value_label = Widget::Error($value_label, $errors['translations'][$lc][$context][$handle]['value']);
 							}
 
 							$value_xml->appendChild($value_label);
+                            
+                            /* Translation item deletion button */
+                            $Tdel_xml = new XMLElement('div',null,array('class' => 'Tdel'));
+                            
+                            $Tdel_button = new XMLElement('button', __('Delete'));
+                            $Tdel_button->setAttributeArray(array('name' => "action[del-translation][{$context}][{$handle}]", 'title' => __('Delete'), 'type' => 'button', 'accesskey' => 'd'));
+                            $Tdel_xml->appendChild($Tdel_button);
+                            
 							$item_xml->appendChild($value_xml);
-
+                            $item_xml->appendChild($Tdel_xml);
+                            
 							$context_xml->appendChild($item_xml);
 						}
-
+                        
+                        /* Context control buttons to add Translations and Add/Delete Contexts */
+                        $controls_xml = new XMLElement('div',null,array('class'=>'controler'));
+                        $Tadd_button = new XMLElement('button', __('Add a translation'));
+                        $Tadd_button->setAttributeArray(array('name' => "action[add-translation][{$context}]", 'class' => 'Tadd', 'title' => __('Add a translation'), 'type' => 'button', 'accesskey' => 't'));
+                        
+                        $Cadd_button = new XMLElement('button', __('Add a context'));
+                        $Cadd_button->setAttributeArray(array('name' => "action[add-context][{$context}]", 'class' => 'Cadd', 'title' => __('Add a context'), 'type' => 'button', 'accesskey' => 'c'));
+    
+                        $Cdel_button = new XMLElement('button', __('Delete a context'));
+                        $Cdel_button->setAttributeArray(array('name' => "action[del-context][{$context}]", 'class' => 'Cdel', 'title' => __('Delete a context'), 'type' => 'button', 'accesskey' => 'r'));
+                        
+                        $controls_xml->appendChild($Tadd_button);
+                        $controls_xml->appendChild($Cadd_button);
+                        $controls_xml->appendChild($Cdel_button);
+                        
+                        $context_xml->appendChild($controls_xml);
+                        
 						$lc_wrapper->appendChild($context_xml);
 					}
 
