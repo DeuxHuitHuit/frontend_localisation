@@ -164,7 +164,7 @@
 		}
 
 		private function _initFLang(){
-			require_once(EXTENSIONS.'/frontend_localisation/lib/class.flang.php');
+			require_once(EXTENSIONS.'/frontend_localisation/lib/class.FLang.php');
 
 			// initialize Language codes
 			$langs = Symphony::Configuration()->get( 'langs', 'frontend_localisation' );
