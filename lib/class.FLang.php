@@ -1,20 +1,17 @@
 <?php
 
-	if( !defined( '__IN_SYMPHONY__' ) ) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
+	if (!defined('__IN_SYMPHONY__')) {
+		die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
+	}
 
-
-
-	require_once EXTENSIONS.'/languages/lib/class.languages.php';
-
-
+	require_once EXTENSIONS . '/languages/lib/class.languages.php';
 
 	/**
 	 * Provides Frontend language information
 	 *
 	 * @static
 	 */
-	Final Class FLang
-	{
+	Final Class FLang {
 
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Properties  */
@@ -59,8 +56,8 @@
 		 *
 		 * @return string
 		 */
-		public static function getLangCode(){
-			return self::buildLanguageCode( self::$_lang, self::$_reg );
+		public static function getLangCode() {
+			return self::buildLanguageCode(self::$_lang, self::$_reg);
 		}
 
 		/**
@@ -68,7 +65,7 @@
 		 *
 		 * @return string
 		 */
-		public static function getLang(){
+		public static function getLang() {
 			return self::$_lang;
 		}
 
@@ -77,7 +74,7 @@
 		 *
 		 * @return string
 		 */
-		public static function getReg(){
+		public static function getReg() {
 			return self::$_reg;
 		}
 
@@ -86,7 +83,7 @@
 		 *
 		 * @return string
 		 */
-		public static function getMainLang(){
+		public static function getMainLang() {
 			return self::$_main_lang;
 		}
 
@@ -95,8 +92,24 @@
 		 *
 		 * @return array
 		 */
-		public static function getLangs(){
+		public static function getLangs() {
 			return self::$_langs;
+		}
+
+		public static function getAllLangs($lc = null) {
+			if ($lc === null) {
+				$lc = self::getLangCode();
+			}
+
+			if (!self::validateLangCode($lc)) {
+				$lc = self::getMainLang();
+			}
+
+			if (!($languages = Languages::local()->listAll($lc))) {
+				$languages = Languages::local()->listAll();
+			}
+
+			return $languages;
 		}
 
 
@@ -113,29 +126,29 @@
 		 *
 		 * @return boolean - true if success, false otherwise
 		 */
-		public static function setLangCode($language, $region = ''){
-			General::ensureType( array(
+		public static function setLangCode($language, $region = '') {
+			General::ensureType(array(
 				'language' => array('var' => $language, 'type' => 'string'),
 				'region'   => array('var' => $region, 'type' => 'string')
-			) );
+			));
 
-			$language = strtolower( $language );
-			$region   = strtolower( $region );
+			$language = strtolower($language);
+			$region   = strtolower($region);
 
 			// if language code
-			if( strpos( $language, '-' ) !== false ){
+			if (strpos($language, '-') !== false) {
 				$lang_code = $language;
-				list($language, $region) = self::extractLanguageBits( $lang_code );
+				list($language, $region) = self::extractLanguageBits($lang_code);
 			}
 			// if language
-			else{
-				$lang_code = self::buildLanguageCode( $language, $region );
+			else {
+				$lang_code = self::buildLanguageCode($language, $region);
 			}
 
 			// make sure language code exists in current setup
-			if( in_array( $lang_code, self::$_langs ) ){
-				self::setLang( $language );
-				self::setReg( $region );
+			if (in_array($lang_code, self::$_langs)) {
+				self::setLang($language);
+				self::setReg($region);
 
 				return true;
 			}
@@ -148,7 +161,7 @@
 		 *
 		 * @param $language
 		 */
-		private static function setLang($language){
+		private static function setLang($language) {
 			self::$_lang = $language;
 		}
 
@@ -157,7 +170,7 @@
 		 *
 		 * @param $region
 		 */
-		private static function setReg($region){
+		private static function setReg($region) {
 			self::$_reg = $region;
 		}
 
@@ -168,8 +181,10 @@
 		 *
 		 * @return boolean
 		 */
-		public static function setMainLang($lang_code){
-			if( !self::validateLangCode( $lang_code ) ) return false;
+		public static function setMainLang($lang_code) {
+			if (!self::validateLangCode($lang_code)) {
+				return false;
+			}
 
 			self::$_main_lang = $lang_code;
 
@@ -183,32 +198,32 @@
 		 *
 		 * @return boolean
 		 */
-		public static function setLangs($langs){
-			$langs = explode( ',', General::sanitize( $langs ) );
+		public static function setLangs($langs) {
+			$langs = explode(',', General::sanitize($langs));
 
 			// if no language codes, return false
-			if( $langs === false || !is_array( $langs ) ){
+			if ($langs === false || !is_array($langs)) {
 				return false;
 			}
 
-			$langs = self::cleanLanguageCodes( $langs );
+			$langs = self::cleanLanguageCodes($langs);
 
-			if( count( $langs ) === 0 ){
+			if (count($langs) === 0) {
 				return false;
 			}
 
 			$new_codes = array();
-			$all_codes = array_keys( Languages::all()->listAll() );
+			$all_codes = array_keys(Languages::all()->listAll());
 
 			// only valid language codes are preserved
-			foreach($langs as $lc){
-				if( in_array( $lc, $all_codes ) ){
+			foreach ($langs as $lc) {
+				if (in_array($lc, $all_codes)) {
 					$new_codes[] = $lc;
 				}
 			}
 
 			// if no valid language codes, return false
-			if( empty($new_codes) ){
+			if (empty($new_codes)) {
 				return false;
 			}
 
@@ -231,8 +246,8 @@
 		 *
 		 * @return boolean true if language code is valid, false otherwise
 		 */
-		public static function validateLangCode($lang_code){
-			return in_array( $lang_code, self::$_langs );
+		public static function validateLangCode($lang_code) {
+			return in_array($lang_code, self::$_langs);
 		}
 
 		/**
@@ -242,10 +257,10 @@
 		 *
 		 * @return array
 		 */
-		public static function cleanLanguageCodes($langs){
-			$clean = array_map( 'trim', $langs );
-			$clean = array_map( 'strtolower', $clean );
-			$clean = array_filter( $clean );
+		public static function cleanLanguageCodes($langs) {
+			$clean = array_map('trim', $langs);
+			$clean = array_map('strtolower', $clean);
+			$clean = array_filter($clean);
 
 			return $clean;
 		}
@@ -258,8 +273,8 @@
 		 *
 		 * @return string - the language code
 		 */
-		public static function buildLanguageCode($language, $region = ''){
-			return $language.(($region !== '') ? '-'.$region : '');
+		public static function buildLanguageCode($language, $region = '') {
+			return $language . (($region !== '') ? '-' . $region : '');
 		}
 
 		/**
@@ -271,14 +286,13 @@
 		 *
 		 * @return array - array(0 => string, 1 => string)
 		 */
-		public static function extractLanguageBits($lang_code){
-			$bits = explode( '-', $lang_code );
+		public static function extractLanguageBits($lang_code) {
+			$bits = explode('-', $lang_code);
 
-			if( empty($bits[0]) ){
+			if (empty($bits[0])) {
 				throw new Exception('Invalid language code.');
 			}
 
 			return array($bits[0], isset($bits[1]) ? $bits[1] : '');
 		}
-
 	}
