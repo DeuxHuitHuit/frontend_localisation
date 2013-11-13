@@ -7,8 +7,6 @@
 	final class Extension_Frontend_Localisation extends Extension
 	{
 
-		const CHECKBOX_YES = 'yes';
-
 		private static $assets_loaded = false;
 
 
