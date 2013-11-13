@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.1" date="2013-11-13" min="2.3"><![CDATA[
+			* Fixed FLang naming.
+		]]></release>
 		<release version="2.0" date="2013-09-30" min="2.3"><![CDATA[
 			* Removed Translations feature. It is bloated. Recommended: Use a dedicatied Section with Multilingual Fields.
 			* It now depends on "Languages" extension. Please install it.
