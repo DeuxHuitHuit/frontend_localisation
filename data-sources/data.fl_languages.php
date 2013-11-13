@@ -3,7 +3,7 @@
 
 
 	require_once(TOOLKIT.'/class.datasource.php');
-	require_once(EXTENSIONS.'/frontend_localisation/lib/class.flang.php');
+	require_once(EXTENSIONS.'/frontend_localisation/lib/class.FLang.php');
 
 
 
