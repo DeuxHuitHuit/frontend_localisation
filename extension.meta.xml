@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.2" date="2013-11-13" min="2.3"><![CDATA[
+			* Fixed bad error reporting when saving preferences.
+		]]></release>
 		<release version="2.1" date="2013-11-13" min="2.3"><![CDATA[
 			* Fixed FLang naming.
 		]]></release>
