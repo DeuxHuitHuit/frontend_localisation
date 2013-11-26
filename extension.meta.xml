@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.4" date="2013-11-26" min="2.3"><![CDATA[
+			* Multilingual Tabs initialize with Main Language instead of Author language.
+		]]></release>
         <release version="2.3" date="2013-11-21" min="2.3"><![CDATA[
 			* FLang now initializes with Author language in Administration and Frontend Language in Frontend.
 		]]></release>
