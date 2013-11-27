@@ -25,22 +25,30 @@
 	</authors>
 
 	<dependencies>
-		<dependency version="1.0">languages</dependency>
+		<dependency version="1.2">languages</dependency>
 	</dependencies>
 
 	<releases>
+		<release version="2.5" date="2013-11-27" min="2.3.4"><![CDATA[
+			* Fixes for Languages 1.2 compatibility.
+		]]></release>
+
 		<release version="2.4" date="2013-11-26" min="2.3"><![CDATA[
 			* Multilingual Tabs initialize with Main Language instead of Author language.
 		]]></release>
+
 		<release version="2.3" date="2013-11-21" min="2.3"><![CDATA[
 			* FLang now initializes with Author language in Administration and Frontend Language in Frontend.
 		]]></release>
+
 		<release version="2.2" date="2013-11-13" min="2.3"><![CDATA[
 			* Fixed bad error reporting when saving preferences.
 		]]></release>
+
 		<release version="2.1" date="2013-11-13" min="2.3"><![CDATA[
 			* Fixed FLang naming.
 		]]></release>
+
 		<release version="2.0" date="2013-09-30" min="2.3"><![CDATA[
 			* Removed Translations feature. It is bloated. Recommended: Use a dedicatied Section with Multilingual Fields.
 			* It now depends on "Languages" extension. Please install it.
