@@ -9,8 +9,8 @@
 			var langs_val = $('select[name="' + langs_name + '"]').val();
 
 			$form.append($('<input/>').attr({
-				'name' : langs_name,
-				'type' : 'hidden',
+				'name':  langs_name,
+				'type':  'hidden',
 				'value': langs_val.join(',')
 			}));
 		});

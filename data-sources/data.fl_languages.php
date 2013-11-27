@@ -2,15 +2,12 @@
 
 
 
-	require_once(TOOLKIT.'/class.datasource.php');
-	require_once(EXTENSIONS.'/frontend_localisation/lib/class.FLang.php');
+	require_once(TOOLKIT . '/class.datasource.php');
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
 
+	Class datasourcefl_languages extends Datasource {
 
-
-	Class datasourcefl_languages extends Datasource
-	{
-
-		public function about(){
+		public function about() {
 			return array(
 				'name'         => 'FL: Languages',
 				'author'       => array(
@@ -24,11 +21,11 @@
 			);
 		}
 
-		public function allowEditorToParse(){
+		public function allowEditorToParse() {
 			return false;
 		}
 
-		public function grab(&$param_pool = null){
+		public function grab(&$param_pool = null) {
 			$result = new XMLElement('fl-languages');
 
 			$main_lang  = FLang::getMainLang();
@@ -37,27 +34,26 @@
 			$langs      = FLang::getLangs();
 
 			$current_language_xml = new XMLElement('current-language', $lang_names[$crt_lc] ? $lang_names[$crt_lc]['name'] : $crt_lc);
-			$current_language_xml->setAttribute( 'handle', $crt_lc );
-			$current_language_xml->setAttribute( 'language', FLang::getLang() );
-			$current_language_xml->setAttribute( 'region', FLang::getReg() );
-			$result->appendChild( $current_language_xml );
+			$current_language_xml->setAttribute('handle', $crt_lc);
+			$current_language_xml->setAttribute('language', FLang::getLang());
+			$current_language_xml->setAttribute('region', FLang::getReg());
+			$result->appendChild($current_language_xml);
 
 			$supported_languages_xml = new XMLElement('supported-languages');
 
-			foreach($langs as $lc){
+			foreach ($langs as $lc) {
 				$lang_xml = new XMLElement('item', $lang_names[$lc] ? $lang_names[$lc]['name'] : $lc);
-				$lang_xml->setAttribute( 'handle', $lc );
+				$lang_xml->setAttribute('handle', $lc);
 
-				if( $lc === $main_lang ){
-					$lang_xml->setAttribute( 'main', 'yes' );
+				if ($lc === $main_lang) {
+					$lang_xml->setAttribute('main', 'yes');
 				}
 
-				$supported_languages_xml->appendChild( $lang_xml );
+				$supported_languages_xml->appendChild($lang_xml);
 			}
 
-			$result->appendChild( $supported_languages_xml );
+			$result->appendChild($supported_languages_xml);
 
 			return $result;
 		}
-
 	}
