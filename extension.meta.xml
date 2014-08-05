@@ -18,6 +18,10 @@
 
 	<authors>
 		<author>
+			<name github="DeuxHuitHuit" symphony="nitriques" twitter="DeuxHuitHuit">Deux Huit Huit</name>
+			<website>http://deuxhuithuit.com</website>
+		</author>
+		<author>
 			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
 			<email>vlad.github@gmail.com</email>
 			<website>http://www.xanderadvertising.com</website>
@@ -29,6 +33,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.5.1" date="2014-08-05" min="2.3.4" max="2.5"><![CDATA[
+			* Mark the extension as compatible with 2.4 and 2.5
+		]]></release>
 		<release version="2.5" date="2013-11-27" min="2.3.4"><![CDATA[
 			* Fixes for Languages 1.2 compatibility.
 		]]></release>
