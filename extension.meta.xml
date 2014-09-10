@@ -33,6 +33,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.5.2" date="2014-09-10" min="2.3.4" max="2.5"><![CDATA[
+			* FLang::setLangCode: fail early if language is empty
+			* Extension::update: fix notice warning
+		]]></release>
 		<release version="2.5.1" date="2014-08-05" min="2.3.4" max="2.5"><![CDATA[
 			* Mark the extension as compatible with 2.4 and 2.5
 		]]></release>
