@@ -123,6 +123,10 @@
 		 * @return boolean - true if success, false otherwise
 		 */
 		public static function setLangCode($language, $region = '') {
+			if (empty($language)) {
+				return false;
+			}
+
 			General::ensureType(array(
 				'language' => array('var' => $language, 'type' => 'string'),
 				'region'   => array('var' => $region, 'type' => 'string')
