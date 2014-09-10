@@ -171,8 +171,8 @@
 			}
 
 			// read current language
-			$language = General::sanitize((string) $_REQUEST['fl-language']);
-			$region   = General::sanitize((string) $_REQUEST['fl-region']);
+			$language = isset($_REQUEST['fl-language']) ? General::sanitize($_REQUEST['fl-language']) : null;
+			$region   = isset($_REQUEST['fl-region'])   ? General::sanitize($_REQUEST['fl-region'])   : null;
 
 			// set language code
 			if (false === FLang::setLangCode($language, $region)) {
