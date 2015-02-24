@@ -85,14 +85,19 @@
 					'callback' => 'dFrontendInitialised'
 				),
 				array(
-					'page'     => '/backend/',
-					'delegate' => 'InitaliseAdminPageHead',
-					'callback' => 'dInitialiseAdminPageHead'
-				),
-				array(
 					'page'     => '/frontend/',
 					'delegate' => 'FrontendParamsPostResolve',
 					'callback' => 'dFrontendParamsPostResolve'
+				),
+				array(
+					'page'     => '/backend/',
+					'delegate' => 'AdminPagePreBuild',
+					'callback' => 'dAdminPagePreBuild'
+				),
+				array(
+					'page'     => '/backend/',
+					'delegate' => 'InitaliseAdminPageHead',
+					'callback' => 'dInitialiseAdminPageHead'
 				),
 				array(
 					'page'     => '/system/preferences/',
@@ -143,6 +148,16 @@
 		/**
 		 * Backend
 		 */
+		public function dAdminPagePreBuild() {
+			try {
+				$this->meetDependencies();
+			} catch (Exception $e) {
+				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
+			}
+
+			$this->_initFLang();
+		}
+
 		public function dInitialiseAdminPageHead() {
 			try {
 				$this->meetDependencies();
