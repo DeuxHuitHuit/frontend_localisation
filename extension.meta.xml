@@ -33,7 +33,11 @@
 	</dependencies>
 
 	<releases>
-		<release version="2.5.2" date="2014-09-10" min="2.3.4" max="2.5"><![CDATA[
+		<release version="2.6.0" date="2015-02-24" min="2.3.4" max="2.6.x"><![CDATA[
+			* Added support for the new AdminPagePreBuild: this allows translation in content pages
+			* Marked as 2.6.x compatible
+		]]></release>
+		<release version="2.5.2" date="2014-09-10" min="2.3.4" max="2.5.x"><![CDATA[
 			* FLang::setLangCode: fail early if language is empty
 			* Extension::update: fix notice warning
 		]]></release>
