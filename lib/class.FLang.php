@@ -126,6 +126,9 @@
 			if (empty($language)) {
 				return false;
 			}
+			if ($region == null) {
+				$region = '';
+			}
 
 			General::ensureType(array(
 				'language' => array('var' => $language, 'type' => 'string'),
