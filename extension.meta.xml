@@ -33,6 +33,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.6.1" date="2015-05-05" min="2.3.4" max="2.6.x"><![CDATA[
+			* Fixed a bug when no region is set.
+		]]></release>
 		<release version="2.6.0" date="2015-02-24" min="2.3.4" max="2.6.x"><![CDATA[
 			* Added support for the new AdminPagePreBuild: this allows translation in content pages
 			* Marked as 2.6.x compatible
