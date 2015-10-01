@@ -33,6 +33,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.6.2" date="2015-10-01" min="2.3.4" max="2.6.x"><![CDATA[
+			* Removed un-necessary delegate.
+		]]></release>
 		<release version="2.6.1" date="2015-05-05" min="2.3.4" max="2.6.x"><![CDATA[
 			* Fixed a bug when no region is set.
 		]]></release>
