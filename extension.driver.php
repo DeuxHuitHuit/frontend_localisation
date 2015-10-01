@@ -91,11 +91,6 @@
 				),
 				array(
 					'page'     => '/backend/',
-					'delegate' => 'AdminPagePreBuild',
-					'callback' => 'dAdminPagePreBuild'
-				),
-				array(
-					'page'     => '/backend/',
 					'delegate' => 'InitaliseAdminPageHead',
 					'callback' => 'dInitialiseAdminPageHead'
 				),
@@ -148,16 +143,6 @@
 		/**
 		 * Backend
 		 */
-		public function dAdminPagePreBuild() {
-			try {
-				$this->meetDependencies();
-			} catch (Exception $e) {
-				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
-			}
-
-			$this->_initFLang();
-		}
-
 		public function dInitialiseAdminPageHead() {
 			try {
 				$this->meetDependencies();
