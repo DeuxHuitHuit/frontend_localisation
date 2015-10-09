@@ -18,7 +18,7 @@
 			try {
 				$this->meetDependencies();
 			} catch (Exception $e) {
-				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
+				$this->showAlertIfPossible($e);
 			}
 
 			/* Configuration */
@@ -44,7 +44,7 @@
 			try {
 				$this->meetDependencies();
 			} catch (Exception $e) {
-				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
+				$this->showAlertIfPossible($e);
 			}
 
 			if (version_compare($previousVersion, '1.4', '<')) {
@@ -91,8 +91,8 @@
 				),
 				array(
 					'page'     => '/backend/',
-					'delegate' => 'InitaliseAdminPageHead',
-					'callback' => 'dInitialiseAdminPageHead'
+					'delegate' => 'AdminPagePreBuild',
+					'callback' => 'dAdminPagePreBuild'
 				),
 				array(
 					'page'     => '/system/preferences/',
@@ -143,11 +143,11 @@
 		/**
 		 * Backend
 		 */
-		public function dInitialiseAdminPageHead() {
+		public function dAdminPagePreBuild() {
 			try {
 				$this->meetDependencies();
 			} catch (Exception $e) {
-				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
+				$this->showAlertIfPossible($e);
 			}
 
 			$this->_initFLang();
@@ -383,5 +383,14 @@
 			}
 
 			return true;
+		}
+
+		private function showAlertIfPossible($e) {
+			if (class_exists('Administration') && Administration::instance()->Page) {
+				Administration::instance()->Page->pageAlert($e->getMessage(), Alert::ERROR);
+			}
+			else {
+				Symphony::Log()->pushExceptionToLog($e, true);
+			}
 		}
 	}
