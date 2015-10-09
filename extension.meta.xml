@@ -33,6 +33,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="2.6.3" date="2015-10-09" min="2.3.4" max="2.6.x"><![CDATA[
+			* Reverted c631bbb and made sure that page alerts won't crash
+		]]></release>
 		<release version="2.6.2" date="2015-10-01" min="2.3.4" max="2.6.x"><![CDATA[
 			* Removed un-necessary delegate.
 		]]></release>
