@@ -25,7 +25,7 @@
 			return false;
 		}
 
-		public function grab(&$param_pool = null) {
+		public function execute(array &$param_pool = null) {
 			$result = new XMLElement('fl-languages');
 
 			$main_lang  = FLang::getMainLang();
