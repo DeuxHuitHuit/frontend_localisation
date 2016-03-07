@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<extension id="frontend_localisation" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
-
+<extension id="frontend_localisation" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
 	<name>Frontend Localisation</name>
-
 	<description>Offers an integrated solution to localise the Frontend of your site and more...</description>
-
-	<repo type="github">https://github.com/vlad-ghita/frontend_localisation</repo>
-
-	<url type="discuss">http://symphony-cms.com/download/extensions/view/82249/</url>
-
+	<repo type="github">https://github.com/DeuxHuitHuit/frontend_localisation</repo>
+	<url type="discuss">http://www.getsymphony.com/download/extensions/view/82249/</url>
 	<types>
 		<type>Interface</type>
 		<type>Multilingual</type>
 		<type>Workflow</type>
 	</types>
-
 	<authors>
 		<author>
 			<name github="DeuxHuitHuit" symphony="nitriques" twitter="DeuxHuitHuit">Deux Huit Huit</name>
-			<website>http://deuxhuithuit.com</website>
+			<website>https://deuxhuithuit.com</website>
 		</author>
 		<author>
 			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
@@ -27,12 +20,13 @@
 			<website>http://www.xanderadvertising.com</website>
 		</author>
 	</authors>
-
 	<dependencies>
 		<dependency version="1.2">languages</dependency>
 	</dependencies>
-
 	<releases>
+		<release version="2.6.4" date="2016-03-07" min="2.3.4" max="2.x.x"><![CDATA[
+			* Updated compatibility info
+		]]></release>
 		<release version="2.6.3" date="2015-10-09" min="2.3.4" max="2.6.x"><![CDATA[
 			* Reverted c631bbb and made sure that page alerts won't crash
 		]]></release>
@@ -56,67 +50,54 @@
 		<release version="2.5" date="2013-11-27" min="2.3.4"><![CDATA[
 			* Fixes for Languages 1.2 compatibility.
 		]]></release>
-
 		<release version="2.4" date="2013-11-26" min="2.3"><![CDATA[
 			* Multilingual Tabs initialize with Main Language instead of Author language.
 		]]></release>
-
 		<release version="2.3" date="2013-11-21" min="2.3"><![CDATA[
 			* FLang now initializes with Author language in Administration and Frontend Language in Frontend.
 		]]></release>
-
 		<release version="2.2" date="2013-11-13" min="2.3"><![CDATA[
 			* Fixed bad error reporting when saving preferences.
 		]]></release>
-
 		<release version="2.1" date="2013-11-13" min="2.3"><![CDATA[
 			* Fixed FLang naming.
 		]]></release>
-
 		<release version="2.0" date="2013-09-30" min="2.3"><![CDATA[
 			* Removed Translations feature. It is bloated. Recommended: Use a dedicatied Section with Multilingual Fields.
 			* It now depends on "Languages" extension. Please install it.
 			* Updated language selection on Preferences page.
 		]]></release>
-
 		<release version="1.7.1" date="2012-09-09" min="2.3"><![CDATA[
 			* Added a new delegate to modify settings at initialization.
 			* Fixed error when creating new translation if no languages are set.
 			* On Translations index a proper message appears if no languages are set.
 		]]></release>
-
 		<release version="1.7" date="2012-06-26" min="2.3"><![CDATA[
 			* Added a new delegate to Translations DS for customized execution.
 			* Pumped up `TManager::addFolder()` with an option to replace existing folder.
 			* Minor tweaks and code styling.
 		]]></release>
-
 		<release version="1.6.5" date="2012-06-07" min="2.3"><![CDATA[
 			* Fixed bug on content pages with Multilingual Tabs.
 			* Proper space usage on Translations index page.
 			* Deactivated Translation name setting with localised page values.
 		]]></release>
-
 		<release version="1.6.4" date="2012-05-26" min="2.3"><![CDATA[
 			* Javascript scales better now. The new symphonyMultilingualTabs jQuery plugin can be used to instantiate tabs on-the-fly.
 		]]></release>
-
 		<release version="1.6.3" date="2012-05-18" min="2.3"><![CDATA[
 			* Added language information to param pool.
 		]]></release>
-
 		<release version="1.6" date="2012-05-15" min="2.3"><![CDATA[
 			* Fixed a (stupid) critical bug in TManager class.
 			* Improves support for multilingual extensions.
 			* Multilingual field Javascript rewrite.
 		]]></release>
-
 		<release version="1.5" date="2012-05-14" min="2.3"><![CDATA[
 			* FLang and TManager classes are now static to align with Symphony 2.3 style.
 			* Implemented error feedback for Preferences page settings.
 			* Fixed minor bugs regarding Reference language & Translations logic.
 		]]></release>
-
 		<release version="1.4" date="2012-05-11" min="2.3"><![CDATA[
 			* Symphony 2.3 update
 			* Integrates Frontend Languages management. Dropped support for FLang drivers. Requires a third-party FLang detection driver to be installed.
@@ -124,33 +105,26 @@
 			* Boosted `fl_utilities.xsl` with a parameter for dynamic translations pool.
 			* Added `FLSavePreferences` delegate firing on Preferences page which provides the old language codes and new languages codes introduced.
 		]]></release>
-
 		<release version="1.3.2" date="2012-01-18" min="2.2"><![CDATA[
 			* Proper missing languages handle on Translations index. Fixes #1.
 			* Settings will be saved to file only if meta info changed. Fixes some file errors.
 		]]></release>
-
 		<release version="1.3.1" date="2012-01-08" min="2.2"><![CDATA[
 			* Removed XML validation of Translations.
 		]]></release>
-
 		<release version="1.3" date="2012-01-08" min="2.2"><![CDATA[
 			* Fixed some bugs regarding Page's Translation management on saving a Page.
 			* Fixed a bug where the handle of a Translation item wasn't changing.
 			* Fixed a bug where the relation between Translation and Pages wasn't removed on Translation deletion.
 		]]></release>
-
 		<release version="1.2" date="2012-01-03" min="2.2"><![CDATA[
 			* Fixed some Translation synchronisation bugs.
 		]]></release>
-
 		<release version="1.1" date="2011-12-29" min="2.2"><![CDATA[
 			* Fixed some bugs regarding storage_format switching.
 			* Titles for Symphony Page translations are now handled automatically.
 			* Comprehensive README.
 		]]></release>
-
 		<release version="1.0" date="2011-12-23" min="2.2">Initial stable release.</release>
 	</releases>
-
 </extension>
