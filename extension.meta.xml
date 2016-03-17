@@ -24,6 +24,9 @@
 		<dependency version="1.2">languages</dependency>
 	</dependencies>
 	<releases>
+		<release version="2.6.5" date="2016-03-16" min="2.3.4" max="2.x.x"><![CDATA[
+			* Fixed Data Source execute method signature
+		]]></release>
 		<release version="2.6.4" date="2016-03-07" min="2.3.4" max="2.x.x"><![CDATA[
 			* Updated compatibility info
 		]]></release>
