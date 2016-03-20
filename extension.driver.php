@@ -4,6 +4,8 @@
 		die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	}
 
+	require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
+
 	final class Extension_Frontend_Localisation extends Extension {
 
 		private static $assets_loaded = false;
@@ -154,7 +156,6 @@
 		}
 
 		private function _initFLang() {
-			require_once(EXTENSIONS . '/frontend_localisation/lib/class.FLang.php');
 
 			// initialize Language codes
 			$langs = Symphony::Configuration()->get('langs', 'frontend_localisation');
