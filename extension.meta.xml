@@ -24,6 +24,9 @@
 		<dependency version="1.2">languages</dependency>
 	</dependencies>
 	<releases>
+		<release version="2.6.6" date="2016-03-20" min="2.3.4" max="2.x.x"><![CDATA[
+			* Fixed language selection in the backend: Try author language before default backend language
+		]]></release>
 		<release version="2.6.5" date="2016-03-16" min="2.3.4" max="2.x.x"><![CDATA[
 			* Fixed Data Source execute method signature
 		]]></release>
