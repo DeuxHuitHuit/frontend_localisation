@@ -177,14 +177,16 @@
 			$region   = isset($_REQUEST['fl-region'])   ? General::sanitize($_REQUEST['fl-region'])   : null;
 
 			// set language code
-			if (false === FLang::setLangCode($language, $region)) {
+			if (!FLang::setLangCode($language, $region)) {
 
 				// try to set language from Admin
-				if (Symphony::Engine() instanceof Administration) {
-
-					// author language is not supported
-					if (false === FLang::setLangCode(Lang::get())) {
-						FLang::setLangCode(FLang::getMainLang());
+				if (class_exists('Administration', false) && Symphony::isLoggedIn()) {
+					$author = Symphony::Author();
+					if (!$author || !FLang::setLangCode($author->get('language'))) {
+						// author language is not supported, use main lang
+						if (!FLang::setLangCode(FLang::getMainLang())) {
+							FLang::setLangCode(Lang::get());
+						}
 					}
 				}
 
