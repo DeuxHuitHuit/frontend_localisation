@@ -166,8 +166,9 @@
 			if (!FLang::setMainLang($main_lang)) {
 				$langs = FLang::getLangs();
 
-				if (isset($langs[0]) && !FLang::setLangCode($langs[0])) {
-					// do something useful here if no lang is set ...
+				if (!FLang::setLangCode($langs[0])) {
+					// Use backend as main
+					FLang::setLangCode(Lang::get());
 				}
 			}
 
