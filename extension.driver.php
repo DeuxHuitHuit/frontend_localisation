@@ -26,11 +26,9 @@
 			/* Configuration */
 			Symphony::Configuration()->set('langs', '', 'frontend_localisation');
 			Symphony::Configuration()->set('main_lang', '', 'frontend_localisation');
-			Symphony::Configuration()->set('ref_lang', '', 'frontend_localisation');
+			Symphony::Configuration()->set('main_reg', '', 'frontend_localisation');
 
-			Symphony::Configuration()->write();
-
-			return true;
+			return Symphony::Configuration()->write();
 		}
 
 		public function uninstall() {
@@ -68,8 +66,20 @@
 				try {
 					Symphony::Database()->query("ALTER TABLE `tbl_pages` DROP `translations`");
 				} catch (Exception $e) {
+					// ignore
 				}
 			}
+
+			if (version_compare($previousVersion, '2.7.0', '<')) {
+				// This value is deprecated
+				Symphony::Configuration()->remove('ref_lang', 'frontend_localisation');
+				// Add this new value, to be able to set a default region
+				if (Symphony::Configuration()->get('main_reg', 'frontend_localisation') === null) {
+					Symphony::Configuration()->set('main_reg', '', 'frontend_localisation');
+				}
+			}
+
+			return Symphony::Configuration()->write();
 		}
 
 
