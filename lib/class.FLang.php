@@ -277,7 +277,7 @@
 		 * @return string - the language code
 		 */
 		public static function buildLanguageCode($language, $region = '') {
-			return $language . (($region !== '') ? '-' . $region : '');
+			return $language . (!empty($region) ? '-' . $region : '');
 		}
 
 		/**
