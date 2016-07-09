@@ -39,6 +39,13 @@
 		private static $_main_lang = '';
 
 		/**
+		 * Main region
+		 *
+		 * @var string
+		 */
+		private static $_main_reg = '';
+
+		/**
 		 * Stored language codes
 		 *
 		 * @var array
@@ -79,12 +86,21 @@
 		}
 
 		/**
-		 * Get main language. Defaults to first language
+		 * Get main language.
 		 *
 		 * @return string
 		 */
 		public static function getMainLang() {
 			return self::$_main_lang;
+		}
+
+		/**
+		 * Get main region.
+		 *
+		 * @return string
+		 */
+		public static function getMainReg() {
+			return self::$_main_reg;
 		}
 
 		/**
@@ -96,6 +112,11 @@
 			return self::$_langs;
 		}
 
+		/**
+		 * Get all known languages
+		 *
+		 * @return array
+		 */
 		public static function getAllLangs($lc = null) {
 			if ($lc === null) {
 				$lc = self::getLangCode();
@@ -190,6 +211,24 @@
 			}
 
 			self::$_main_lang = $lang_code;
+
+			return true;
+		}
+
+		/**
+		 * Set main language code
+		 *
+		 * @param $lang_code
+		 *
+		 * @return boolean
+		 */
+		public static function setMainReg($reg) {
+			// @TODO: validation
+			/*if (!self::validateLangCode($lang_code)) {
+				return false;
+			}*/
+
+			self::$_main_reg = $reg;
 
 			return true;
 		}
