@@ -181,6 +181,9 @@
 					FLang::setLangCode(Lang::get());
 				}
 			}
+			// initialize Main region
+			$main_reg = Symphony::Configuration()->get('main_reg', 'frontend_localisation');
+			FLang::setMainReg($main_reg);
 
 			// read current language
 			$language = isset($_REQUEST['fl-language']) ? General::sanitize($_REQUEST['fl-language']) : null;
