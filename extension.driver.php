@@ -69,7 +69,7 @@
 					// ignore
 				}
 			}
-
+			
 			if (version_compare($previousVersion, '2.7.0', '<')) {
 				// This value is deprecated
 				Symphony::Configuration()->remove('ref_lang', 'frontend_localisation');
@@ -78,7 +78,7 @@
 					Symphony::Configuration()->set('main_reg', '', 'frontend_localisation');
 				}
 			}
-
+			
 			return Symphony::Configuration()->write();
 		}
 
