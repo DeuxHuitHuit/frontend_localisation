@@ -216,9 +216,9 @@
 		}
 
 		/**
-		 * Set main language code
+		 * Set main region code
 		 *
-		 * @param $lang_code
+		 * @param $reg
 		 *
 		 * @return boolean
 		 */
