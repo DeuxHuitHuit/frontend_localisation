@@ -58,3 +58,4 @@ On Preferences page you can:
 
 This extension provides a static [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.flang.php) for easy access to Frontend language information.<br/>
 If you want to create a third-party FLang detection driver, make sure that your driver adds the `fl-language` & `fl-region` params to the URL query string with appropriate values.
+You can also set a main region value, but you need to edit the config.php file manually. Doing so will force you to use a driver that specify a region.
