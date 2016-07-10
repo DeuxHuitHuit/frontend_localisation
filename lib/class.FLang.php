@@ -160,18 +160,14 @@
 			$region   = strtolower($region);
 
 			// if language code
-			if (strpos($language, '-') !== false) {
-				$lang_code = $language;
-				list($language, $region) = self::extractLanguageBits($lang_code);
-			}
-			// if language
-			else {
-				$lang_code = self::buildLanguageCode($language, $region);
+			if (empty($region) && strpos($language, '-') !== false) {
+				list($language, $region) = self::extractLanguageBits($language);
 			}
 
 			// make sure language code exists in current setup
-			if (in_array($lang_code, self::$_langs)) {
+			if (in_array($language, self::$_langs)) {
 				self::setLang($language);
+				// TODO: Validate region as well
 				self::setReg($region);
 
 				return true;
