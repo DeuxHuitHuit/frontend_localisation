@@ -143,7 +143,7 @@
 		 *
 		 * @return boolean - true if success, false otherwise
 		 */
-		public static function setLangCode($language, $region = '') {
+		public static function setLangCode($language, $region = null) {
 			if (empty($language)) {
 				return false;
 			}
