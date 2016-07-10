@@ -202,9 +202,9 @@
 					}
 				}
 
-				// set main lang
+				// use main lang
 				else {
-					FLang::setLangCode(FLang::getMainLang());
+					FLang::setLangCode(FLang::getMainLang(), FLang::getMainReg());
 				}
 			}
 		}
