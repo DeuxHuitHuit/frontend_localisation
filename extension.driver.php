@@ -174,11 +174,10 @@
 			// initialize Main language
 			$main_lang = Symphony::Configuration()->get('main_lang', 'frontend_localisation');
 			if (!FLang::setMainLang($main_lang)) {
-				$langs = FLang::getLangs();
-
-				if (!FLang::setLangCode($langs[0])) {
+				// try the first one
+				if (!FLang::setMainLang($langs[0])) {
 					// Use backend as main
-					FLang::setLangCode(Lang::get());
+					FLang::setMainLang(Lang::get());
 				}
 			}
 			// initialize Main region
