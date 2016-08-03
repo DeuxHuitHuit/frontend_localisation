@@ -54,6 +54,8 @@ On Preferences page you can:
 - `Site languages`: choose site languages
 - `Main language`: choose the main language of the site
 
+Important! When you change the language, re-install the detection driver `FLang detection gTLDs`.
+
 #### 5.2 @ PHP developers ####
 
 This extension provides a static [FLang class](https://github.com/vlad-ghita/frontend_localisation/blob/master/lib/class.flang.php) for easy access to Frontend language information.<br/>
