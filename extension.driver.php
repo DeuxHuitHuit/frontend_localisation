@@ -135,7 +135,7 @@
 
 			$this->_initFLang();
 
-			Lang::set(FLang::getLangCode());
+			Lang::set(FLang::getLangCode(), false);
 		}
 
 		public function dFrontendParamsPostResolve($context) {
