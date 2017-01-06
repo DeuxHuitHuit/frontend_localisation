@@ -1,5 +1,11 @@
+All source code included in this Symphony Extension
+is, unless otherwise specified, released under the MIT licence as
+follows:
+
+----- begin license block -----
+
 Copyright 2013 Xander Advertising (www.xanderadvertising.com)
-Copyright 2014-2016 Deux Huit Huit (https://deuxhuithuit.com)
+Copyright 2014-2017 Deux Huit Huit (https://deuxhuithuit.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,3 +24,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+----- end license block -----
