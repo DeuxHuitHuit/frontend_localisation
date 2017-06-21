@@ -3,7 +3,7 @@
 	<name>Frontend Localisation</name>
 	<description>Offers an integrated solution to localise the Frontend of your site and more...</description>
 	<repo type="github">https://github.com/DeuxHuitHuit/frontend_localisation</repo>
-	<url type="discuss">http://www.getsymphony.com/download/extensions/view/82249/</url>
+	<url type="discuss">https://www.getsymphony.com/download/extensions/view/82249/</url>
 	<types>
 		<type>Interface</type>
 		<type>Multilingual</type>
@@ -24,6 +24,9 @@
 		<dependency version="1.2.0">languages</dependency>
 	</dependencies>
 	<releases>
+		<release version="2.7.3" date="2017-06-21" min="2.5.0" max="2.x.x"><![CDATA[
+			* Removed double invalid container
+		]]></release>
 		<release version="2.7.2" date="2017-01-06" min="2.5.0" max="2.x.x"><![CDATA[
 			* Silence wrong fatal errors
 		]]></release>
